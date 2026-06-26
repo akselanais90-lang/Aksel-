@@ -3,11 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
-  <title>Impression des factures - CH Clean Store</title>
+  <title>Impression des factures - aksel & anais</title>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/esc-pos-encoder@1.3.0/dist/esc-pos-encoder.umd.js"></script>
   <style>
+    /* جميع الأنماط كما هي دون تغيير */
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: 'Cairo', 'Segoe UI', sans-serif;
@@ -243,27 +244,31 @@
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
   import { getDatabase, ref, onValue, set, remove, push, get, update } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
   import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+
+  // ====== إعدادات Firebase الجديدة ======
   const firebaseConfig = {
-    apiKey: "AIzaSyAe1ZmzSkemgaCoqRtKc0Yjn85F36obpsA",
-    authDomain: "chcleanstore-596af.firebaseapp.com",
-    databaseURL: "https://chcleanstore-596af-default-rtdb.europe-west1.firebasedatabase.app",
-    projectId: "chcleanstore-596af",
-    storageBucket: "chcleanstore-596af.firebasestorage.app",
-    messagingSenderId: "198046127297",
-    appId: "1:198046127297:web:d54d64a66e1ae315337040",
-    measurementId: "G-XKN3FQ46XY"
+    apiKey: "AIzaSyAr3Opxs_ikZZ4JZqArcnM8T_YEeyzS_mI",
+    authDomain: "aksel-ff2ef.firebaseapp.com",
+    databaseURL: "https://aksel-ff2ef-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "aksel-ff2ef",
+    storageBucket: "aksel-ff2ef.firebasestorage.app",
+    messagingSenderId: "101955395761",
+    appId: "1:101955395761:web:6e31949dbae0e9293b8290",
+    measurementId: "G-4KFHZ1ZFQ9"
   };
+
   const app = initializeApp(firebaseConfig);
   // ====== تفعيل الدخول المجهول ======
-const auth = getAuth(app);
-signInAnonymously(auth)
-  .then(() => {
-    console.log("✅ تم الدخول المجهول بنجاح (صفحة الطباعة)");
-  })
-  .catch((error) => {
-    console.warn("⚠️ فشل الدخول المجهول، لكن الموقع سيستمر في العمل للقراءة فقط:", error);
-  });
-window.auth = auth;
+  const auth = getAuth(app);
+  signInAnonymously(auth)
+    .then(() => {
+      console.log("✅ تم الدخول المجهول بنجاح (صفحة الطباعة)");
+    })
+    .catch((error) => {
+      console.warn("⚠️ فشل الدخول المجهول، لكن الموقع سيستمر في العمل للقراءة فقط:", error);
+    });
+  window.auth = auth;
+
   const db = getDatabase(app);
   const currentUser = localStorage.getItem("user") || "default_user";
   const printersRef = ref(db, `users/${currentUser}/printers`);
@@ -277,6 +282,7 @@ window.auth = auth;
   const paperSizeSelect = document.getElementById('paperSizeSelect');
   const confirmAddBtn = document.getElementById('confirmAddPrinter');
   const cancelAddBtn = document.getElementById('cancelAddPrinter');
+
   function showStatus(message, type = 'info') {
     statusMsg.textContent = message;
     statusMsg.className = type;
@@ -360,6 +366,7 @@ window.auth = auth;
       showStatus('❌ Échec de la suppression', 'error');
     }
   };
+
   // ============================================================
   // Commandes ESC/POS originales (pour la détection)
   // ============================================================
@@ -375,6 +382,7 @@ window.auth = auth;
   function escposBoldOff() { return new Uint8Array([ESC, 0x45, 0x00]); }
   function escposFontSize(n) { return new Uint8Array([GS, 0x21, n]); }
   function escposAlign(align) { return new Uint8Array([ESC, 0x61, align]); }
+
   // ============================================================
   // Construction de la facture (LTR, grand format, espaces élargis)
   // ============================================================
@@ -397,7 +405,7 @@ window.auth = auth;
       .align('center')
       .bold(true)
       .size(2, 2)
-      .text('CH CLEAN STORE')
+      .text('aksel & anais')
       .size(1, 1)
       .bold(false)
       .newline();
@@ -476,6 +484,7 @@ window.auth = auth;
     encoder.cut();
     return encoder.encode();
   }
+
   // ====== Fallback (manuel avec grand format et LTR) ======
   function buildInvoiceFallback(order) {
     const items = order.items || [];
@@ -490,7 +499,7 @@ window.auth = auth;
     chunks.push(escposAlign(1));
     chunks.push(escposFontSize(0x22));
     chunks.push(escposBoldOn());
-    chunks.push(escposLine('  CH CLEAN STORE  '));
+    chunks.push(escposLine('aksel & anais'));
     chunks.push(escposBoldOff());
     chunks.push(escposFontSize(0x00));
     chunks.push(escposLine('='.repeat(48)));
@@ -550,6 +559,7 @@ window.auth = auth;
     }
     return allData;
   }
+
   // ============================================================
   // Envoi par morceaux
   // ============================================================
@@ -565,6 +575,7 @@ window.auth = auth;
       showStatus(`⏳ Envoi... ${Math.round((sent/total)*100)}%`, 'info');
     }
   }
+
   // ============================================================
   // Détection automatique du protocole
   // ============================================================
@@ -591,6 +602,7 @@ window.auth = auth;
     } catch (e) { console.warn('TSPL test failed:', e); }
     return 'raw';
   }
+
   // ============================================================
   // Impression intelligente (recherche originale)
   // ============================================================
@@ -670,7 +682,7 @@ window.auth = auth;
         lines.push('GAP 0 mm, 0 mm');
         lines.push('CLS');
         let y = 10;
-        lines.push(`TEXT 10,${y},"0",2,2,1,"CH CLEAN STORE"`); y += 35;
+        lines.push(`TEXT 10,${y},"0",2,2,1,"aksel & anais"`); y += 35;
         lines.push(`TEXT 10,${y},"0",1,1,1,"Facture: ${invoiceNumber}"`); y += 25;
         lines.push(`TEXT 10,${y},"0",1,1,1,"Client: ${customer}"`); y += 25;
         if (phone) lines.push(`TEXT 10,${y},"0",1,1,1,"Tel: ${phone}"`); y += 25;
@@ -693,7 +705,7 @@ window.auth = auth;
         const phone = order.phone || '';
         const address = order.address || '';
         const date = new Date(order.confirmedAt || Date.now()).toLocaleString('fr-FR');
-        let text = 'CH CLEAN STORE\n';
+        let text = 'aksel & anais\n';
         text += '========================\n';
         text += `Facture: ${invoiceNumber}\n`;
         text += `Client: ${customer}\n`;
@@ -725,6 +737,7 @@ window.auth = auth;
       return false;
     }
   }
+
   // ============================================================
   // Ajout d'une imprimante (inchangé)
   // ============================================================
@@ -792,6 +805,7 @@ window.auth = auth;
       showStatus(`❌ ${errorMsg}`, 'error');
     }
   });
+
   // ============================================================
   // Supprimer toutes les imprimantes (inchangé)
   // ============================================================
@@ -805,6 +819,7 @@ window.auth = auth;
       showStatus('❌ Échec de la suppression', 'error');
     }
   });
+
   // ============================================================
   // Affichage de la liste des factures (inchangé)
   // ============================================================
@@ -840,6 +855,7 @@ window.auth = auth;
     html += `</div>`;
     container.innerHTML = html;
   }
+
   // ============================================================
   // Fonctions d'impression (inchangées)
   // ============================================================
@@ -870,7 +886,7 @@ window.auth = auth;
       win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Facture #${order.invoiceNumber||'----'}</title>
         <style>body{font-family:'Cairo',sans-serif;padding:20px;direction:ltr}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ddd;padding:6px;text-align:center}</style>
       </head><body>
-        <h2 style="text-align:center;">CH CLEAN STORE</h2>
+        <h2 style="text-align:center;">aksel & anais</h2>
         <p><strong>Facture :</strong> ${order.invoiceNumber||'----'}</p>
         <p><strong>Client :</strong> ${escapeHtml(order.customerName||'')}</p>
         <p><strong>Tél :</strong> ${escapeHtml(order.phone||'')}</p>
@@ -885,6 +901,7 @@ window.auth = auth;
       setTimeout(()=>win.focus(),300);
     } catch(e) { alert('Erreur : '+e.message); }
   };
+
   // ============================================================
   // Initialisation
   // ============================================================
