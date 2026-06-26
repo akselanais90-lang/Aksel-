@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
+  <title>Impression des factures - CH Clean Store</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/esc-pos-encoder@1.3.0/dist/esc-pos-encoder.umd.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Cairo', 'Segoe UI', sans-serif;
+      background: #f3f4f6;
+      color: #1e293b;
+      padding: 16px;
+      direction: rtl;
+    }
+    .header {
+      background: white;
+      padding: 16px 20px;
+      border-radius: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .header h1 { font-size: 1.2rem; color: #10b981; }
+    .header .actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .btn {
+      padding: 8px 18px;
+      border: none;
+      border-radius: 30px;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      font-family: 'Cairo', sans-serif;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: 0.2s;
+      text-decoration: none;
+    }
+    .btn-primary { background: #10b981; color: white; }
+    .btn-primary:hover { background: #059669; transform: scale(0.97); }
+    .btn-print { background: #1e293b; color: white; }
+    .btn-print:hover { background: #0f172a; }
+    .btn-back { background: #e2e8f0; color: #1e293b; }
+    .btn-back:hover { background: #cbd5e1; }
+    .btn-bluetooth { background: #2563eb; color: white; }
+    .btn-bluetooth:hover { background: #1d4ed8; }
+    .btn-danger { background: #dc2626; color: white; }
+    .btn-danger:hover { background: #b91c1c; }
+    .btn-success { background: #10b981; color: white; }
+    .btn-success:hover { background: #059669; }
+    .btn-warning { background: #f59e0b; color: white; }
+    .btn-warning:hover { background: #d97706; }
+    .btn-outline { background: transparent; border: 2px solid #e2e8f0; color: #1e293b; }
+    .btn-outline:hover { background: #f1f5f9; }
+    .printer-panel {
+      background: white;
+      border-radius: 20px;
+      padding: 16px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .printer-panel .section-title {
+      font-weight: 700;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 15px;
+      color: #0f172a;
+    }
+    .printer-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .printer-chip {
+      background: #f1f5f9;
+      padding: 6px 16px;
+      border-radius: 30px;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: 0.2s;
+    }
+    .printer-chip:hover { background: #e2e8f0; }
+    .printer-chip.active {
+      border-color: #10b981;
+      background: #d1fae5;
+      font-weight: 700;
+    }
+    .printer-chip .delete-printer {
+      background: none;
+      border: none;
+      color: #ef4444;
+      cursor: pointer;
+      font-size: 14px;
+      padding: 0 4px;
+    }
+    .printer-chip .delete-printer:hover { color: #b91c1c; }
+    .printer-chip .protocol-badge {
+      font-size: 9px;
+      background: #64748b;
+      color: white;
+      padding: 0 6px;
+      border-radius: 20px;
+      text-transform: uppercase;
+    }
+    .printer-chip .paper-badge {
+      font-size: 9px;
+      background: #10b981;
+      color: white;
+      padding: 0 6px;
+      border-radius: 20px;
+    }
+    .empty-printers {
+      color: #94a3b8;
+      font-size: 13px;
+      padding: 4px 0;
+    }
+    .printer-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      border-top: 1px solid #e2e8f0;
+      padding-top: 12px;
+      margin-top: 4px;
+    }
+    #statusMessage {
+      padding: 10px 16px;
+      border-radius: 12px;
+      margin-bottom: 16px;
+      display: none;
+      font-weight: 600;
+    }
+    #statusMessage.success { background: #d1fae5; color: #065f46; display: block; }
+    #statusMessage.error { background: #fee2e2; color: #991b1b; display: block; }
+    #statusMessage.info { background: #dbeafe; color: #1e40af; display: block; }
+    #statusMessage.warning { background: #fef3c7; color: #92400e; display: block; }
+    .invoice-list { display: flex; flex-direction: column; gap: 16px; }
+    .invoice-card {
+      background: white;
+      border-radius: 20px;
+      padding: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      border-right: 4px solid #10b981;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .invoice-card .info { display: flex; flex-wrap: wrap; gap: 16px; font-size: 14px; }
+    .invoice-card .info strong { color: #0f172a; }
+    .invoice-card .total { font-weight: 800; color: #10b981; font-size: 1.1rem; }
+    .no-data { text-align: center; padding: 40px; color: #94a3b8; background: white; border-radius: 20px; }
+    .no-data i { font-size: 40px; display: block; margin-bottom: 12px; }
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(6px);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-content {
+      background: white;
+      width: 100%;
+      max-width: 420px;
+      border-radius: 28px;
+      padding: 24px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    }
+    .modal-content h3 { text-align: center; margin-bottom: 16px; color: #0f172a; }
+    .modal-content label { display: block; font-weight: 600; margin-bottom: 4px; font-size: 13px; }
+    .modal-content select, .modal-content input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      font-family: inherit;
+      margin-bottom: 12px;
+    }
+    .modal-content .btn-group { display: flex; gap: 10px; }
+    .modal-content .btn-group button { flex: 1; }
+    @media (max-width: 640px) {
+      .invoice-card { flex-direction: column; align-items: stretch; }
+      .invoice-card .info { gap: 8px; font-size: 13px; }
+      .printer-chip { font-size: 12px; padding: 4px 12px; }
+    }
+  </style>
+</head>
+<body>
+<div class="header no-print">
+  <h1><i class="fas fa-print"></i> Impression des factures</h1>
+  <div class="actions">
+    <a href="admin.html" class="btn btn-back"><i class="fas fa-arrow-right"></i> Retour à l'admin</a>
+  </div>
+</div>
+<div class="printer-panel no-print" id="printerPanel">
+  <div class="section-title"><i class="fas fa-bluetooth"></i> Imprimantes enregistrées</div>
+  <div id="printerListContainer" class="printer-list"><div class="empty-printers">⏳ Chargement...</div></div>
+  <div class="printer-actions">
+    <button class="btn btn-bluetooth" id="addPrinterBtn"><i class="fas fa-plus"></i> Ajouter une imprimante</button>
+    <button class="btn btn-danger" id="clearAllPrintersBtn" style="display:none;"><i class="fas fa-trash"></i> Tout supprimer</button>
+  </div>
+  <div style="font-size:11px; color:#94a3b8; margin-top:6px;">
+    <i class="fas fa-info-circle"></i> Sélectionnez une imprimante, puis appuyez sur "Imprimer" sur la facture.
+  </div>
+</div>
+<div id="statusMessage"></div>
+<div id="app"></div>
+<div id="addPrinterModal" class="modal">
+  <div class="modal-content">
+    <h3><i class="fas fa-bluetooth"></i> Ajouter une imprimante</h3>
+    <label>Choisissez la taille du papier :</label>
+    <select id="paperSizeSelect">
+      <option value="80">80 mm (standard)</option>
+      <option value="58">58 mm (petit)</option>
+    </select>
+    <p style="font-size:12px; color:#6b7280; margin-bottom:12px;">Ce paramètre sera enregistré avec l'imprimante.</p>
+    <div class="btn-group">
+      <button class="btn btn-success" id="confirmAddPrinter"><i class="fas fa-check"></i> Confirmer</button>
+      <button class="btn btn-outline" id="cancelAddPrinter"><i class="fas fa-times"></i> Annuler</button>
+    </div>
+  </div>
+</div>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+  import { getDatabase, ref, onValue, set, remove, push, get, update } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+  import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+  const firebaseConfig = {
+    apiKey: "AIzaSyAe1ZmzSkemgaCoqRtKc0Yjn85F36obpsA",
+    authDomain: "chcleanstore-596af.firebaseapp.com",
+    databaseURL: "https://chcleanstore-596af-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "chcleanstore-596af",
+    storageBucket: "chcleanstore-596af.firebasestorage.app",
+    messagingSenderId: "198046127297",
+    appId: "1:198046127297:web:d54d64a66e1ae315337040",
+    measurementId: "G-XKN3FQ46XY"
+  };
+  const app = initializeApp(firebaseConfig);
+  // ====== تفعيل الدخول المجهول ======
+const auth = getAuth(app);
+signInAnonymously(auth)
+  .then(() => {
+    console.log("✅ تم الدخول المجهول بنجاح (صفحة الطباعة)");
+  })
+  .catch((error) => {
+    console.warn("⚠️ فشل الدخول المجهول، لكن الموقع سيستمر في العمل للقراءة فقط:", error);
+  });
+window.auth = auth;
+  const db = getDatabase(app);
+  const currentUser = localStorage.getItem("user") || "default_user";
+  const printersRef = ref(db, `users/${currentUser}/printers`);
+  let printersList = [];
+  let selectedPrinterId = null;
+  const printerListContainer = document.getElementById('printerListContainer');
+  const addPrinterBtn = document.getElementById('addPrinterBtn');
+  const clearAllBtn = document.getElementById('clearAllPrintersBtn');
+  const statusMsg = document.getElementById('statusMessage');
+  const addModal = document.getElementById('addPrinterModal');
+  const paperSizeSelect = document.getElementById('paperSizeSelect');
+  const confirmAddBtn = document.getElementById('confirmAddPrinter');
+  const cancelAddBtn = document.getElementById('cancelAddPrinter');
+  function showStatus(message, type = 'info') {
+    statusMsg.textContent = message;
+    statusMsg.className = type;
+    statusMsg.style.display = 'block';
+    setTimeout(() => { statusMsg.style.display = 'none'; }, 6000);
+  }
+  function escapeHtml(str) {
+    if (!str) return '';
+    return String(str).replace(/[&<>]/g, function(m) {
+      if (m === '&') return '&amp;';
+      if (m === '<') return '&lt;';
+      if (m === '>') return '&gt;';
+      return m;
+    });
+  }
+  function loadPrintersFromFirebase() {
+    onValue(printersRef, (snapshot) => {
+      const data = snapshot.val();
+      printersList = [];
+      if (data) {
+        printersList = Object.entries(data).map(([id, printer]) => ({ id, ...printer }));
+        printersList.sort((a, b) => (b.lastUsed || 0) - (a.lastUsed || 0));
+      }
+      renderPrinterList();
+      if (printersList.length > 0 && !selectedPrinterId) {
+        selectedPrinterId = printersList[0].id;
+      }
+      if (selectedPrinterId && !printersList.find(p => p.id === selectedPrinterId)) {
+        selectedPrinterId = printersList.length > 0 ? printersList[0].id : null;
+      }
+      renderPrinterList();
+      updateClearAllButton();
+    });
+  }
+  function renderPrinterList() {
+    if (printersList.length === 0) {
+      printerListContainer.innerHTML = `<div class="empty-printers">📭 Aucune imprimante enregistrée.</div>`;
+      return;
+    }
+    let html = '';
+    printersList.forEach(printer => {
+      const isActive = (printer.id === selectedPrinterId);
+      const protocolLabel = printer.protocol || 'escpos';
+      const paperLabel = printer.paperWidth ? `${printer.paperWidth}mm` : '80mm';
+      html += `
+        <div class="printer-chip ${isActive ? 'active' : ''}" data-id="${printer.id}" onclick="selectPrinter('${printer.id}')">
+          <i class="fas fa-print"></i>
+          <span>${escapeHtml(printer.name || 'Imprimante')}</span>
+          <span class="protocol-badge">${escapeHtml(protocolLabel)}</span>
+          <span class="paper-badge">${paperLabel}</span>
+          <button class="delete-printer" onclick="event.stopPropagation(); deletePrinter('${printer.id}')" title="Supprimer">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      `;
+    });
+    printerListContainer.innerHTML = html;
+  }
+  function updateClearAllButton() {
+    clearAllBtn.style.display = printersList.length > 0 ? 'inline-flex' : 'none';
+  }
+  window.selectPrinter = function(printerId) {
+    selectedPrinterId = printerId;
+    const printer = printersList.find(p => p.id === printerId);
+    if (printer) {
+      update(ref(db, `users/${currentUser}/printers/${printerId}`), { lastUsed: Date.now() });
+    }
+    renderPrinterList();
+    showStatus(`✅ Imprimante sélectionnée : "${printer?.name || 'Imprimante'}"`, 'success');
+  };
+  window.deletePrinter = async function(printerId) {
+    if (!confirm('⚠️ Supprimer cette imprimante définitivement ?')) return;
+    try {
+      await remove(ref(db, `users/${currentUser}/printers/${printerId}`));
+      showStatus('✅ Imprimante supprimée', 'success');
+      if (selectedPrinterId === printerId) {
+        selectedPrinterId = printersList.length > 1 ? printersList[0].id : null;
+      }
+    } catch (e) {
+      console.error(e);
+      showStatus('❌ Échec de la suppression', 'error');
+    }
+  };
+  // ============================================================
+  // Commandes ESC/POS originales (pour la détection)
+  // ============================================================
+  const ESC = 0x1B;
+  const GS = 0x1D;
+  function escposInit() { return new Uint8Array([ESC, 0x40]); }
+  function escposLine(text) {
+    const encoder = new TextEncoder();
+    return encoder.encode(text + '\n');
+  }
+  function escposCut() { return new Uint8Array([GS, 0x56, 0x00]); }
+  function escposBoldOn() { return new Uint8Array([ESC, 0x45, 0x01]); }
+  function escposBoldOff() { return new Uint8Array([ESC, 0x45, 0x00]); }
+  function escposFontSize(n) { return new Uint8Array([GS, 0x21, n]); }
+  function escposAlign(align) { return new Uint8Array([ESC, 0x61, align]); }
+  // ============================================================
+  // Construction de la facture (LTR, grand format, espaces élargis)
+  // ============================================================
+  function buildInvoice(order) {
+    const items = order.items || [];
+    const total = items.reduce((sum, it) => sum + (Number(it.price) * Number(it.quantity)), 0);
+    const invoiceNumber = order.invoiceNumber ? order.invoiceNumber.toString().padStart(4, '0') : '----';
+    const customer = order.customerName || 'Client';
+    const phone = order.phone || '';
+    const address = order.address || '';
+    const date = new Date(order.confirmedAt || Date.now()).toLocaleString('fr-FR');
+    if (typeof EscPosEncoder === 'undefined') {
+      console.warn('Bibliothèque esc-pos-encoder non chargée, utilisation du fallback.');
+      return buildInvoiceFallback(order);
+    }
+    const encoder = new EscPosEncoder();
+    encoder.initialize();
+    // 1. Nom du magasin (centre, gras, très grand)
+    encoder
+      .align('center')
+      .bold(true)
+      .size(2, 2)
+      .text('CH CLEAN STORE')
+      .size(1, 1)
+      .bold(false)
+      .newline();
+    // 2. Ligne de séparation
+    encoder
+      .align('center')
+      .text('='.repeat(48))
+      .newline();
+    // 3. Informations (alignées à gauche, LTR, taille 2x1)
+    encoder.align('left');
+    encoder.size(2, 1);
+    encoder.text(`N° Facture : ${invoiceNumber}`);
+    encoder.text(`Date : ${date}`);
+    encoder.text(`Client : ${customer}`);
+    if (phone) encoder.text(`Tél : ${phone}`);
+    if (address) encoder.text(`Adresse : ${address}`);
+    encoder.newline();
+    encoder.size(1, 1);
+    // 4. Ligne de séparation
+    encoder
+      .align('center')
+      .text('-'.repeat(48))
+      .newline();
+    // 5. En-tête du tableau (centre, gras, taille 2x1)
+    encoder
+      .align('center')
+      .bold(true)
+      .size(2, 1)
+      .text('Produit          Qté   Prix    Total')
+      .size(1, 1)
+      .bold(false)
+      .newline();
+    // 6. Lignes du tableau (à gauche, taille 2x1 pour les produits aussi)
+    encoder.align('left');
+    encoder.size(2, 1); // 2x1 = largeur double, hauteur normale
+    const colName = 16;
+    const colQty = 5;
+    const colPrice = 7;
+    const colTotal = 8;
+    items.forEach(item => {
+      const name = (item.name || 'Produit').substring(0, colName);
+      const qty = Number(item.quantity) || 0;
+      const price = Number(item.price) || 0;
+      const totalItem = qty * price;
+      const namePadded = name.padEnd(colName);
+      const qtyPadded = String(qty).padStart(colQty);
+      const pricePadded = Number(price).toFixed(2).padStart(colPrice);
+      const totalPadded = Number(totalItem).toFixed(2).padStart(colTotal);
+      const row = `${namePadded}  ${qtyPadded}   ${pricePadded}   ${totalPadded}`;
+      encoder.text(row);
+    });
+    encoder.size(1, 1);
+    // 7. Ligne de séparation
+    encoder
+      .align('center')
+      .text('-'.repeat(48))
+      .newline();
+    // 8. Total (centre, gras, très grand) avec espaces entre les chiffres
+    encoder
+      .align('center')
+      .bold(true)
+      .size(2, 2)
+      .text(`Total : ${total.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ')} DA`)
+      .size(1, 1)
+      .bold(false)
+      .newline();
+    // 9. Message de remerciement
+    encoder
+      .align('center')
+      .size(2, 1)
+      .text('Merci pour votre confiance')
+      .size(1, 1)
+      .newline()
+      .newline();
+    // 10. Coupe du papier
+    encoder.cut();
+    return encoder.encode();
+  }
+  // ====== Fallback (manuel avec grand format et LTR) ======
+  function buildInvoiceFallback(order) {
+    const items = order.items || [];
+    const total = items.reduce((sum, it) => sum + (Number(it.price) * Number(it.quantity)), 0);
+    const invoiceNumber = order.invoiceNumber ? order.invoiceNumber.toString().padStart(4, '0') : '----';
+    const customer = order.customerName || 'Client';
+    const phone = order.phone || '';
+    const address = order.address || '';
+    const date = new Date(order.confirmedAt || Date.now()).toLocaleString('fr-FR');
+    const chunks = [];
+    chunks.push(escposInit());
+    chunks.push(escposAlign(1));
+    chunks.push(escposFontSize(0x22));
+    chunks.push(escposBoldOn());
+    chunks.push(escposLine('  CH CLEAN STORE  '));
+    chunks.push(escposBoldOff());
+    chunks.push(escposFontSize(0x00));
+    chunks.push(escposLine('='.repeat(48)));
+    chunks.push(escposAlign(0)); // LTR aligné à gauche
+    chunks.push(escposFontSize(0x11));
+    chunks.push(escposLine(`N° Facture : ${invoiceNumber}`));
+    chunks.push(escposLine(`Date : ${date}`));
+    chunks.push(escposLine(`Client : ${customer}`));
+    if (phone) chunks.push(escposLine(`Tél : ${phone}`));
+    if (address) chunks.push(escposLine(`Adresse : ${address}`));
+    chunks.push(escposFontSize(0x00));
+    chunks.push(escposLine('-'.repeat(48)));
+    chunks.push(escposAlign(1));
+    chunks.push(escposBoldOn());
+    chunks.push(escposFontSize(0x11));
+    chunks.push(escposLine('  Produit   Qté  Prix  Total  '));
+    chunks.push(escposBoldOff());
+    chunks.push(escposFontSize(0x00));
+    chunks.push(escposAlign(0));
+    const colName = 16, colQty = 5, colPrice = 7, colTotal = 8;
+    function formatRow(name, qty, price, total) {
+      let nameStr = name.substring(0, colName);
+      nameStr = nameStr.padEnd(colName);
+      const qtyStr = String(qty).padStart(colQty);
+      const priceStr = Number(price).toFixed(2).padStart(colPrice);
+      const totalStr = Number(total).toFixed(2).padStart(colTotal);
+      return nameStr + '  ' + qtyStr + '   ' + priceStr + '   ' + totalStr;
+    }
+    items.forEach(item => {
+      const name = item.name || 'Produit';
+      const qty = Number(item.quantity) || 0;
+      const price = Number(item.price) || 0;
+      const totalItem = qty * price;
+      const row = formatRow(name, qty, price, totalItem);
+      chunks.push(escposLine(row));
+    });
+    chunks.push(escposLine('-'.repeat(48)));
+    chunks.push(escposAlign(1));
+    chunks.push(escposBoldOn());
+    chunks.push(escposFontSize(0x22));
+    const totalFormatted = total.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+    chunks.push(escposLine(`Total : ${totalFormatted} DA`));
+    chunks.push(escposFontSize(0x00));
+    chunks.push(escposBoldOff());
+    chunks.push(escposLine(''));
+    chunks.push(escposFontSize(0x11));
+    chunks.push(escposLine('Merci pour votre confiance'));
+    chunks.push(escposFontSize(0x00));
+    chunks.push(escposLine(''));
+    chunks.push(escposCut());
+    const totalLength = chunks.reduce((s, arr) => s + arr.length, 0);
+    const allData = new Uint8Array(totalLength);
+    let offset = 0;
+    for (const chunk of chunks) {
+      allData.set(chunk, offset);
+      offset += chunk.length;
+    }
+    return allData;
+  }
+  // ============================================================
+  // Envoi par morceaux
+  // ============================================================
+  async function sendChunked(characteristic, data, chunkSize = 150) {
+    const total = data.length;
+    let sent = 0;
+    while (sent < total) {
+      const end = Math.min(sent + chunkSize, total);
+      const chunk = data.slice(sent, end);
+      await characteristic.writeValue(chunk);
+      sent = end;
+      await new Promise(r => setTimeout(r, 30));
+      showStatus(`⏳ Envoi... ${Math.round((sent/total)*100)}%`, 'info');
+    }
+  }
+  // ============================================================
+  // Détection automatique du protocole
+  // ============================================================
+  async function detectProtocol(characteristic) {
+    try {
+      const testData = new Uint8Array([0x1B, 0x40, 0x1B, 0x64, 0x02, 0x1B, 0x4A, 0x0A]);
+      await characteristic.writeValue(testData);
+      await new Promise(r => setTimeout(r, 500));
+      const testEscpos = new Uint8Array([
+        ...escposInit(),
+        ...escposLine('Test ESC/POS'),
+        ...escposCut()
+      ]);
+      await characteristic.writeValue(testEscpos);
+      return 'escpos';
+    } catch (e) { console.warn('ESC/POS test failed:', e); }
+    try {
+      const testTspl = new Uint8Array([
+        ...new TextEncoder().encode('SIZE 58 mm, 40 mm\nGAP 0 mm, 0 mm\nCLS\n'),
+        ...new TextEncoder().encode('TEXT 10,10,"0",1,1,1,"Test TSPL"\nPRINT 1\n')
+      ]);
+      await characteristic.writeValue(testTspl);
+      return 'tspl';
+    } catch (e) { console.warn('TSPL test failed:', e); }
+    return 'raw';
+  }
+  // ============================================================
+  // Impression intelligente (recherche originale)
+  // ============================================================
+  async function smartPrint(order) {
+    if (!selectedPrinterId) {
+      showStatus('⚠️ Veuillez sélectionner une imprimante', 'warning');
+      return false;
+    }
+    const selectedPrinter = printersList.find(p => p.id === selectedPrinterId);
+    if (!selectedPrinter) {
+      showStatus('⚠️ Imprimante introuvable', 'error');
+      return false;
+    }
+    try {
+      showStatus(`⏳ Connexion à "${selectedPrinter.name}"...`, 'info');
+      if (!navigator.bluetooth) throw new Error('Votre navigateur ne supporte pas Web Bluetooth');
+      const device = await navigator.bluetooth.requestDevice({
+        filters: [{ namePrefix: selectedPrinter.name }],
+        optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb']
+      });
+      showStatus(`⏳ Connexion à ${device.name}...`, 'info');
+      const server = await device.gatt.connect();
+      showStatus('✅ Connecté à l\'imprimante', 'success');
+      let service;
+      let characteristic;
+      const serviceUUID = '000018f0-0000-1000-8000-00805f9b34fb';
+      try {
+        service = await server.getPrimaryService(serviceUUID);
+      } catch (e) {
+        const services = await server.getPrimaryServices();
+        for (const s of services) {
+          const chars = await s.getCharacteristics();
+          for (const c of chars) {
+            if (c.properties.write || c.properties.writeWithoutResponse) {
+              service = s;
+              characteristic = c;
+              break;
+            }
+          }
+          if (characteristic) break;
+        }
+        if (!characteristic) throw new Error('Caractéristique d\'écriture introuvable');
+      }
+      if (!characteristic) {
+        const chars = await service.getCharacteristics();
+        for (const c of chars) {
+          if (c.properties.write || c.properties.writeWithoutResponse) {
+            characteristic = c;
+            break;
+          }
+        }
+        if (!characteristic) throw new Error('Caractéristique d\'écriture introuvable');
+      }
+      let protocol = selectedPrinter.protocol;
+      if (!protocol || protocol === 'unknown') {
+        showStatus('⏳ Détection du protocole...', 'info');
+        protocol = await detectProtocol(characteristic);
+        await update(ref(db, `users/${currentUser}/printers/${selectedPrinterId}`), {
+          protocol: protocol,
+          detectedAt: Date.now()
+        });
+        selectedPrinter.protocol = protocol;
+        renderPrinterList();
+        showStatus(`✅ Protocole détecté : ${protocol.toUpperCase()}`, 'success');
+      }
+      let printData;
+      if (protocol === 'tspl') {
+        const items = order.items || [];
+        const total = items.reduce((sum, it) => sum + (Number(it.price) * Number(it.quantity)), 0);
+        const invoiceNumber = order.invoiceNumber ? order.invoiceNumber.toString().padStart(4, '0') : '----';
+        const customer = order.customerName || 'Client';
+        const phone = order.phone || '';
+        const address = order.address || '';
+        const date = new Date(order.confirmedAt || Date.now()).toLocaleString('fr-FR');
+        const lines = [];
+        lines.push('SIZE 58 mm, 40 mm');
+        lines.push('GAP 0 mm, 0 mm');
+        lines.push('CLS');
+        let y = 10;
+        lines.push(`TEXT 10,${y},"0",2,2,1,"CH CLEAN STORE"`); y += 35;
+        lines.push(`TEXT 10,${y},"0",1,1,1,"Facture: ${invoiceNumber}"`); y += 25;
+        lines.push(`TEXT 10,${y},"0",1,1,1,"Client: ${customer}"`); y += 25;
+        if (phone) lines.push(`TEXT 10,${y},"0",1,1,1,"Tel: ${phone}"`); y += 25;
+        if (address) lines.push(`TEXT 10,${y},"0",1,1,1,"Adr: ${address}"`); y += 25;
+        lines.push(`TEXT 10,${y},"0",1,1,1,"Date: ${date}"`); y += 25;
+        lines.push('LINE 10,10,10,220,2'); y += 20;
+        items.forEach(item => {
+          const line = `${item.name} x${item.quantity} = ${(Number(item.price)*Number(item.quantity)).toFixed(2)}`;
+          lines.push(`TEXT 10,${y},"0",1,1,1,"${line.substring(0,20)}"`); y += 25;
+        });
+        lines.push('LINE 10,10,10,220,2'); y += 20;
+        lines.push(`TEXT 10,${y},"0",2,2,1,"Total: ${total.toFixed(2)} DA"`); y += 35;
+        lines.push('PRINT 1');
+        printData = new TextEncoder().encode(lines.join('\n') + '\n');
+      } else if (protocol === 'raw') {
+        const items = order.items || [];
+        const total = items.reduce((sum, it) => sum + (Number(it.price) * Number(it.quantity)), 0);
+        const invoiceNumber = order.invoiceNumber ? order.invoiceNumber.toString().padStart(4, '0') : '----';
+        const customer = order.customerName || 'Client';
+        const phone = order.phone || '';
+        const address = order.address || '';
+        const date = new Date(order.confirmedAt || Date.now()).toLocaleString('fr-FR');
+        let text = 'CH CLEAN STORE\n';
+        text += '========================\n';
+        text += `Facture: ${invoiceNumber}\n`;
+        text += `Client: ${customer}\n`;
+        if (phone) text += `Tel: ${phone}\n`;
+        if (address) text += `Adr: ${address}\n`;
+        text += `Date: ${date}\n`;
+        text += '------------------------\n';
+        items.forEach(item => {
+          text += `${item.name} x${item.quantity} = ${(Number(item.price)*Number(item.quantity)).toFixed(2)}\n`;
+        });
+        text += '========================\n';
+        const totalFormatted = total.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+        text += `Total: ${totalFormatted} DA\n`;
+        text += 'Merci pour votre confiance\n\n\n\n';
+        printData = new TextEncoder().encode(text);
+      } else {
+        printData = buildInvoice(order);
+      }
+      showStatus(`⏳ Envoi des données (${printData.length} octets)...`, 'info');
+      await sendChunked(characteristic, printData, 150);
+      await update(ref(db, `users/${currentUser}/printers/${selectedPrinterId}`), { lastUsed: Date.now() });
+      showStatus('✅ Impression réussie !', 'success');
+      return true;
+    } catch (e) {
+      console.error(e);
+      let errorMsg = e.message || 'Erreur inconnue';
+      if (errorMsg.includes('user cancelled')) errorMsg = 'Impression annulée';
+      showStatus(`❌ Échec : ${errorMsg}`, 'error');
+      return false;
+    }
+  }
+  // ============================================================
+  // Ajout d'une imprimante (inchangé)
+  // ============================================================
+  addPrinterBtn.addEventListener('click', () => {
+    addModal.style.display = 'flex';
+  });
+  cancelAddBtn.addEventListener('click', () => {
+    addModal.style.display = 'none';
+  });
+  confirmAddBtn.addEventListener('click', async () => {
+    const paperWidth = parseInt(paperSizeSelect.value) || 80;
+    addModal.style.display = 'none';
+    try {
+      showStatus('⏳ Recherche d\'imprimante...', 'info');
+      if (!navigator.bluetooth) throw new Error('Votre navigateur ne supporte pas Web Bluetooth');
+      const device = await navigator.bluetooth.requestDevice({
+        filters: [{ services: ['000018f0-0000-1000-8000-00805f9b34fb'] }],
+        optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb']
+      });
+      showStatus(`⏳ Connexion à ${device.name || 'l\'imprimante'}...`, 'info');
+      const server = await device.gatt.connect();
+      let characteristic;
+      try {
+        const service = await server.getPrimaryService('000018f0-0000-1000-8000-00805f9b34fb');
+        const chars = await service.getCharacteristics();
+        for (const c of chars) {
+          if (c.properties.write || c.properties.writeWithoutResponse) {
+            characteristic = c;
+            break;
+          }
+        }
+      } catch (e) {
+        const services = await server.getPrimaryServices();
+        for (const s of services) {
+          const chars = await s.getCharacteristics();
+          for (const c of chars) {
+            if (c.properties.write || c.properties.writeWithoutResponse) {
+              characteristic = c;
+              break;
+            }
+          }
+          if (characteristic) break;
+        }
+      }
+      if (!characteristic) throw new Error('Caractéristique d\'écriture introuvable');
+      showStatus('⏳ Détection du protocole...', 'info');
+      const protocol = await detectProtocol(characteristic);
+      const newPrinterRef = push(printersRef);
+      const printerData = {
+        name: device.name || 'Imprimante inconnue',
+        protocol: protocol,
+        paperWidth: paperWidth,
+        deviceId: device.id || 'unknown',
+        lastUsed: Date.now(),
+        createdAt: Date.now(),
+        detectedAt: Date.now()
+      };
+      await set(newPrinterRef, printerData);
+      selectedPrinterId = newPrinterRef.key;
+      showStatus(`✅ Imprimante "${printerData.name}" enregistrée (${protocol.toUpperCase()}, ${paperWidth}mm)`, 'success');
+    } catch (e) {
+      console.error(e);
+      let errorMsg = e.message || 'Échec de la connexion';
+      if (errorMsg.includes('user cancelled')) errorMsg = 'Connexion annulée';
+      showStatus(`❌ ${errorMsg}`, 'error');
+    }
+  });
+  // ============================================================
+  // Supprimer toutes les imprimantes (inchangé)
+  // ============================================================
+  clearAllBtn.addEventListener('click', async () => {
+    if (!confirm('⚠️ Supprimer toutes les imprimantes enregistrées ?')) return;
+    try {
+      await remove(printersRef);
+      selectedPrinterId = null;
+      showStatus('✅ Toutes les imprimantes ont été supprimées', 'success');
+    } catch (e) {
+      showStatus('❌ Échec de la suppression', 'error');
+    }
+  });
+  // ============================================================
+  // Affichage de la liste des factures (inchangé)
+  // ============================================================
+  function renderInvoicesList(confirmedData) {
+    const container = document.getElementById('app');
+    const confirmed = confirmedData || {};
+    const entries = Object.entries(confirmed);
+    if (entries.length === 0) {
+      container.innerHTML = `<div class="no-data"><i class="fas fa-file-invoice"></i> Aucune facture confirmée</div>`;
+      return;
+    }
+    const sorted = entries.reverse().slice(0, 50);
+    let html = `<div class="invoice-list">`;
+    sorted.forEach(([key, order]) => {
+      const date = order.confirmedAt ? new Date(order.confirmedAt).toLocaleString('fr-FR') : '---';
+      const total = order.totalPrice || 0;
+      html += `
+        <div class="invoice-card">
+          <div class="info">
+            <div><strong>#${order.invoiceNumber || '---'}</strong></div>
+            <div><i class="fas fa-user"></i> ${escapeHtml(order.customerName || 'Client')}</div>
+            <div><i class="fas fa-phone"></i> ${escapeHtml(order.phone || '')}</div>
+            <div><i class="fas fa-calendar"></i> ${date}</div>
+          </div>
+          <div class="total">${total.toLocaleString()} DA</div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button class="btn btn-print" onclick="printInvoice('${key}')"><i class="fas fa-print"></i> Imprimer</button>
+            <button class="btn btn-print" style="background:#6b7280;" onclick="previewInvoice('${key}')"><i class="fas fa-eye"></i> Aperçu</button>
+          </div>
+        </div>
+      `;
+    });
+    html += `</div>`;
+    container.innerHTML = html;
+  }
+  // ============================================================
+  // Fonctions d'impression (inchangées)
+  // ============================================================
+  window.printInvoice = async (key) => {
+    try {
+      const snapshot = await get(ref(db, `confirmedOrders/${key}`));
+      if (!snapshot.exists()) { showStatus('❌ Facture introuvable', 'error'); return; }
+      await smartPrint(snapshot.val());
+    } catch (e) {
+      showStatus('❌ Erreur : ' + e.message, 'error');
+    }
+  };
+  window.previewInvoice = async (key) => {
+    try {
+      const snapshot = await get(ref(db, `confirmedOrders/${key}`));
+      if (!snapshot.exists()) { alert('Facture introuvable'); return; }
+      const order = snapshot.val();
+      let itemsRows = '', totalQte = 0;
+      if (order.items) {
+        order.items.forEach(it => {
+          const qty = Number(it.quantity || 0);
+          const price = Number(it.price || 0);
+          totalQte += qty;
+          itemsRows += `<tr><td>${escapeHtml(it.name)}</td><td>${qty}</td><td>${price.toFixed(2)}</td><td>${(qty*price).toFixed(2)}</td></tr>`;
+        });
+      }
+      const win = window.open('', '_blank', 'width=400,height=600');
+      win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Facture #${order.invoiceNumber||'----'}</title>
+        <style>body{font-family:'Cairo',sans-serif;padding:20px;direction:ltr}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ddd;padding:6px;text-align:center}</style>
+      </head><body>
+        <h2 style="text-align:center;">CH CLEAN STORE</h2>
+        <p><strong>Facture :</strong> ${order.invoiceNumber||'----'}</p>
+        <p><strong>Client :</strong> ${escapeHtml(order.customerName||'')}</p>
+        <p><strong>Tél :</strong> ${escapeHtml(order.phone||'')}</p>
+        <p><strong>Adresse :</strong> ${escapeHtml(order.address||'')}</p>
+        <p><strong>Date :</strong> ${new Date(order.confirmedAt||Date.now()).toLocaleString('fr-FR')}</p>
+        <table><tr><th>Produit</th><th>Qté</th><th>Prix</th><th>Total</th></tr>${itemsRows||'<tr><td colspan="4">Aucun produit</td></tr>'}</table>
+        <h3 style="text-align:left;">Total : ${(order.totalPrice||0).toLocaleString()} DA</h3>
+        <button onclick="window.print()">🖨️ Imprimer</button>
+        <button onclick="window.close()">✖️ Fermer</button>
+      </body></html>`);
+      win.document.close();
+      setTimeout(()=>win.focus(),300);
+    } catch(e) { alert('Erreur : '+e.message); }
+  };
+  // ============================================================
+  // Initialisation
+  // ============================================================
+  loadPrintersFromFirebase();
+  onValue(ref(db, 'confirmedOrders'), (snap) => renderInvoicesList(snap.val()));
+  console.log('✅ Impression des factures (LTR, tout en grand format, espaces élargis) initialisée');
+</script>
+</body>
+</html>
