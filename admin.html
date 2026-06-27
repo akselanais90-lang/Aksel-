@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, shrink-to-fit=yes" />
-  <title>لوحة الإدارة - Caksel & anais</title>
+  <title>لوحة الإدارة - aksel & anais</title>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
@@ -54,6 +54,7 @@
     .product-info { padding: 12px; }
     .product-name { font-weight: 700; font-size: 14px; margin-bottom: 6px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
     .product-price { color: #10b981; font-weight: 800; font-size: 16px; margin-bottom: 4px; }
+    .product-wholesale-price { color: #8e44ad; font-weight: 600; font-size: 13px; margin-bottom: 4px; }
     .product-family { font-size: 11px; color: #6b7280; margin-bottom: 8px; background: #f3f4f6; padding: 2px 10px; border-radius: 20px; display: inline-block; }
     .product-actions { display: flex; gap: 8px; flex-wrap: wrap; }
     .btn-icon { flex: 1; padding: 8px; border-radius: 30px; border: none; font-weight: 600; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
@@ -154,6 +155,7 @@
   <button id="btnCover"><i class="fas fa-image"></i> تغيير الغلاف</button>
   <button id="btnUsers"><i class="fas fa-users"></i> إدارة المستخدمين</button>
   <button id="btnOwnerSettings"><i class="fas fa-crown"></i> إعدادات المالك</button>
+  <button id="btnWholesaleCode"><i class="fas fa-key"></i>  تغيير الرقم السري للجملة</button>
   <button id="btnDeleteAllProducts"><i class="fas fa-trash-alt"></i> حذف كل المنتجات</button>
   <button id="btnLogout"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</button>
 </div>
@@ -240,6 +242,8 @@
       <input type="text" id="serial" placeholder="الرقم التسلسلي" required>
       <input type="text" id="name" placeholder="اسم المنتج" required>
       <input type="number" id="price" placeholder="سعر البيع (دج)" required>
+      <!-- ====== حقل سعر الجملة الجديد ====== -->
+      <input type="number" id="wholesalePrice" placeholder="سعر الجملة (دج) - اختياري">
       <div class="family-field-wrapper">
         <select id="familySelect">
           <option value="">-- اختر عائلة --</option>
@@ -325,8 +329,7 @@
     <span onclick="closeModal('ownerModal')" style="position: absolute; top: 15px; left: 20px; font-size: 24px; cursor: pointer; color: #aaa;">&times;</span>
     <h3 style="margin-bottom: 14px; font-size: 18px; color: #1f2937;">🔐 إعدادات المالك</h3>
     <input id="newOwnerName" placeholder="الاسم الجديد" style="width:100%; padding:12px; margin-bottom:10px; border-radius:14px; border:1px solid #e5e7eb; background:#f8fafc; outline:none;">
-    <input id="newOwnerPass" placeholder="كلمة المرور الجديدة" style="width:100%; padding:12px; margin-bottom:14px; border-radius:14px; border:1px solid #e5e7eb; background:#f8fafc; outline:none;">
-    <button id="saveOwnerBtn" class="btn-primary" style="margin-bottom:10px;">💾 حفظ</button>
+    <input id="newOwnerPass" placeholder="كلمة المرور الجديدة" style="width:100%; padding:12px; margin-bottom:10px; border-radius:14px; border:1px solid #e5e7eb; background:#f8fafc; outline:none;">
     <button onclick="closeModal('ownerModal')" style="width:100%; padding:12px; border:none; border-radius:14px; background:#e74c3c; color:white; font-weight:700; cursor:pointer;">❌ إلغاء</button>
   </div>
 </div>
@@ -337,8 +340,20 @@
     <div id="orderDetailContent"></div>
   </div>
 </div>
-
-<!-- ====== مودال اختيار طريقة الطباعة (جديد) ====== -->
+<!-- ====== مودال تغيير الرقم السري للجملة (مستقل) ====== -->
+<div id="wholesaleCodeModal" class="modal" onclick="closeModalOnOutsideClick(event, 'wholesaleCodeModal')">
+  <div class="modal-content" onclick="event.stopPropagation()">
+    <span onclick="closeModal('wholesaleCodeModal')" style="position: absolute; top: 15px; left: 20px; font-size: 24px; cursor: pointer; color: #aaa;">&times;</span>
+    <h3 style="margin-bottom: 18px; font-size: 18px; color: #8e44ad; text-align: center;">🔑 تغيير الرقم السري للجملة</h3>
+    <p style="font-size: 13px; color: #6b7280; margin-bottom: 14px; text-align: center;">
+      هذا الرقم السري يستخدمه زبائن الجملة لتفعيل أسعار الجملة في المتجر.
+    </p>
+    <input id="wholesaleCodeInput" placeholder="الرقم السري الجديد" style="width:100%; padding:12px; margin-bottom:14px; border-radius:14px; border:1px solid #e5e7eb; background:#f8fafc; outline:none; direction:ltr; font-size:16px;">
+    <button id="saveWholesaleCodeBtn" class="btn-primary" style="margin-bottom:10px; background: linear-gradient(135deg, #8e44ad, #9b59b6);">💾 حفظ الرقم السري</button>
+    <button onclick="closeModal('wholesaleCodeModal')" style="width:100%; padding:12px; border:none; border-radius:14px; background:#e74c3c; color:white; font-weight:700; cursor:pointer;">❌ إلغاء</button>
+  </div>
+</div>
+<!-- ====== مودال اختيار طريقة الطباعة ====== -->
 <div id="printOptionModal" class="modal" onclick="closeModalOnOutsideClick(event, 'printOptionModal')">
   <div class="modal-content" onclick="event.stopPropagation()" style="max-width:400px; text-align:center;">
     <h3 style="margin-bottom:16px;">🖨️ اختر طريقة الطباعة</h3>
@@ -360,7 +375,6 @@
   import { getDatabase, ref, onValue, set, remove, update, push, get } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
   import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 
-  // ====== الإعدادات الجديدة لـ Firebase (تم استبدالها) ======
   const firebaseConfig = {
     apiKey: "AIzaSyAr3Opxs_ikZZ4JZqArcnM8T_YEeyzS_mI",
     authDomain: "aksel-ff2ef.firebaseapp.com",
@@ -372,17 +386,11 @@
     measurementId: "G-4KFHZ1ZFQ9"
   };
 
-  // تهيئة Firebase
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
-  // تسجيل دخول مجهول (لا يؤثر على صلاحيات المستخدمين المسجلين في قاعدة البيانات)
   signInAnonymously(auth)
-    .then(() => {
-      console.log("✅ تم الدخول المجهول بنجاح");
-    })
-    .catch((error) => {
-      console.warn("⚠️ فشل الدخول المجهول، لكن الموقع سيستمر في العمل للقراءة فقط:", error);
-    });
+    .then(() => console.log("✅ تم الدخول المجهول بنجاح"))
+    .catch((error) => console.warn("⚠️ فشل الدخول المجهول، لكن الموقع سيستمر في العمل للقراءة فقط:", error));
   window.auth = auth;
 
   const db = getDatabase(app);
@@ -392,6 +400,7 @@
   const invoiceCounterRef = ref(db, "settings/invoiceCounter");
   const familiesRef = ref(db, "families");
   const discountsRef = ref(db, "discounts");
+  const wholesaleCodeRef = ref(db, "store/wholesaleCode");
 
   const IMGBB_KEY = "7a64e5d9dc491bbce3ab42186c17e006";
   const WHATSAPP_NUMBER = "2130781554885";
@@ -411,9 +420,6 @@
   let familiesList = [];
   let editingProductId = null;
   let currentFamilyFilter = 'الكل';
-
-  // ====== متغيرات سياق الطباعة (جديد) ======
-  let printContext = { key: null, order: null, type: null };
 
   // ====== دوال مساعدة ======
   function showToast(msg) {
@@ -485,7 +491,7 @@
     }); 
   }
 
-  // ====== دوال العائلات ======
+  // ====== دوال العائلات (بدون تغيير) ======
   function loadFamilies() {
     onValue(familiesRef, (snap) => {
       const data = snap.val();
@@ -708,7 +714,7 @@
     applyFiltersAndRender();
   }
 
-  // ====== دوال المنتجات والطلبات ======
+  // ====== دوال المنتجات والطلبات (مع دعم الجملة) ======
   async function getNextInvoiceNumber() {
     const snapshot = await get(invoiceCounterRef);
     let currentNumber = snapshot.exists() ? snapshot.val() : 0;
@@ -737,7 +743,9 @@
     return push(ordersRef, order);
   }
 
-  // ====== دوال الطباعة الجديدة (مع الخيارات) ======
+  // ====== دوال الطباعة (بدون تغيير) ======
+  let printContext = { key: null, order: null, type: null };
+
   async function confirmOrderOnly(key, order) {
     const currentUserName = localStorage.getItem("user") || "Admin";
     const invoiceNumber = await getNextInvoiceNumber();
@@ -753,14 +761,13 @@
   function showPrintOptions(key, order, type) {
     printContext.key = key;
     printContext.order = order;
-    printContext.type = type; // 'whatsapp' or 'confirmed'
+    printContext.type = type;
     document.getElementById('printOptionModal').style.display = 'flex';
   }
 
   function printNormal() {
     const { key, order, type } = printContext;
     if (type === 'whatsapp') {
-      // تم التأكيد مسبقاً، نطبع فقط
       const sellerName = localStorage.getItem("user") || "Admin";
       printInvoice(order, sellerName);
     } else {
@@ -771,16 +778,13 @@
   }
 
   function printThermal() {
-    // فتح صفحة الطباعة الحرارية
     window.open('print_invoice.html', '_blank');
     closeModal('printOptionModal');
   }
 
-  // ربط أحداث أزرار الطباعة
   document.getElementById('thermalPrintBtn').addEventListener('click', printThermal);
   document.getElementById('normalPrintBtn').addEventListener('click', printNormal);
 
-  // ====== دوال الطباعة القديمة (المعدلة) ======
   function printInvoice(order, sellerName) {
     let rows = "";
     let totalQte = 0;
@@ -1001,7 +1005,7 @@
     setTimeout(() => { win.focus(); }, 500);
   }
 
-  // ====== عرض المنتجات ======
+  // ====== عرض المنتجات (مع إظهار سعر الجملة في البطاقة) ======
   function renderProducts(page) {
     const container = document.getElementById("productsContainer");
     if (!container) return;
@@ -1049,14 +1053,12 @@
             ${Number(discount.newPrice).toLocaleString()} دج
           </div>
         `;
-        if (!discount.unlimited && discount.endDate) {
-          const timer = document.createElement("div");
-          timer.className = "discount-timer";
-          timer.id = `timer_${id}`;
-          timer.dataset.end = discount.endDate;
-          timer.dataset.productId = id;
-          timer.innerHTML = `<i class="far fa-clock"></i> <span class="time-left">جاري...</span>`;
-        }
+      }
+      
+      // عرض سعر الجملة إذا وجد
+      let wholesaleHtml = '';
+      if (prod.wholesalePrice && !isNaN(prod.wholesalePrice)) {
+        wholesaleHtml = `<div class="product-wholesale-price">🏷️ جملة: ${Number(prod.wholesalePrice).toLocaleString()} دج</div>`;
       }
       
       card.innerHTML = `
@@ -1064,6 +1066,7 @@
         <div class="product-info">
           <div class="product-name">${escapeHtml(prod.name)}</div>
           ${priceHtml}
+          ${wholesaleHtml}
           <div class="product-family">🏷️ ${prod.family || 'غير مصنف'}</div>
           ${isOnSale && !discount.unlimited && discount.endDate ? `<div class="discount-timer" id="timer_${id}" data-end="${discount.endDate}" data-productid="${id}"><i class="far fa-clock"></i> <span class="time-left">جاري...</span></div>` : ''}
           <div class="product-actions">
@@ -1096,8 +1099,40 @@
     });
     renderPagination(total);
   }
+// ====== زر تغيير الرقم السري للجملة (مستقل) ======
+document.getElementById("btnWholesaleCode")?.addEventListener("click", () => {
+  if (!isOwner() && !isAdmin()) {
+    showToast("غير مسموح");
+    return;
+  }
+  openModal("wholesaleCodeModal");
+  // جلب الرقم السري الحالي ووضعه في الحقل
+  get(wholesaleCodeRef).then(snap => {
+    if (snap.exists() && snap.val().code) {
+      document.getElementById("wholesaleCodeInput").value = snap.val().code;
+    } else {
+      document.getElementById("wholesaleCodeInput").value = '';
+    }
+  });
+});
 
-  // ====== دوال التخفيضات ======
+// ====== حفظ الرقم السري للجملة ======
+document.getElementById("saveWholesaleCodeBtn")?.addEventListener("click", async () => {
+  const code = document.getElementById("wholesaleCodeInput").value.trim();
+  if (!code) {
+    showToast("⚠️ الرجاء إدخال الرقم السري");
+    return;
+  }
+  try {
+    await set(wholesaleCodeRef, { code: code });
+    showToast("✅ تم حفظ الرقم السري للجملة بنجاح");
+    closeModal("wholesaleCodeModal");
+  } catch (error) {
+    console.error(error);
+    showToast("❌ حدث خطأ أثناء الحفظ");
+  }
+});
+  // ====== دوال التخفيضات (بدون تغيير) ======
   function loadDiscounts() {
     onValue(discountsRef, (snap) => {
       const data = snap.val() || {};
@@ -1119,91 +1154,91 @@
   }
 
   function renderDiscountsList() {
-  const container = document.getElementById("discountsContainer");
-  if (!container) return;
-  container.innerHTML = "";
-  
-  const activeDiscounts = Object.entries(allDiscounts).filter(([_, d]) => d.isActive);
-  if (activeDiscounts.length === 0) {
-    container.innerHTML = `<div class="no-data" style="grid-column: 1 / -1;"><i class="fas fa-tag"></i> لا توجد تخفيضات نشطة حالياً</div>`;
-    return;
-  }
-  
-  container.className = "products-grid";
-  
-  activeDiscounts.forEach(([productId, discount]) => {
-    const product = allProducts[productId];
-    if (!product) return;
+    const container = document.getElementById("discountsContainer");
+    if (!container) return;
+    container.innerHTML = "";
     
-    const card = document.createElement("div");
-    card.className = "product-card on-sale";
-    
-    let timerText = '';
-    if (discount.unlimited) {
-      timerText = '<span style="color:#2563eb; font-weight:600;"><i class="fas fa-infinity"></i> دائم</span>';
-    } else if (discount.endDate) {
-      const end = new Date(discount.endDate);
-      const now = new Date();
-      const diff = end.getTime() - now.getTime();
-      if (diff > 0) {
-        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-        const secs = Math.floor((diff % (1000 * 60)) / 1000);
-        timerText = `⏳ ${days}يوم ${hours}س ${mins}د ${secs}ث`;
-      } else {
-        timerText = '⛔ منتهي';
-      }
+    const activeDiscounts = Object.entries(allDiscounts).filter(([_, d]) => d.isActive);
+    if (activeDiscounts.length === 0) {
+      container.innerHTML = `<div class="no-data" style="grid-column: 1 / -1;"><i class="fas fa-tag"></i> لا توجد تخفيضات نشطة حالياً</div>`;
+      return;
     }
     
-    const startDate = discount.startDate ? new Date(discount.startDate).toLocaleString('ar-DZ') : '---';
-    const endDate = discount.endDate ? new Date(discount.endDate).toLocaleString('ar-DZ') : 'بدون انتهاء';
+    container.className = "products-grid";
     
-    card.innerHTML = `
-      <div style="position:relative;">
-        <img src="${product.imageUrl || 'https://via.placeholder.com/150'}" style="width:100%; height:180px; object-fit:cover; background:#f0f0f0;">
-        <div class="sale-badge" style="position:absolute; top:8px; right:8px; background:#dc2626; color:#ffdd00; padding:4px 12px; border-radius:30px; font-weight:700; font-size:11px; box-shadow:0 2px 8px rgba(220,38,38,0.3); z-index:5; display:flex; align-items:center; gap:4px;">
-          <i class="fas fa-tags"></i> ${discount.unlimited ? 'دائم' : 'تخفيض'}
+    activeDiscounts.forEach(([productId, discount]) => {
+      const product = allProducts[productId];
+      if (!product) return;
+      
+      const card = document.createElement("div");
+      card.className = "product-card on-sale";
+      
+      let timerText = '';
+      if (discount.unlimited) {
+        timerText = '<span style="color:#2563eb; font-weight:600;"><i class="fas fa-infinity"></i> دائم</span>';
+      } else if (discount.endDate) {
+        const end = new Date(discount.endDate);
+        const now = new Date();
+        const diff = end.getTime() - now.getTime();
+        if (diff > 0) {
+          const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+          const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+          const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+          const secs = Math.floor((diff % (1000 * 60)) / 1000);
+          timerText = `⏳ ${days}يوم ${hours}س ${mins}د ${secs}ث`;
+        } else {
+          timerText = '⛔ منتهي';
+        }
+      }
+      
+      const startDate = discount.startDate ? new Date(discount.startDate).toLocaleString('ar-DZ') : '---';
+      const endDate = discount.endDate ? new Date(discount.endDate).toLocaleString('ar-DZ') : 'بدون انتهاء';
+      
+      card.innerHTML = `
+        <div style="position:relative;">
+          <img src="${product.imageUrl || 'https://via.placeholder.com/150'}" style="width:100%; height:180px; object-fit:cover; background:#f0f0f0;">
+          <div class="sale-badge" style="position:absolute; top:8px; right:8px; background:#dc2626; color:#ffdd00; padding:4px 12px; border-radius:30px; font-weight:700; font-size:11px; box-shadow:0 2px 8px rgba(220,38,38,0.3); z-index:5; display:flex; align-items:center; gap:4px;">
+            <i class="fas fa-tags"></i> ${discount.unlimited ? 'دائم' : 'تخفيض'}
+          </div>
         </div>
-      </div>
-      <div class="product-info">
-        <div class="product-name" style="font-weight:700; font-size:14px; margin-bottom:6px;">${escapeHtml(product.name)}</div>
-        <div class="product-price" style="color:#dc2626; font-weight:800; font-size:1.2rem; margin-bottom:4px;">
-          <span class="old-price" style="text-decoration:line-through; color:#999; font-size:0.8rem; margin-left:6px;">${Number(product.price).toLocaleString()} دج</span>
-          ${Number(discount.newPrice).toLocaleString()} دج
+        <div class="product-info">
+          <div class="product-name" style="font-weight:700; font-size:14px; margin-bottom:6px;">${escapeHtml(product.name)}</div>
+          <div class="product-price" style="color:#dc2626; font-weight:800; font-size:1.2rem; margin-bottom:4px;">
+            <span class="old-price" style="text-decoration:line-through; color:#999; font-size:0.8rem; margin-left:6px;">${Number(product.price).toLocaleString()} دج</span>
+            ${Number(discount.newPrice).toLocaleString()} دج
+          </div>
+          <div class="product-family" style="font-size:11px; color:#6b7280; margin-bottom:8px; background:#f3f4f6; padding:2px 10px; border-radius:20px; display:inline-block;">
+            🏷️ ${product.family || 'غير مصنف'}
+          </div>
+          <div style="font-size:12px; color:#6b7280; margin-bottom:6px;">
+            <i class="far fa-calendar-alt"></i> من ${startDate} إلى ${endDate}
+          </div>
+          <div style="font-size:12px; font-weight:600; color:#dc2626; background:#fee2e2; padding:2px 10px; border-radius:20px; display:inline-block; margin-bottom:8px;">
+            ${timerText}
+          </div>
+          <div class="product-actions" style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button class="btn-icon btn-remove-discount" data-id="${productId}" style="background:#fee2e2; color:#dc2626; flex:1;">
+              <i class="fas fa-trash"></i> إزالة
+            </button>
+            <button class="btn-icon btn-reactivate" data-id="${productId}" style="background:#dbeafe; color:#2563eb; flex:1;">
+              <i class="fas fa-undo"></i> إعادة تفعيل
+            </button>
+          </div>
         </div>
-        <div class="product-family" style="font-size:11px; color:#6b7280; margin-bottom:8px; background:#f3f4f6; padding:2px 10px; border-radius:20px; display:inline-block;">
-          🏷️ ${product.family || 'غير مصنف'}
-        </div>
-        <div style="font-size:12px; color:#6b7280; margin-bottom:6px;">
-          <i class="far fa-calendar-alt"></i> من ${startDate} إلى ${endDate}
-        </div>
-        <div style="font-size:12px; font-weight:600; color:#dc2626; background:#fee2e2; padding:2px 10px; border-radius:20px; display:inline-block; margin-bottom:8px;">
-          ${timerText}
-        </div>
-        <div class="product-actions" style="display:flex; gap:8px; flex-wrap:wrap;">
-          <button class="btn-icon btn-remove-discount" data-id="${productId}" style="background:#fee2e2; color:#dc2626; flex:1;">
-            <i class="fas fa-trash"></i> إزالة
-          </button>
-          <button class="btn-icon btn-reactivate" data-id="${productId}" style="background:#dbeafe; color:#2563eb; flex:1;">
-            <i class="fas fa-undo"></i> إعادة تفعيل
-          </button>
-        </div>
-      </div>
-    `;
-    
-    container.appendChild(card);
-    
-    card.querySelector('.btn-remove-discount').addEventListener('click', (e) => {
-      e.stopPropagation();
-      removeDiscount(productId);
+      `;
+      
+      container.appendChild(card);
+      
+      card.querySelector('.btn-remove-discount').addEventListener('click', (e) => {
+        e.stopPropagation();
+        removeDiscount(productId);
+      });
+      card.querySelector('.btn-reactivate').addEventListener('click', (e) => {
+        e.stopPropagation();
+        reactivateDiscount(productId);
+      });
     });
-    card.querySelector('.btn-reactivate').addEventListener('click', (e) => {
-      e.stopPropagation();
-      reactivateDiscount(productId);
-    });
-  });
-}
+  }
 
   function openDiscountModal(productId) {
     const modal = document.getElementById("discountModal");
@@ -1367,6 +1402,7 @@
     }, 1000);
   }
 
+  // ====== عرض المنتجات المخفية ======
   function renderHidden() {
     const container = document.getElementById("hiddenProductsContainer");
     if (!container) return;
@@ -1398,6 +1434,7 @@
     });
   }
 
+  // ====== الترقيم ======
   function renderPagination(total) {
     const pagination = document.getElementById("pagination");
     if (!pagination) return;
@@ -1445,6 +1482,7 @@
     createBtn("›", currentPage + 1, false, currentPage === total);
   }
 
+  // ====== تعديل المنتج (مع تعبئة سعر الجملة) ======
   window.editProduct = (id) => {
     const p = allProducts[id];
     if(!p) return;
@@ -1453,6 +1491,7 @@
     document.getElementById("serial").value = p.serial || "";
     document.getElementById("name").value = p.name || "";
     document.getElementById("price").value = p.price || "";
+    document.getElementById("wholesalePrice").value = p.wholesalePrice || "";
     setFamilyInForm(p.family || "");
     document.getElementById("formTitle").innerText = "✏️ تعديل المنتج";
     const toggleBtn = document.getElementById("toggleVisibilityBtn");
@@ -1480,12 +1519,14 @@
     throw new Error("فشل الرفع");
   }
 
+  // ====== حفظ المنتج (مع إضافة سعر الجملة) ======
   document.getElementById("productForm").onsubmit = async (e) => {
     e.preventDefault();
     const id = document.getElementById("editId").value;
     const serial = document.getElementById("serial").value.trim();
     const name = document.getElementById("name").value.trim();
     const price = parseFloat(document.getElementById("price").value)||0;
+    const wholesalePrice = parseFloat(document.getElementById("wholesalePrice").value)||0;
     const familySelect = document.getElementById("familySelect");
     const selectedFamily = familySelect.value;
     const fileInput = document.getElementById("imageFile");
@@ -1506,6 +1547,7 @@
         serial, 
         name, 
         price, 
+        wholesalePrice: wholesalePrice > 0 ? wholesalePrice : null, // نخزن null إذا كان 0
         family: selectedFamily || "",
         imageUrl: newImg, 
         deleteUrl: newDel, 
@@ -1518,6 +1560,7 @@
       document.getElementById("editId").value = "";
       editingProductId = null;
       document.getElementById("familySelect").value = "";
+      document.getElementById("wholesalePrice").value = "";
     } catch(err) { alert("خطأ: "+err.message); }
   };
 
@@ -1529,7 +1572,7 @@
     closeModal("productModal");
   }
 
-  // ====== عرض الطلبات ======
+  // ====== عرض الطلبات (بدون تغيير) ======
   function renderWhatsappOrders(ordersData) {
     const container = document.getElementById("whatsappOrdersContainer");
     if (!container) return;
@@ -1630,7 +1673,7 @@
     });
   }
 
-  // ====== مودال تفاصيل الطلب (معدل مع خيارات الطباعة) ======
+  // ====== مودال تفاصيل الطلب (بدون تغيير) ======
   function openOrderDetailModal(order, type, key) {
     const modal = document.getElementById("orderDetailModal");
     const content = document.getElementById("orderDetailContent");
@@ -1720,13 +1763,10 @@
     `;
     modal.style.display = "flex";
     
-    // ====== أحداث الأزرار المعدلة ======
     const confirmBtn = content.querySelector('.confirm-order-detail');
     if (confirmBtn) {
       confirmBtn.addEventListener('click', async () => {
-        // تأكيد الطلب أولاً
         const confirmedOrder = await confirmOrderOnly(key, order);
-        // ثم إظهار خيارات الطباعة
         showPrintOptions(key, confirmedOrder, 'confirmed');
         closeModal('orderDetailModal');
       });
@@ -1915,18 +1955,40 @@
     loadUsersList();
   };
 
-  document.getElementById("btnOwnerSettings")?.addEventListener("click", () => { if(isOwner()) openModal("ownerModal"); });
-  document.getElementById("saveOwnerBtn")?.addEventListener("click", async () => {
-    const newName = document.getElementById("newOwnerName").value.trim();
-    const newPass = document.getElementById("newOwnerPass").value.trim();
-    if(!newName||!newPass) return;
-    const current = localStorage.getItem("user");
-    await set(ref(db, `users/owner/${newName}`), { password: newPass, role: "owner" });
-    if(newName !== current) await remove(ref(db, `users/owner/${current}`));
-    localStorage.setItem("user", newName);
-    showToast("تم تحديث بيانات المالك");
-    closeModal("ownerModal");
+  // ====== إعدادات المالك (مع إضافة الرقم السري للجملة) ======
+  document.getElementById("btnOwnerSettings")?.addEventListener("click", () => { 
+    if(isOwner()) {
+      openModal("ownerModal");
+      // جلب الرقم السري الحالي ووضعه في الحقل
+      get(wholesaleCodeRef).then(snap => {
+        if (snap.exists() && snap.val().code) {
+          document.getElementById("wholesaleCodeInput").value = snap.val().code;
+        } else {
+          document.getElementById("wholesaleCodeInput").value = '';
+        }
+      });
+    } else {
+      showToast("غير مسموح");
+    }
   });
+
+  document.getElementById("saveOwnerBtn")?.addEventListener("click", async () => {
+  const newName = document.getElementById("newOwnerName").value.trim();
+  const newPass = document.getElementById("newOwnerPass").value.trim();
+  
+  if (!newName || !newPass) {
+    showToast("⚠️ الرجاء إدخال الاسم وكلمة المرور");
+    return;
+  }
+  
+  const current = localStorage.getItem("user");
+  await set(ref(db, `users/owner/${newName}`), { password: newPass, role: "owner" });
+  if (newName !== current) await remove(ref(db, `users/owner/${current}`));
+  localStorage.setItem("user", newName);
+  
+  showToast("✅ تم تحديث بيانات المالك");
+  closeModal("ownerModal");
+});
 
   document.getElementById("btnDeleteAllProducts")?.addEventListener("click", async () => {
     if(confirm("حذف جميع المنتجات نهائياً؟")) { 
@@ -2036,6 +2098,7 @@
       document.getElementById("familySelect").value = "";
       document.getElementById("newFamilyInput").style.display = "none";
       document.getElementById("newFamilyInput").value = "";
+      document.getElementById("wholesalePrice").value = "";
       const btn = document.getElementById("addFamilyBtn");
       btn.innerHTML = '<i class="fas fa-plus"></i> إضافة';
       btn.style.background = "#10b981";
