@@ -7,7 +7,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
-    /* ====== كل الستايل القديم يبقى كما هو ====== */
+    /* ====== جميع الأنماط كما هي (بدون تغيير) ====== */
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Cairo', sans-serif; background: #fafafa; color: #262626; padding-bottom: 80px; }
     .top-bar { background: white; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #dbdbdb; position: sticky; top: 0; z-index: 100; }
@@ -155,6 +155,7 @@
   <button id="btnCover"><i class="fas fa-image"></i> تغيير الغلاف</button>
   <button id="btnUsers"><i class="fas fa-users"></i> إدارة المستخدمين</button>
   <button id="btnOwnerSettings"><i class="fas fa-crown"></i> إعدادات المالك</button>
+  <!-- هذا الزر سيظهر فقط للمالك (تم تعديله في الكود) -->
   <button id="btnWholesaleCode"><i class="fas fa-key"></i>  تغيير الرقم السري للجملة</button>
   <button id="btnDeleteAllProducts"><i class="fas fa-trash-alt"></i> حذف كل المنتجات</button>
   <button id="btnLogout"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</button>
@@ -215,6 +216,7 @@
 </div>
 
 <div id="confirmedSection" style="display: none;">
+  <!-- زر حذف الطلبات سيظهر فقط للمالك (تم تعديله في الكود) -->
   <div style="text-align:center; margin:12px;">
     <button id="deleteAllConfirmedBtn" class="delete-all-btn">🗑️ حذف جميع الطلبات المؤكدة</button>
   </div>
@@ -370,7 +372,6 @@
 <div class="toast" id="toastMessage">✅ تم بنجاح</div>
 
 <script type="module">
-  // استيراد Firebase SDK
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
   import { getDatabase, ref, onValue, set, remove, update, push, get } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
   import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
@@ -439,22 +440,40 @@
     }
   }
 
+  // ====== تحديث صلاحيات الأزرار (التعديل المطلوب) ======
   function updateMenuPermissions() {
     const role = getRole();
     const isOwnerRole = role === "owner";
     const isAdminRole = role === "admin";
-    const btns = {
-      btnCover: isOwnerRole || isAdminRole,
-      btnUsers: isOwnerRole,
-      btnOwnerSettings: isOwnerRole,
-      btnDeleteAllProducts: isOwnerRole,
-      btnLogout: true
+
+    // أزرار خاصة بالمالك فقط
+    const ownerOnlyBtns = {
+      btnUsers: true,
+      btnOwnerSettings: true,
+      btnDeleteAllProducts: true,
+      btnWholesaleCode: true,   // ✅ زر تغيير الرقم السري للمالك فقط
     };
-    for (let [id, show] of Object.entries(btns)) {
+    for (let [id, show] of Object.entries(ownerOnlyBtns)) {
       const btn = document.getElementById(id);
-      if (btn) btn.style.display = show ? "flex" : "none";
+      if (btn) btn.style.display = isOwnerRole ? "flex" : "none";
     }
+
+    // زر تغيير الغلاف للمالك والمدير
+    const coverBtn = document.getElementById("btnCover");
+    if (coverBtn) coverBtn.style.display = (isOwnerRole || isAdminRole) ? "flex" : "none";
+
+    // زر تسجيل الخروج للجميع
+    const logoutBtn = document.getElementById("btnLogout");
+    if (logoutBtn) logoutBtn.style.display = "flex";
+
+    // زر إضافة منتج للمالك والمدير
     document.getElementById("addProductBtn").style.display = (isOwnerRole || isAdminRole) ? "flex" : "none";
+
+    // زر حذف جميع الطلبات المؤكدة للمالك فقط ✅
+    const deleteAllConfirmedBtn = document.getElementById("deleteAllConfirmedBtn");
+    if (deleteAllConfirmedBtn) {
+      deleteAllConfirmedBtn.style.display = isOwnerRole ? "inline-block" : "none";
+    }
   }
 
   function updateNotificationBadge() {
@@ -1099,39 +1118,40 @@
     });
     renderPagination(total);
   }
-// ====== زر تغيير الرقم السري للجملة (مستقل) ======
-document.getElementById("btnWholesaleCode")?.addEventListener("click", () => {
-  if (!isOwner() && !isAdmin()) {
-    showToast("غير مسموح");
-    return;
-  }
-  openModal("wholesaleCodeModal");
-  // جلب الرقم السري الحالي ووضعه في الحقل
-  get(wholesaleCodeRef).then(snap => {
-    if (snap.exists() && snap.val().code) {
-      document.getElementById("wholesaleCodeInput").value = snap.val().code;
-    } else {
-      document.getElementById("wholesaleCodeInput").value = '';
+
+  // ====== زر تغيير الرقم السري للجملة (مستقل) ======
+  // ملاحظة: هذا الزر يظهر فقط للمالك (تم التحكم به في updateMenuPermissions)
+  document.getElementById("btnWholesaleCode")?.addEventListener("click", () => {
+    if (!isOwner()) {
+      showToast("غير مسموح");
+      return;
+    }
+    openModal("wholesaleCodeModal");
+    get(wholesaleCodeRef).then(snap => {
+      if (snap.exists() && snap.val().code) {
+        document.getElementById("wholesaleCodeInput").value = snap.val().code;
+      } else {
+        document.getElementById("wholesaleCodeInput").value = '';
+      }
+    });
+  });
+
+  document.getElementById("saveWholesaleCodeBtn")?.addEventListener("click", async () => {
+    const code = document.getElementById("wholesaleCodeInput").value.trim();
+    if (!code) {
+      showToast("⚠️ الرجاء إدخال الرقم السري");
+      return;
+    }
+    try {
+      await set(wholesaleCodeRef, { code: code });
+      showToast("✅ تم حفظ الرقم السري للجملة بنجاح");
+      closeModal("wholesaleCodeModal");
+    } catch (error) {
+      console.error(error);
+      showToast("❌ حدث خطأ أثناء الحفظ");
     }
   });
-});
 
-// ====== حفظ الرقم السري للجملة ======
-document.getElementById("saveWholesaleCodeBtn")?.addEventListener("click", async () => {
-  const code = document.getElementById("wholesaleCodeInput").value.trim();
-  if (!code) {
-    showToast("⚠️ الرجاء إدخال الرقم السري");
-    return;
-  }
-  try {
-    await set(wholesaleCodeRef, { code: code });
-    showToast("✅ تم حفظ الرقم السري للجملة بنجاح");
-    closeModal("wholesaleCodeModal");
-  } catch (error) {
-    console.error(error);
-    showToast("❌ حدث خطأ أثناء الحفظ");
-  }
-});
   // ====== دوال التخفيضات (بدون تغيير) ======
   function loadDiscounts() {
     onValue(discountsRef, (snap) => {
@@ -1547,7 +1567,7 @@ document.getElementById("saveWholesaleCodeBtn")?.addEventListener("click", async
         serial, 
         name, 
         price, 
-        wholesalePrice: wholesalePrice > 0 ? wholesalePrice : null, // نخزن null إذا كان 0
+        wholesalePrice: wholesalePrice > 0 ? wholesalePrice : null,
         family: selectedFamily || "",
         imageUrl: newImg, 
         deleteUrl: newDel, 
@@ -1955,40 +1975,33 @@ document.getElementById("saveWholesaleCodeBtn")?.addEventListener("click", async
     loadUsersList();
   };
 
-  // ====== إعدادات المالك (مع إضافة الرقم السري للجملة) ======
+  // ====== إعدادات المالك ======
   document.getElementById("btnOwnerSettings")?.addEventListener("click", () => { 
     if(isOwner()) {
       openModal("ownerModal");
-      // جلب الرقم السري الحالي ووضعه في الحقل
-      get(wholesaleCodeRef).then(snap => {
-        if (snap.exists() && snap.val().code) {
-          document.getElementById("wholesaleCodeInput").value = snap.val().code;
-        } else {
-          document.getElementById("wholesaleCodeInput").value = '';
-        }
-      });
     } else {
       showToast("غير مسموح");
     }
   });
 
+  // حفظ إعدادات المالك (بدون الرقم السري)
   document.getElementById("saveOwnerBtn")?.addEventListener("click", async () => {
-  const newName = document.getElementById("newOwnerName").value.trim();
-  const newPass = document.getElementById("newOwnerPass").value.trim();
-  
-  if (!newName || !newPass) {
-    showToast("⚠️ الرجاء إدخال الاسم وكلمة المرور");
-    return;
-  }
-  
-  const current = localStorage.getItem("user");
-  await set(ref(db, `users/owner/${newName}`), { password: newPass, role: "owner" });
-  if (newName !== current) await remove(ref(db, `users/owner/${current}`));
-  localStorage.setItem("user", newName);
-  
-  showToast("✅ تم تحديث بيانات المالك");
-  closeModal("ownerModal");
-});
+    const newName = document.getElementById("newOwnerName").value.trim();
+    const newPass = document.getElementById("newOwnerPass").value.trim();
+    
+    if (!newName || !newPass) {
+      showToast("⚠️ الرجاء إدخال الاسم وكلمة المرور");
+      return;
+    }
+    
+    const current = localStorage.getItem("user");
+    await set(ref(db, `users/owner/${newName}`), { password: newPass, role: "owner" });
+    if (newName !== current) await remove(ref(db, `users/owner/${current}`));
+    localStorage.setItem("user", newName);
+    
+    showToast("✅ تم تحديث بيانات المالك");
+    closeModal("ownerModal");
+  });
 
   document.getElementById("btnDeleteAllProducts")?.addEventListener("click", async () => {
     if(confirm("حذف جميع المنتجات نهائياً؟")) { 
