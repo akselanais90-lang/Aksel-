@@ -198,6 +198,12 @@
     }
     .modal-content .btn-group { display: flex; gap: 10px; }
     .modal-content .btn-group button { flex: 1; }
+    .modal-content .hint {
+      font-size: 12px;
+      color: #6b7280;
+      margin-top: -8px;
+      margin-bottom: 12px;
+    }
     @media (max-width: 640px) {
       .invoice-card { flex-direction: column; align-items: stretch; }
       .invoice-card .info { gap: 8px; font-size: 13px; }
@@ -217,7 +223,7 @@
   <div id="printerListContainer" class="printer-list"><div class="empty-printers">⏳ Chargement...</div></div>
   <div class="printer-actions">
     <button class="btn btn-bluetooth" id="addPrinterBtn"><i class="fas fa-plus"></i> Ajouter une imprimante</button>
-    <button class="btn btn-danger" id="clearAllPrintersBtn" style="display:none;"><i class="fas fa-trash"></i> Tout supprimer</button>
+    <button class="btn btn-danger" id="clearAllPrintersBtn"><i class="fas fa-trash"></i> Tout supprimer</button>
   </div>
   <div style="font-size:11px; color:#94a3b8; margin-top:6px;">
     <i class="fas fa-info-circle"></i> Sélectionnez une imprimante, puis appuyez sur "Imprimer" sur la facture.
@@ -233,9 +239,9 @@
       <option value="80">80 mm (standard)</option>
       <option value="58">58 mm (petit)</option>
     </select>
-    <p style="font-size:12px; color:#6b7280; margin-bottom:12px;">Ce paramètre sera enregistré avec l'imprimante.</p>
+    <p class="hint">⚠️ Assurez-vous que le Bluetooth de votre appareil est activé et que l'imprimante est allumée et en mode appairage.</p>
     <div class="btn-group">
-      <button class="btn btn-success" id="confirmAddPrinter"><i class="fas fa-check"></i> Confirmer</button>
+      <button class="btn btn-success" id="confirmAddPrinter"><i class="fas fa-bluetooth"></i> Rechercher</button>
       <button class="btn btn-outline" id="cancelAddPrinter"><i class="fas fa-times"></i> Annuler</button>
     </div>
   </div>
@@ -258,15 +264,10 @@
   };
 
   const app = initializeApp(firebaseConfig);
-  // ====== تفعيل الدخول المجهول ======
   const auth = getAuth(app);
   signInAnonymously(auth)
-    .then(() => {
-      console.log("✅ تم الدخول المجهول بنجاح (صفحة الطباعة)");
-    })
-    .catch((error) => {
-      console.warn("⚠️ فشل الدخول المجهول، لكن الموقع سيستمر في العمل للقراءة فقط:", error);
-    });
+    .then(() => console.log("✅ تم الدخول المجهول بنجاح (صفحة الطباعة)"))
+    .catch((error) => console.warn("⚠️ فشل الدخول المجهول، لكن الموقع سيستمر في العمل للقراءة فقط:", error));
   window.auth = auth;
 
   const db = getDatabase(app);
@@ -314,7 +315,6 @@
         selectedPrinterId = printersList.length > 0 ? printersList[0].id : null;
       }
       renderPrinterList();
-      updateClearAllButton();
     });
   }
   function renderPrinterList() {
@@ -340,9 +340,6 @@
       `;
     });
     printerListContainer.innerHTML = html;
-  }
-  function updateClearAllButton() {
-    clearAllBtn.style.display = printersList.length > 0 ? 'inline-flex' : 'none';
   }
   window.selectPrinter = function(printerId) {
     selectedPrinterId = printerId;
@@ -577,7 +574,7 @@
   }
 
   // ============================================================
-  // Détection automatique du protocole
+  // Détection automatique du protocole (améliorée)
   // ============================================================
   async function detectProtocol(characteristic) {
     try {
@@ -604,7 +601,7 @@
   }
 
   // ============================================================
-  // Impression intelligente (recherche originale)
+  // Impression intelligente (recherche améliorée)
   // ============================================================
   async function smartPrint(order) {
     if (!selectedPrinterId) {
@@ -617,12 +614,40 @@
       return false;
     }
     try {
-      showStatus(`⏳ Connexion à "${selectedPrinter.name}"...`, 'info');
+      showStatus(`⏳ Recherche de l'imprimante...`, 'info');
       if (!navigator.bluetooth) throw new Error('Votre navigateur ne supporte pas Web Bluetooth');
-      const device = await navigator.bluetooth.requestDevice({
-        filters: [{ namePrefix: selectedPrinter.name }],
-        optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb']
-      });
+
+      let device = null;
+      const printerName = selectedPrinter.name || '';
+
+      // الطريقة 1: البحث بالاسم الكامل
+      try {
+        device = await navigator.bluetooth.requestDevice({
+          filters: [{ name: printerName }],
+          optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb']
+        });
+      } catch (e1) {
+        console.warn('Échec recherche par nom:', e1);
+        // الطريقة 2: البحث ببادئة الاسم (أول 10 حروف)
+        try {
+          const prefix = printerName.substring(0, 10);
+          device = await navigator.bluetooth.requestDevice({
+            filters: [{ namePrefix: prefix }],
+            optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb']
+          });
+        } catch (e2) {
+          console.warn('Échec recherche par préfixe:', e2);
+          // الطريقة 3: البحث عن أي جهاز (الأكثر شمولاً)
+          device = await navigator.bluetooth.requestDevice({
+            acceptAllDevices: true,
+            optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb']
+          });
+        }
+      }
+
+      if (!device) throw new Error('Aucun appareil trouvé');
+      
+      showStatus(`✅ Appareil trouvé : ${device.name || 'Inconnu'}`, 'success');
       showStatus(`⏳ Connexion à ${device.name}...`, 'info');
       const server = await device.gatt.connect();
       showStatus('✅ Connecté à l\'imprimante', 'success');
@@ -739,7 +764,7 @@
   }
 
   // ============================================================
-  // Ajout d'une imprimante (inchangé)
+  // Ajout d'une imprimante (AMÉLIORÉ avec recherche large)
   // ============================================================
   addPrinterBtn.addEventListener('click', () => {
     addModal.style.display = 'flex';
@@ -747,70 +772,150 @@
   cancelAddBtn.addEventListener('click', () => {
     addModal.style.display = 'none';
   });
-  confirmAddBtn.addEventListener('click', async () => {
-    const paperWidth = parseInt(paperSizeSelect.value) || 80;
-    addModal.style.display = 'none';
+
+  // ====== دالة إضافة الطابعة (محسنة) ======
+confirmAddBtn.addEventListener('click', async () => {
+  const paperWidth = parseInt(paperSizeSelect.value) || 80;
+  addModal.style.display = 'none';
+  
+  try {
+    showStatus('⏳ تأكد من أن البلوتوث مفعل والطابعة في وضع الاقتران (pairing mode).', 'info');
+    showStatus('⏳ جاري البحث عن الطابعة...', 'info');
+    
+    if (!navigator.bluetooth) {
+      throw new Error('متصفحك لا يدعم Web Bluetooth (استخدم Chrome على Android أو Edge على الكمبيوتر).');
+    }
+    
+    let device = null;
+    const serviceUUID = '000018f0-0000-1000-8000-00805f9b34fb';
+    
+    // === المحاولة 1: البحث بأي جهاز (بدون فلتر) ===
     try {
-      showStatus('⏳ Recherche d\'imprimante...', 'info');
-      if (!navigator.bluetooth) throw new Error('Votre navigateur ne supporte pas Web Bluetooth');
-      const device = await navigator.bluetooth.requestDevice({
-        filters: [{ services: ['000018f0-0000-1000-8000-00805f9b34fb'] }],
-        optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb']
+      showStatus('⏳ المحاولة 1: البحث عن أي جهاز Bluetooth...', 'info');
+      device = await navigator.bluetooth.requestDevice({
+        acceptAllDevices: true,
+        optionalServices: [serviceUUID]
       });
-      showStatus(`⏳ Connexion à ${device.name || 'l\'imprimante'}...`, 'info');
-      const server = await device.gatt.connect();
-      let characteristic;
+    } catch (e1) {
+      console.warn('بحث acceptAllDevices فشل:', e1);
+      
+      // === المحاولة 2: البحث بالخدمة ===
       try {
-        const service = await server.getPrimaryService('000018f0-0000-1000-8000-00805f9b34fb');
-        const chars = await service.getCharacteristics();
+        showStatus('⏳ المحاولة 2: البحث عن أجهزة بها خدمة الطباعة...', 'info');
+        device = await navigator.bluetooth.requestDevice({
+          filters: [{ services: [serviceUUID] }],
+          optionalServices: [serviceUUID]
+        });
+      } catch (e2) {
+        console.warn('بحث بالخدمة فشل:', e2);
+        
+        // === المحاولة 3: البحث باسم يحتوي على "printer" أو "thermal" ===
+        try {
+          showStatus('⏳ المحاولة 3: البحث عن طابعة باسم يحتوي على printer/thermal...', 'info');
+          device = await navigator.bluetooth.requestDevice({
+            filters: [
+              { namePrefix: 'printer' },
+              { namePrefix: 'thermal' },
+              { namePrefix: 'bluetooth' }
+            ],
+            optionalServices: [serviceUUID]
+          });
+        } catch (e3) {
+          console.warn('بحث بالاسم فشل:', e3);
+          throw new Error('❌ لم يتم العثور على أي طابعة. تأكد من:\n- تفعيل البلوتوث\n- تشغيل الطابعة\n- وضع الطابعة في وضع الاقتران (Pairing Mode)\n- قرب الهاتف من الطابعة');
+        }
+      }
+    }
+    
+    if (!device) throw new Error('لم يتم العثور على طابعة.');
+    
+    showStatus(`✅ تم العثور على: ${device.name || 'جهاز غير معروف'}`, 'success');
+    showStatus(`⏳ جاري الاتصال بـ ${device.name}...`, 'info');
+    
+    // الاتصال بالجهاز
+    let server;
+    try {
+      server = await device.gatt.connect();
+    } catch (e) {
+      throw new Error(`فشل الاتصال بـ ${device.name}. تأكد من أن الطابعة قيد التشغيل.`);
+    }
+    
+    // البحث عن خاصية الكتابة
+    let characteristic = null;
+    let service = null;
+    try {
+      service = await server.getPrimaryService(serviceUUID);
+      const chars = await service.getCharacteristics();
+      for (const c of chars) {
+        if (c.properties.write || c.properties.writeWithoutResponse) {
+          characteristic = c;
+          break;
+        }
+      }
+    } catch (e) {
+      // البحث في جميع الخدمات
+      const services = await server.getPrimaryServices();
+      for (const s of services) {
+        const chars = await s.getCharacteristics();
         for (const c of chars) {
           if (c.properties.write || c.properties.writeWithoutResponse) {
+            service = s;
             characteristic = c;
             break;
           }
         }
-      } catch (e) {
-        const services = await server.getPrimaryServices();
-        for (const s of services) {
-          const chars = await s.getCharacteristics();
-          for (const c of chars) {
-            if (c.properties.write || c.properties.writeWithoutResponse) {
-              characteristic = c;
-              break;
-            }
-          }
-          if (characteristic) break;
-        }
+        if (characteristic) break;
       }
-      if (!characteristic) throw new Error('Caractéristique d\'écriture introuvable');
-      showStatus('⏳ Détection du protocole...', 'info');
-      const protocol = await detectProtocol(characteristic);
-      const newPrinterRef = push(printersRef);
-      const printerData = {
-        name: device.name || 'Imprimante inconnue',
-        protocol: protocol,
-        paperWidth: paperWidth,
-        deviceId: device.id || 'unknown',
-        lastUsed: Date.now(),
-        createdAt: Date.now(),
-        detectedAt: Date.now()
-      };
-      await set(newPrinterRef, printerData);
-      selectedPrinterId = newPrinterRef.key;
-      showStatus(`✅ Imprimante "${printerData.name}" enregistrée (${protocol.toUpperCase()}, ${paperWidth}mm)`, 'success');
-    } catch (e) {
-      console.error(e);
-      let errorMsg = e.message || 'Échec de la connexion';
-      if (errorMsg.includes('user cancelled')) errorMsg = 'Connexion annulée';
-      showStatus(`❌ ${errorMsg}`, 'error');
     }
-  });
+    
+    if (!characteristic) {
+      throw new Error('لم نجد خاصية كتابة على هذه الطابعة. قد تكون غير متوافقة.');
+    }
+    
+    showStatus('⏳ جاري اكتشاف البروتوكول...', 'info');
+    const protocol = await detectProtocol(characteristic);
+    
+    // حفظ الطابعة
+    const newPrinterRef = push(printersRef);
+    const printerData = {
+      name: device.name || 'Imprimante inconnue',
+      protocol: protocol,
+      paperWidth: paperWidth,
+      deviceId: device.id || 'unknown',
+      lastUsed: Date.now(),
+      createdAt: Date.now(),
+      detectedAt: Date.now()
+    };
+    await set(newPrinterRef, printerData);
+    selectedPrinterId = newPrinterRef.key;
+    renderPrinterList();
+    showStatus(`✅ تم تسجيل الطابعة "${printerData.name}" (${protocol.toUpperCase()}, ${paperWidth}mm)`, 'success');
+    
+  } catch (e) {
+    console.error(e);
+    let errorMsg = e.message || 'حدث خطأ غير متوقع';
+    if (errorMsg.includes('user cancelled')) {
+      errorMsg = '❌ تم إلغاء البحث من قبل المستخدم.';
+    } else if (errorMsg.includes('not found')) {
+      errorMsg = '❌ لم يتم العثور على طابعة. تأكد من أن الطابعة في وضع الاقتران.';
+    }
+    showStatus(errorMsg, 'error');
+    
+    // عرض زر "إعادة المحاولة"
+    if (confirm('❌ فشل البحث. هل تريد إعادة المحاولة مع تعليمات إضافية؟')) {
+      // إعادة فتح المودال
+      addModal.style.display = 'flex';
+      // عرض تعليمات
+      showStatus('💡 تأكد من أن الطابعة مشغّلة وفي وضع الاقتران (عادةً بالضغط على زر الطاقة لمدة 3 ثوان).', 'warning');
+    }
+  }
+});
 
   // ============================================================
-  // Supprimer toutes les imprimantes (inchangé)
+  // Supprimer toutes les imprimantes
   // ============================================================
   clearAllBtn.addEventListener('click', async () => {
-    if (!confirm('⚠️ Supprimer toutes les imprimantes enregistrées ?')) return;
+    if (!confirm('⚠️ Supprimer toutes les imprimantes enregistrées définitivement ?')) return;
     try {
       await remove(printersRef);
       selectedPrinterId = null;
@@ -821,7 +926,7 @@
   });
 
   // ============================================================
-  // Affichage de la liste des factures (inchangé)
+  // Affichage de la liste des factures
   // ============================================================
   function renderInvoicesList(confirmedData) {
     const container = document.getElementById('app');
@@ -857,7 +962,7 @@
   }
 
   // ============================================================
-  // Fonctions d'impression (inchangées)
+  // Fonctions d'impression
   // ============================================================
   window.printInvoice = async (key) => {
     try {
