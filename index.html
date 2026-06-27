@@ -7,7 +7,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
-    /* ====== كل الستايل يبقى كما هو ====== */
+    /* ====== كل الستايل الأصلي مع إضافات الجملة ====== */
     * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     body {
       font-family: 'Cairo', 'Segoe UI', system-ui, sans-serif;
@@ -17,6 +17,7 @@
       text-align: right;
       min-height: 100vh;
       padding-bottom: 80px;
+      transition: background 0.3s;
     }
     :root {
       --primary: #10b981;
@@ -24,6 +25,8 @@
       --success: #2ecc71;
       --danger: #e74c3c;
       --warning: #f39c12;
+      --vip: #8e44ad;
+      --vip-light: #f3e9ff;
       --card: #ffffff;
       --text: #1e293b;
       --muted: #64748b;
@@ -33,6 +36,21 @@
       --shadow-lg: 0 12px 28px rgba(0,0,0,0.1);
       --radius-card: 20px;
     }
+
+    /* ====== حالة الجملة النشطة ====== */
+    body.wholesale-active {
+      background: var(--vip-light);
+    }
+    body.wholesale-active .product-price {
+      color: var(--vip) !important;
+    }
+    body.wholesale-active #cartBtn {
+      background: linear-gradient(135deg, var(--vip), #9b59b6);
+    }
+    body.wholesale-active .cat-btn.active {
+      background: linear-gradient(135deg, var(--vip), #9b59b6);
+    }
+
     header {
       position: sticky;
       top: 0;
@@ -109,6 +127,64 @@
     .cat-clear-btn.show { display: inline-flex; align-items: center; gap: 4px; }
     .cat-clear-btn:hover { background: #fef2f2; transform: scale(0.95); }
 
+    /* ====== صندوق الجملة السري (يظهر بالضغط على الشعار) ====== */
+    .wholesale-box {
+      background: linear-gradient(145deg, #ffffff, #fafcff);
+      margin: 16px 20px;
+      padding: 18px 22px;
+      border-radius: 28px;
+      box-shadow: var(--shadow-md);
+      border: 1px solid rgba(0,0,0,0.03);
+      display: none; /* مخفي حتى نضغط على الشعار */
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .wholesale-box .info { display: flex; align-items: center; gap: 14px; }
+    .wholesale-box .info .icon {
+      width: 48px; height: 48px;
+      background: linear-gradient(135deg, #8e44ad, #9b59b6);
+      border-radius: 16px;
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-size: 1.4rem;
+      box-shadow: 0 4px 12px rgba(142,68,173,0.3);
+    }
+    .wholesale-box .info .text h3 { font-size: 0.95rem; font-weight: 800; margin-bottom: 2px; }
+    .wholesale-box .info .text p { font-size: 0.75rem; color: var(--muted); }
+    .wholesale-box .actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .wholesale-box .actions input {
+      padding: 10px 16px; border: 1px solid var(--border); border-radius: 40px;
+      background: #f8fafc; font-family: inherit; outline: none; min-width: 140px; direction: ltr;
+    }
+    .wholesale-box .actions input:focus { border-color: #8e44ad; box-shadow: 0 0 0 3px rgba(142,68,173,0.15); }
+    .wholesale-box .actions button {
+      padding: 10px 24px; border: none; border-radius: 40px; font-weight: 700;
+      cursor: pointer; transition: 0.2s; font-family: 'Cairo', sans-serif;
+    }
+    .btn-activate { background: linear-gradient(135deg, #8e44ad, #9b59b6); color: white; box-shadow: 0 4px 12px rgba(142,68,173,0.3); }
+    .btn-activate:hover { transform: scale(1.03); }
+    .btn-deactivate { background: #eef2f6; color: #475569; }
+    .btn-deactivate:hover { background: #e2e8f0; }
+    #wholesaleStatus {
+      font-weight: 700; font-size: 0.85rem; padding: 6px 14px; border-radius: 30px;
+      background: #f1f5f9; white-space: nowrap;
+    }
+    #wholesaleStatus.active { background: #d4edda; color: #155724; }
+    #wholesaleStatus.inactive { background: #f8d7da; color: #721c24; }
+    @media (max-width: 600px) {
+      .wholesale-box { flex-direction: column; align-items: stretch; }
+      .wholesale-box .actions { flex-direction: column; }
+      .wholesale-box .actions input { width: 100%; }
+      .wholesale-box .actions button { width: 100%; }
+    }
+
+    /* حالة التفعيل (يتغير لون المتجر) */
+    body.wholesale-active { background: #f3e9ff; }
+    body.wholesale-active .product-price { color: #8e44ad !important; }
+    body.wholesale-active #cartBtn { background: linear-gradient(135deg, #8e44ad, #9b59b6); }
+    body.wholesale-active .cat-btn.active { background: linear-gradient(135deg, #8e44ad, #9b59b6); }
+
     .products-container {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -147,11 +223,38 @@
       height: 2.5rem;
       overflow: hidden;
     }
+    /* ====== عرض السعر (يدعم الجملة) ====== */
     .product-price {
       font-size: 1.1rem;
       font-weight: 800;
       color: var(--primary);
       margin-bottom: 4px;
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .product-price .retail-price {
+      font-size: 0.9rem;
+      color: var(--muted);
+      text-decoration: line-through;
+    }
+    .product-price .wholesale-price {
+      font-size: 1.2rem;
+      color: var(--vip);
+    }
+    .product-price .wholesale-price .badge {
+      font-size: 0.6rem;
+      background: var(--vip);
+      color: white;
+      padding: 2px 10px;
+      border-radius: 30px;
+      margin-right: 6px;
+      vertical-align: middle;
+    }
+    .product-price .normal-price {
+      font-size: 1.2rem;
+      color: inherit;
     }
     .product-family-tag {
       font-size: 0.7rem;
@@ -191,22 +294,15 @@
       background: white;
     }
 
-    /* ====== ستايل التخفيضات ====== */
+    /* ====== ستايل التخفيضات (يبقى كما هو) ====== */
     .product-card.on-sale {
       border: 3px solid #dc2626;
       background: #fff5f5;
       box-shadow: 0 0 20px rgba(220,38,38,0.15);
     }
-    .product-card.on-sale .product-price {
-      color: #dc2626;
-      font-size: 1.3rem;
-    }
-    .product-card.on-sale .old-price {
-      text-decoration: line-through;
-      color: #9ca3af;
-      font-size: 0.8rem;
-      margin-left: 6px;
-    }
+    .product-card.on-sale .normal-price { color: #dc2626; }
+    .product-card.on-sale .wholesale-price { color: #dc2626; }
+    .product-card.on-sale .retail-price { text-decoration: line-through; color: #9ca3af; font-size: 0.8rem; margin-left: 6px; }
     .sale-badge {
       position: absolute;
       top: 8px;
@@ -250,7 +346,6 @@
       width: 100%;
       overflow: hidden;
     }
-
     .promo-ribbon {
       position: absolute;
       bottom: 0;
@@ -436,7 +531,7 @@
 <body>
 
 <header>
-  <div class="logo">
+  <div class="logo" onclick="toggleWholesaleBox()">
     <img src="https://i.postimg.cc/3J7HQ20j/1000022206-removebg-preview.png" alt="Logo">
     <span>aksel & anais</span>
   </div>
@@ -459,12 +554,29 @@
     <span class="cat-count" id="countAll">0</span>
   </button>
   <button class="cat-btn" data-family="discounts" id="filterDiscountsBtn" onclick="setFamily('discounts')">
-  <i class="fas fa-tags"></i> التخفيضات
-  <span class="cat-count" id="countDiscounts">0</span>
-</button>
+    <i class="fas fa-tags"></i> التخفيضات
+    <span class="cat-count" id="countDiscounts">0</span>
+  </button>
   <button class="cat-clear-btn" id="clearFilterBtn" onclick="clearFamilyFilter()">
     <i class="fas fa-times-circle"></i> إلغاء التصفية
   </button>
+</div>
+
+<!-- ====== صندوق الجملة السري (يظهر بالضغط على الشعار) ====== -->
+<div id="wholesaleBox" class="wholesale-box">
+  <div class="info">
+    <div class="icon"><i class="fa-solid fa-crown"></i></div>
+    <div class="text">
+      <h3 id="wholesaleStatusTitle">💎 أسعار الجملة</h3>
+      <p id="wholesaleStatusDesc">👑 خاص بزبائن الجملة - أدخل الرمز السري</p>
+    </div>
+  </div>
+  <div class="actions">
+    <input type="password" id="wholesaleInput" placeholder="الرمز السري" dir="ltr">
+    <button class="btn-activate" onclick="activateWholesale()">تفعيل</button>
+    <button class="btn-deactivate" onclick="deactivateWholesale()" style="display:none;">إلغاء التفعيل</button>
+    <span id="wholesaleStatus" class="inactive">غير مفعل</span>
+  </div>
 </div>
 
 <div class="products-container" id="productsContainer"></div>
@@ -507,7 +619,7 @@
   import { getDatabase, ref, onValue, get, push, set, update } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
   import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 
-  // ====== الإعدادات الجديدة لـ Firebase (تم استبدالها) ======
+  // ====== إعدادات Firebase الخاصة بمتجرك ======
   const firebaseConfig = {
     apiKey: "AIzaSyAr3Opxs_ikZZ4JZqArcnM8T_YEeyzS_mI",
     authDomain: "aksel-ff2ef.firebaseapp.com",
@@ -519,25 +631,15 @@
     measurementId: "G-4KFHZ1ZFQ9"
   };
 
-  // ====== مفتاح ImgBB الجديد ======
-  const IMGBB_KEY = "7a64e5d9dc491bbce3ab42186c17e006"; // (يمكن استخدامه لاحقاً)
-
   const app = initializeApp(firebaseConfig);
-  // ====== تفعيل الدخول المجهول ======
   const auth = getAuth(app);
-  signInAnonymously(auth)
-    .then(() => {
-      console.log("✅ تم الدخول المجهول بنجاح (المتجر)");
-    })
-    .catch((error) => {
-      console.warn("⚠️ فشل الدخول المجهول، لكن الموقع سيستمر في العمل للقراءة فقط:", error);
-    });
+  signInAnonymously(auth).then(() => console.log("✅ تم الدخول المجهول")).catch(() => console.warn("⚠️ فشل الدخول المجهول، لكن القراءة مستمرة"));
   window.auth = auth;
   const db = getDatabase(app);
   const WHATSAPP_NUMBER = "2130781554885";
 
   // ============================================================
-  // بيانات التخفيضات والمنتجات والعائلات
+  // البيانات العامة
   // ============================================================
   let allProducts = [];
   let allDiscounts = {};
@@ -547,6 +649,10 @@
   let currentPage = 1;
   const itemsPerPage = 20;
   let searchTerm = '';
+
+  // ====== متغيرات الجملة (مرة واحدة فقط) ======
+  let isWholesaleActive = localStorage.getItem('wholesale_active') === 'true';
+  let wholesaleCode = null;
 
   // ============================================================
   // تحميل البيانات من Firebase
@@ -562,15 +668,12 @@
 
   onValue(ref(db, 'discounts'), (snapshot) => {
     const data = snapshot.val() || {};
-    // إلغاء تنشيط التخفيضات المنتهية تلقائياً
     const now = Date.now();
     Object.entries(data).forEach(([productId, discount]) => {
       if (discount.isActive && !discount.unlimited && discount.endDate) {
         if (new Date(discount.endDate).getTime() < now) {
-          // تحديث في قاعدة البيانات (سيتم تطبيقه فوراً)
-          const refPath = ref(db, `discounts/${productId}`);
-          update(refPath, { isActive: false }).catch(console.error);
-          delete data[productId]; // إزالة من الكائن المحلي
+          update(ref(db, `discounts/${productId}`), { isActive: false }).catch(console.error);
+          delete data[productId];
         }
       }
     });
@@ -579,13 +682,10 @@
     startCountdownTimers();
   });
 
-  // تحميل العائلات
   onValue(ref(db, 'families'), (snap) => {
     const data = snap.val();
     if (data) {
-      familiesList = Object.values(data).map(item => {
-        return typeof item === 'string' ? item : item.name || item;
-      });
+      familiesList = Object.values(data).map(item => typeof item === 'string' ? item : item.name || item);
     } else {
       familiesList = [];
     }
@@ -593,76 +693,139 @@
     updateFamilyCounts();
   });
 
-  // تحميل الغلاف
   onValue(ref(db, 'store/cover'), (snap) => {
     const img = document.getElementById('coverImage');
     if (snap.exists() && snap.val().url) img.src = snap.val().url;
   });
 
+  // ====== جلب الرقم السري للجملة ======
+  onValue(ref(db, 'store/wholesaleCode'), (snap) => {
+    if (snap.exists()) {
+      wholesaleCode = snap.val().code || null;
+    } else {
+      wholesaleCode = null;
+    }
+    // إذا كان مفعلاً مسبقاً، نحدث الواجهة
+    if (isWholesaleActive && wholesaleCode) {
+      applyWholesaleUI(true);
+    }
+  });
+
+  // ============================================================
+  // دوال الجملة (السرية)
+  // ============================================================
+  window.toggleWholesaleBox = () => {
+    const box = document.getElementById('wholesaleBox');
+    box.style.display = (box.style.display === 'flex') ? 'none' : 'flex';
+  };
+
+  window.activateWholesale = async () => {
+    const input = document.getElementById('wholesaleInput').value.trim();
+    if (!input) return alert("الرجاء إدخال الرمز السري");
+    if (!wholesaleCode) return alert("الرمز السري غير مضبوط في قاعدة البيانات");
+    if (input === wholesaleCode) {
+      isWholesaleActive = true;
+      localStorage.setItem('wholesale_active', 'true');
+      applyWholesaleUI(true);
+      cart = [];
+      localStorage.removeItem('cart_store');
+      applyFiltersAndRender();
+      alert("✅ تم تفعيل أسعار الجملة بنجاح! السلة فارغة الآن.");
+    } else {
+      alert("❌ الرمز السري غير صحيح");
+    }
+  };
+
+  window.deactivateWholesale = () => {
+    isWholesaleActive = false;
+    localStorage.setItem('wholesale_active', 'false');
+    applyWholesaleUI(false);
+    cart = [];
+    localStorage.removeItem('cart_store');
+    applyFiltersAndRender();
+    alert("تم إلغاء تفعيل أسعار الجملة.");
+  };
+
+  function applyWholesaleUI(active) {
+    const body = document.body;
+    const status = document.getElementById('wholesaleStatus');
+    const title = document.getElementById('wholesaleStatusTitle');
+    const desc = document.getElementById('wholesaleStatusDesc');
+    const deactivateBtn = document.querySelector('.btn-deactivate');
+
+    if (active) {
+      body.classList.add('wholesale-active');
+      status.className = 'active';
+      status.textContent = '✅ مفعل';
+      title.innerHTML = '✅ تم تفعيل أسعار الجملة';
+      desc.textContent = 'الآن يمكنك الشراء بأسعار الجملة';
+      deactivateBtn.style.display = 'inline-block';
+    } else {
+      body.classList.remove('wholesale-active');
+      status.className = 'inactive';
+      status.textContent = 'غير مفعل';
+      title.innerHTML = '💎 أسعار الجملة';
+      desc.textContent = '👑 خاص بزبائن الجملة - أدخل الرمز السري';
+      deactivateBtn.style.display = 'none';
+    }
+  }
+
   // ============================================================
   // دوال العائلات والفلترة
   // ============================================================
   function renderCategoryButtons() {
-  const bar = document.getElementById('categoriesBar');
-  const existingBtns = bar.querySelectorAll('.cat-btn:not(#filterAllBtn):not(#filterDiscountsBtn)');
-  existingBtns.forEach(btn => btn.remove());
-  
-  // إضافة أزرار العائلات
-  familiesList.forEach(family => {
-    const btn = document.createElement('button');
-    btn.className = 'cat-btn';
-    btn.dataset.family = family;
-    btn.innerHTML = `
-      <i class="fas fa-tag"></i> ${escapeHtml(family)}
-      <span class="cat-count" id="count_${escapeHtml(family)}">0</span>
-    `;
-    btn.addEventListener('click', () => setFamily(family));
-    bar.insertBefore(btn, document.getElementById('clearFilterBtn'));
-  });
-  
-  updateActiveCategory();
-}
+    const bar = document.getElementById('categoriesBar');
+    const existingBtns = bar.querySelectorAll('.cat-btn:not(#filterAllBtn):not(#filterDiscountsBtn)');
+    existingBtns.forEach(btn => btn.remove());
+    familiesList.forEach(family => {
+      const btn = document.createElement('button');
+      btn.className = 'cat-btn';
+      btn.dataset.family = family;
+      btn.innerHTML = `
+        <i class="fas fa-tag"></i> ${escapeHtml(family)}
+        <span class="cat-count" id="count_${escapeHtml(family)}">0</span>
+      `;
+      btn.addEventListener('click', () => setFamily(family));
+      bar.insertBefore(btn, document.getElementById('clearFilterBtn'));
+    });
+    updateActiveCategory();
+  }
 
   function updateActiveCategory() {
-  document.querySelectorAll('.cat-btn').forEach(btn => {
-    const family = btn.dataset.family;
-    btn.classList.toggle('active', family === currentFamilyFilter);
-  });
-  
-  const clearBtn = document.getElementById('clearFilterBtn');
-  if (currentFamilyFilter !== 'الكل' && currentFamilyFilter !== 'discounts') {
-    clearBtn.classList.add('show');
-    clearBtn.innerHTML = `<i class="fas fa-times-circle"></i> ✕ ${escapeHtml(currentFamilyFilter)}`;
-  } else if (currentFamilyFilter === 'discounts') {
-    clearBtn.classList.add('show');
-    clearBtn.innerHTML = `<i class="fas fa-times-circle"></i> ✕ التخفيضات`;
-  } else {
-    clearBtn.classList.remove('show');
+    document.querySelectorAll('.cat-btn').forEach(btn => {
+      const family = btn.dataset.family;
+      btn.classList.toggle('active', family === currentFamilyFilter);
+    });
+    const clearBtn = document.getElementById('clearFilterBtn');
+    if (currentFamilyFilter !== 'الكل' && currentFamilyFilter !== 'discounts') {
+      clearBtn.classList.add('show');
+      clearBtn.innerHTML = `<i class="fas fa-times-circle"></i> ✕ ${escapeHtml(currentFamilyFilter)}`;
+    } else if (currentFamilyFilter === 'discounts') {
+      clearBtn.classList.add('show');
+      clearBtn.innerHTML = `<i class="fas fa-times-circle"></i> ✕ التخفيضات`;
+    } else {
+      clearBtn.classList.remove('show');
+    }
   }
-}
 
   function updateFamilyCounts() {
-  const totalProducts = allProducts.filter(p => !p.hidden).length;
-  const countAll = document.getElementById('countAll');
-  if (countAll) countAll.textContent = totalProducts;
-  
-  // حساب عدد المنتجات المخفضة
-  const discountCount = allProducts.filter(p => {
-    if (p.hidden) return false;
-    const discount = allDiscounts[p.id];
-    return discount && discount.isActive &&
-      (discount.unlimited || (discount.endDate && new Date(discount.endDate).getTime() > Date.now()));
-  }).length;
-  const countDiscounts = document.getElementById('countDiscounts');
-  if (countDiscounts) countDiscounts.textContent = discountCount;
-  
-  // حساب عدد كل عائلة
-  familiesList.forEach(family => {
-    const count = allProducts.filter(p => !p.hidden && p.family === family).length;
-    const countEl = document.getElementById(`count_${escapeHtml(family)}`);
-    if (countEl) countEl.textContent = count;
-  });
-}
+    const totalProducts = allProducts.filter(p => !p.hidden).length;
+    const countAll = document.getElementById('countAll');
+    if (countAll) countAll.textContent = totalProducts;
+    const discountCount = allProducts.filter(p => {
+      if (p.hidden) return false;
+      const discount = allDiscounts[p.id];
+      return discount && discount.isActive &&
+        (discount.unlimited || (discount.endDate && new Date(discount.endDate).getTime() > Date.now()));
+    }).length;
+    const countDiscounts = document.getElementById('countDiscounts');
+    if (countDiscounts) countDiscounts.textContent = discountCount;
+    familiesList.forEach(family => {
+      const count = allProducts.filter(p => !p.hidden && p.family === family).length;
+      const countEl = document.getElementById(`count_${escapeHtml(family)}`);
+      if (countEl) countEl.textContent = count;
+    });
+  }
 
   window.setFamily = (family) => {
     currentFamilyFilter = family;
@@ -677,35 +840,29 @@
   };
 
   function applyFiltersAndRender() {
-  let filtered = allProducts.filter(p => !p.hidden);
-  
-  // فلترة حسب العائلة
-  if (currentFamilyFilter === 'discounts') {
-    // عرض المنتجات التي عليها تخفيض نشط فقط
-    filtered = filtered.filter(p => {
-      const discount = allDiscounts[p.id];
-      return discount && discount.isActive &&
-        (discount.unlimited || (discount.endDate && new Date(discount.endDate).getTime() > Date.now()));
-    });
-  } else if (currentFamilyFilter !== 'الكل') {
-    filtered = filtered.filter(p => p.family === currentFamilyFilter);
+    let filtered = allProducts.filter(p => !p.hidden);
+    if (currentFamilyFilter === 'discounts') {
+      filtered = filtered.filter(p => {
+        const discount = allDiscounts[p.id];
+        return discount && discount.isActive &&
+          (discount.unlimited || (discount.endDate && new Date(discount.endDate).getTime() > Date.now()));
+      });
+    } else if (currentFamilyFilter !== 'الكل') {
+      filtered = filtered.filter(p => p.family === currentFamilyFilter);
+    }
+    if (searchTerm.trim()) {
+      const term = searchTerm.toLowerCase().trim();
+      filtered = filtered.filter(p =>
+        p.name.toLowerCase().includes(term) ||
+        (p.serial && p.serial.toLowerCase().includes(term))
+      );
+    }
+    renderProducts(filtered);
+    updateFamilyCounts();
   }
-  
-  // فلترة حسب البحث
-  if (searchTerm.trim()) {
-    const term = searchTerm.toLowerCase().trim();
-    filtered = filtered.filter(p =>
-      p.name.toLowerCase().includes(term) ||
-      (p.serial && p.serial.toLowerCase().includes(term))
-    );
-  }
-  
-  renderProducts(filtered);
-  updateFamilyCounts();
-}
 
   // ============================================================
-  // عرض المنتجات مع التخفيضات
+  // عرض المنتجات مع دعم الجملة
   // ============================================================
   function renderProducts(filteredProducts) {
     const container = document.getElementById('productsContainer');
@@ -725,33 +882,46 @@
       const isOnSale = discount && discount.isActive && 
         (discount.unlimited || (discount.endDate && new Date(discount.endDate).getTime() > Date.now()));
 
+      const basePrice = Number(p.price) || 0;
+      const salePrice = isOnSale ? Number(discount.newPrice) : basePrice;
+      const wholesalePrice = (p.wholesalePrice !== undefined && !isNaN(p.wholesalePrice)) ? Number(p.wholesalePrice) : null;
+
+      let displayPrice, strikePrice;
+      if (isWholesaleActive && wholesalePrice !== null) {
+        displayPrice = wholesalePrice;
+        strikePrice = basePrice;
+      } else {
+        displayPrice = salePrice;
+        strikePrice = null;
+      }
+
+      const formattedDisplay = displayPrice.toLocaleString();
+      const formattedStrike = strikePrice !== null ? strikePrice.toLocaleString() : '';
+
       const inCart = cart.find(i => i.id === p.id);
       const qty = inCart ? inCart.quantity : 0;
-      const originalPrice = Number(p.price) || 0;
-      const salePrice = isOnSale ? Number(discount.newPrice) : originalPrice;
-      const formattedSalePrice = salePrice.toLocaleString();
-      const formattedOriginal = originalPrice.toLocaleString();
 
-      const card = document.createElement('div');
-      card.className = 'product-card';
-      if (isOnSale) card.classList.add('on-sale');
+      let priceHtml = '';
+      if (strikePrice !== null) {
+        priceHtml = `
+          <span class="retail-price">${formattedStrike} دج</span>
+          <span class="wholesale-price">${formattedDisplay} دج <span class="badge">جملة</span></span>
+        `;
+      } else {
+        priceHtml = `<span class="normal-price">${formattedDisplay} دج</span>`;
+      }
 
-      // شريط PROMO المائل
       let ribbonHtml = '';
       if (isOnSale) {
         const ribbonColor = discount.unlimited ? 'orange' : '';
         ribbonHtml = `<div class="promo-ribbon ${ribbonColor}">PROMO </div>`;
       }
-
-      // شارة التخفيض (بجانب الصورة)
       let badgeHtml = '';
       if (isOnSale) {
         badgeHtml = discount.unlimited ?
-  `<div class="sale-badge" style="background:#2563eb;"><i class="fas fa-infinity"></i></div>` :
-  `<div class="sale-badge"><i class="fas fa-percent"></i></div>`;
+          `<div class="sale-badge" style="background:#2563eb;"><i class="fas fa-infinity"></i></div>` :
+          `<div class="sale-badge"><i class="fas fa-percent"></i></div>`;
       }
-
-      // العد التنازلي
       let timerHtml = '';
       if (isOnSale && !discount.unlimited && discount.endDate) {
         timerHtml = `<div class="discount-timer" id="timer_${p.id}" data-end="${discount.endDate}" data-productid="${p.id}"><i class="far fa-clock"></i> <span class="time-left">جاري...</span></div>`;
@@ -759,27 +929,30 @@
         timerHtml = `<div class="discount-timer unlimited"><i class="fas fa-infinity"></i> تخفيض دائم</div>`;
       }
 
-      // بناء البطاقة
+      const card = document.createElement('div');
+      card.className = 'product-card';
+      if (isOnSale) card.classList.add('on-sale');
+
       card.innerHTML = `
-  <div class="product-image-wrapper">
-    <img src="${p.imageUrl || 'https://via.placeholder.com/150'}" onclick="viewImage('${p.imageUrl || ''}')" loading="lazy">
-    ${ribbonHtml}
-  </div>
-  <div class="product-info">
-    <h3>${escapeHtml(p.name)}</h3>
-    <div class="product-price">
-      ${isOnSale ? `<span class="old-price">${formattedOriginal} دج</span>` : ''}
-      ${formattedSalePrice} دج
-    </div>
-    <div class="product-family-tag">🏷️ ${p.family || 'غير مصنف'}</div>
-    ${timerHtml}
-    <div class="qty-controls">
-      <button class="qty-btn" onclick="updateQty('${p.id}', -1)">-</button>
-      <input type="number" class="qty-input" value="${qty}" min="0" onchange="manualQty('${p.id}', this.value)">
-      <button class="qty-btn" onclick="updateQty('${p.id}', 1)">+</button>
-    </div>
-  </div>
-`;
+        <div class="product-image-wrapper">
+          <img src="${p.imageUrl || 'https://via.placeholder.com/150'}" onclick="viewImage('${p.imageUrl || ''}')" loading="lazy">
+          ${ribbonHtml}
+          ${badgeHtml}
+        </div>
+        <div class="product-info">
+          <h3>${escapeHtml(p.name)}</h3>
+          <div class="product-price">
+            ${priceHtml}
+          </div>
+          <div class="product-family-tag">🏷️ ${p.family || 'غير مصنف'}</div>
+          ${timerHtml}
+          <div class="qty-controls">
+            <button class="qty-btn" onclick="updateQty('${p.id}', -1)">-</button>
+            <input type="number" class="qty-input" value="${qty}" min="0" onchange="manualQty('${p.id}', this.value)">
+            <button class="qty-btn" onclick="updateQty('${p.id}', 1)">+</button>
+          </div>
+        </div>
+      `;
       container.appendChild(card);
     });
 
@@ -788,54 +961,26 @@
   }
 
   // ============================================================
-  // العد التنازلي (تحديث كل ثانية)
+  // دوال السلة (مع دعم الجملة)
   // ============================================================
-  function updateTimer(el) {
-    const endDate = new Date(el.dataset.end);
-    const now = new Date();
-    const diff = endDate.getTime() - now.getTime();
-    const timeSpan = el.querySelector('.time-left');
-    if (!timeSpan) return;
-
-    if (diff <= 0) {
-      timeSpan.textContent = 'انتهى!';
-      el.style.background = '#e5e7eb';
-      el.style.color = '#6b7280';
-      // إلغاء تنشيط التخفيض في Firebase
-      const productId = el.dataset.productid;
-      if (productId && allDiscounts[productId] && allDiscounts[productId].isActive) {
-        const refPath = ref(db, `discounts/${productId}`);
-        update(refPath, { isActive: false }).catch(console.error);
-      }
-      return;
+  function getEffectivePrice(product) {
+    const discount = allDiscounts[product.id];
+    const isOnSale = discount && discount.isActive && 
+      (discount.unlimited || (discount.endDate && new Date(discount.endDate).getTime() > Date.now()));
+    const basePrice = Number(product.price) || 0;
+    const salePrice = isOnSale ? Number(discount.newPrice) : basePrice;
+    const wholesalePrice = (product.wholesalePrice !== undefined && !isNaN(product.wholesalePrice)) ? Number(product.wholesalePrice) : null;
+    if (isWholesaleActive && wholesalePrice !== null) {
+      return wholesalePrice;
     }
-    const days = Math.floor(diff / (1000*60*60*24));
-    const hours = Math.floor((diff % (1000*60*60*24)) / (1000*60*60));
-    const mins = Math.floor((diff % (1000*60*60)) / (1000*60));
-    const secs = Math.floor((diff % (1000*60)) / 1000);
-    let str = '';
-    if (days > 0) str += `${days}يوم `;
-    str += `${String(hours).padStart(2,'0')}:${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
-    timeSpan.textContent = str;
+    return salePrice;
   }
 
-  function startCountdownTimers() {
-    setInterval(() => {
-      document.querySelectorAll('.discount-timer[data-end]').forEach(el => updateTimer(el));
-    }, 1000);
-    // تحديث فوري للمؤقتات الموجودة
-    setTimeout(() => {
-      document.querySelectorAll('.discount-timer[data-end]').forEach(el => updateTimer(el));
-    }, 100);
-  }
-
-  // ============================================================
-  // دوال السلة
-  // ============================================================
   window.updateQty = (id, change) => {
     const p = allProducts.find(x => x.id === id);
+    if (!p) return;
     const idx = cart.findIndex(x => x.id === id);
-    const price = Number(p.price) || 0;
+    const price = getEffectivePrice(p);
     if (idx > -1) {
       cart[idx].quantity += change;
       if (cart[idx].quantity <= 0) cart.splice(idx, 1);
@@ -848,8 +993,9 @@
 
   window.manualQty = (id, val) => {
     const p = allProducts.find(x => x.id === id);
+    if (!p) return;
     const quantity = parseInt(val) || 0;
-    const price = Number(p.price) || 0;
+    const price = getEffectivePrice(p);
     const idx = cart.findIndex(x => x.id === id);
     if (quantity > 0) {
       if (idx > -1) cart[idx].quantity = quantity;
@@ -891,6 +1037,44 @@
   };
 
   window.clearCart = () => { cart = []; localStorage.removeItem('cart_store'); applyFiltersAndRender(); closeModal('cartModal'); };
+
+  // ============================================================
+  // العد التنازلي
+  // ============================================================
+  function updateTimer(el) {
+    const endDate = new Date(el.dataset.end);
+    const now = new Date();
+    const diff = endDate.getTime() - now.getTime();
+    const timeSpan = el.querySelector('.time-left');
+    if (!timeSpan) return;
+    if (diff <= 0) {
+      timeSpan.textContent = 'انتهى!';
+      el.style.background = '#e5e7eb';
+      el.style.color = '#6b7280';
+      const productId = el.dataset.productid;
+      if (productId && allDiscounts[productId] && allDiscounts[productId].isActive) {
+        update(ref(db, `discounts/${productId}`), { isActive: false }).catch(console.error);
+      }
+      return;
+    }
+    const days = Math.floor(diff / (1000*60*60*24));
+    const hours = Math.floor((diff % (1000*60*60*24)) / (1000*60*60));
+    const mins = Math.floor((diff % (1000*60*60)) / (1000*60));
+    const secs = Math.floor((diff % (1000*60)) / 1000);
+    let str = '';
+    if (days > 0) str += `${days}يوم `;
+    str += `${String(hours).padStart(2,'0')}:${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
+    timeSpan.textContent = str;
+  }
+
+  function startCountdownTimers() {
+    setInterval(() => {
+      document.querySelectorAll('.discount-timer[data-end]').forEach(el => updateTimer(el));
+    }, 1000);
+    setTimeout(() => {
+      document.querySelectorAll('.discount-timer[data-end]').forEach(el => updateTimer(el));
+    }, 100);
+  }
 
   // ============================================================
   // تحديد الموقع
@@ -964,19 +1148,19 @@
   }
 
   async function saveOrderToFirebase(orderData) {
-  try {
-    const ordersRef = ref(db, 'whatsappOrders');
-    const newOrderRef = push(ordersRef);
-    orderData.timestamp = Date.now();
-    orderData.status = "pending";
-    await set(newOrderRef, orderData);
-    return true;
-  } catch (e) {
-    console.error("❌ خطأ في حفظ الطلب:", e);
-    alert("❌ فشل حفظ الطلب في قاعدة البيانات:\n" + e.message);
-    return false;
+    try {
+      const ordersRef = ref(db, 'whatsappOrders');
+      const newOrderRef = push(ordersRef);
+      orderData.timestamp = Date.now();
+      orderData.status = "pending";
+      await set(newOrderRef, orderData);
+      return true;
+    } catch (e) {
+      console.error("❌ خطأ في حفظ الطلب:", e);
+      alert("❌ فشل حفظ الطلب في قاعدة البيانات:\n" + e.message);
+      return false;
+    }
   }
-}
 
   window.submitOrder = async () => {
     const name = document.getElementById('custName').value.trim();
@@ -1005,7 +1189,7 @@
       document.getElementById('custName').value = '';
       document.getElementById('custPhone').value = '';
       document.getElementById('custAddress').value = '';
-      alert("✅ تم  تاكيد الطلب يرجى اكمال عمليه عبر الوتساب.  ");
+      alert("✅ تم تاكيد الطلب يرجى اكمال عمليه عبر الوتساب.");
       closeModal('cartModal');
     } else {
       alert("❌ حدث خطأ في حفظ الطلب، يرجى المحاولة مرة أخرى");
@@ -1079,6 +1263,15 @@
       return m;
     });
   }
+
+  // ====== تطبيق الحالة المحفوظة عند بدء التشغيل ======
+  setTimeout(() => {
+    if (isWholesaleActive && wholesaleCode) {
+      applyWholesaleUI(true);
+    } else {
+      applyWholesaleUI(false);
+    }
+  }, 500);
 </script>
 
 <footer>
