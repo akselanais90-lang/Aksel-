@@ -8,7 +8,6 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/esc-pos-encoder@1.3.0/dist/esc-pos-encoder.umd.js"></script>
   <style>
-    /* جميع الأنماط كما هي دون تغيير */
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: 'Cairo', 'Segoe UI', sans-serif;
@@ -251,7 +250,7 @@
   import { getDatabase, ref, onValue, set, remove, push, get, update } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
   import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 
-  // ====== إعدادات Firebase الجديدة ======
+  // ====== إعدادات Firebase ======
   const firebaseConfig = {
     apiKey: "AIzaSyAr3Opxs_ikZZ4JZqArcnM8T_YEeyzS_mI",
     authDomain: "aksel-ff2ef.firebaseapp.com",
@@ -365,7 +364,7 @@
   };
 
   // ============================================================
-  // Commandes ESC/POS originales (pour la détection)
+  // Commandes ESC/POS
   // ============================================================
   const ESC = 0x1B;
   const GS = 0x1D;
@@ -381,7 +380,7 @@
   function escposAlign(align) { return new Uint8Array([ESC, 0x61, align]); }
 
   // ============================================================
-  // Construction de la facture (LTR, grand format, espaces élargis)
+  // بناء الفاتورة
   // ============================================================
   function buildInvoice(order) {
     const items = order.items || [];
@@ -397,92 +396,35 @@
     }
     const encoder = new EscPosEncoder();
     encoder.initialize();
-    // 1. Nom du magasin (centre, gras, très grand)
-    encoder
-      .align('center')
-      .bold(true)
-      .size(2, 2)
-      .text('aksel & anais')
-      .size(1, 1)
-      .bold(false)
-      .newline();
-    // 2. Ligne de séparation
-    encoder
-      .align('center')
-      .text('='.repeat(48))
-      .newline();
-    // 3. Informations (alignées à gauche, LTR, taille 2x1)
-    encoder.align('left');
-    encoder.size(2, 1);
+    encoder.align('center').bold(true).size(2, 2).text('aksel & anais').size(1, 1).bold(false).newline();
+    encoder.align('center').text('='.repeat(48)).newline();
+    encoder.align('left').size(2, 1);
     encoder.text(`N° Facture : ${invoiceNumber}`);
     encoder.text(`Date : ${date}`);
     encoder.text(`Client : ${customer}`);
     if (phone) encoder.text(`Tél : ${phone}`);
     if (address) encoder.text(`Adresse : ${address}`);
-    encoder.newline();
-    encoder.size(1, 1);
-    // 4. Ligne de séparation
-    encoder
-      .align('center')
-      .text('-'.repeat(48))
-      .newline();
-    // 5. En-tête du tableau (centre, gras, taille 2x1)
-    encoder
-      .align('center')
-      .bold(true)
-      .size(2, 1)
-      .text('Produit          Qté   Prix    Total')
-      .size(1, 1)
-      .bold(false)
-      .newline();
-    // 6. Lignes du tableau (à gauche, taille 2x1 pour les produits aussi)
-    encoder.align('left');
-    encoder.size(2, 1); // 2x1 = largeur double, hauteur normale
-    const colName = 16;
-    const colQty = 5;
-    const colPrice = 7;
-    const colTotal = 8;
+    encoder.newline().size(1, 1);
+    encoder.align('center').text('-'.repeat(48)).newline();
+    encoder.align('center').bold(true).size(2, 1).text('Produit          Qté   Prix    Total').size(1, 1).bold(false).newline();
+    encoder.align('left').size(2, 1);
+    const colName = 16, colQty = 5, colPrice = 7, colTotal = 8;
     items.forEach(item => {
       const name = (item.name || 'Produit').substring(0, colName);
       const qty = Number(item.quantity) || 0;
       const price = Number(item.price) || 0;
       const totalItem = qty * price;
-      const namePadded = name.padEnd(colName);
-      const qtyPadded = String(qty).padStart(colQty);
-      const pricePadded = Number(price).toFixed(2).padStart(colPrice);
-      const totalPadded = Number(totalItem).toFixed(2).padStart(colTotal);
-      const row = `${namePadded}  ${qtyPadded}   ${pricePadded}   ${totalPadded}`;
+      const row = `${name.padEnd(colName)}  ${String(qty).padStart(colQty)}   ${Number(price).toFixed(2).padStart(colPrice)}   ${Number(totalItem).toFixed(2).padStart(colTotal)}`;
       encoder.text(row);
     });
     encoder.size(1, 1);
-    // 7. Ligne de séparation
-    encoder
-      .align('center')
-      .text('-'.repeat(48))
-      .newline();
-    // 8. Total (centre, gras, très grand) avec espaces entre les chiffres
-    encoder
-      .align('center')
-      .bold(true)
-      .size(2, 2)
-      .text(`Total : ${total.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ')} DA`)
-      .size(1, 1)
-      .bold(false)
-      .newline();
-    // 9. Message de remerciement
-    encoder
-      .align('center')
-      .size(2, 1)
-      .text('Merci pour votre confiance')
-      .size(1, 1)
-      .newline()
-      .newline();
-    // 10. Coupe du papier
+    encoder.align('center').text('-'.repeat(48)).newline();
+    encoder.align('center').bold(true).size(2, 2).text(`Total : ${total.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ')} DA`).size(1, 1).bold(false).newline();
+    encoder.align('center').size(2, 1).text('Merci pour votre confiance').size(1, 1).newline().newline();
     encoder.cut();
     return encoder.encode();
   }
 
-  // ====== Fallback (manuel avec grand format et LTR) ======
   function buildInvoiceFallback(order) {
     const items = order.items || [];
     const total = items.reduce((sum, it) => sum + (Number(it.price) * Number(it.quantity)), 0);
@@ -492,34 +434,18 @@
     const address = order.address || '';
     const date = new Date(order.confirmedAt || Date.now()).toLocaleString('fr-FR');
     const chunks = [];
-    chunks.push(escposInit());
-    chunks.push(escposAlign(1));
-    chunks.push(escposFontSize(0x22));
-    chunks.push(escposBoldOn());
-    chunks.push(escposLine('aksel & anais'));
-    chunks.push(escposBoldOff());
-    chunks.push(escposFontSize(0x00));
-    chunks.push(escposLine('='.repeat(48)));
-    chunks.push(escposAlign(0)); // LTR aligné à gauche
-    chunks.push(escposFontSize(0x11));
+    chunks.push(escposInit(), escposAlign(1), escposFontSize(0x22), escposBoldOn(), escposLine('aksel & anais'), escposBoldOff(), escposFontSize(0x00), escposLine('='.repeat(48)));
+    chunks.push(escposAlign(0), escposFontSize(0x11));
     chunks.push(escposLine(`N° Facture : ${invoiceNumber}`));
     chunks.push(escposLine(`Date : ${date}`));
     chunks.push(escposLine(`Client : ${customer}`));
     if (phone) chunks.push(escposLine(`Tél : ${phone}`));
     if (address) chunks.push(escposLine(`Adresse : ${address}`));
-    chunks.push(escposFontSize(0x00));
-    chunks.push(escposLine('-'.repeat(48)));
-    chunks.push(escposAlign(1));
-    chunks.push(escposBoldOn());
-    chunks.push(escposFontSize(0x11));
-    chunks.push(escposLine('  Produit   Qté  Prix  Total  '));
-    chunks.push(escposBoldOff());
-    chunks.push(escposFontSize(0x00));
-    chunks.push(escposAlign(0));
+    chunks.push(escposFontSize(0x00), escposLine('-'.repeat(48)));
+    chunks.push(escposAlign(1), escposBoldOn(), escposFontSize(0x11), escposLine('  Produit   Qté  Prix  Total  '), escposBoldOff(), escposFontSize(0x00), escposAlign(0));
     const colName = 16, colQty = 5, colPrice = 7, colTotal = 8;
     function formatRow(name, qty, price, total) {
-      let nameStr = name.substring(0, colName);
-      nameStr = nameStr.padEnd(colName);
+      let nameStr = name.substring(0, colName).padEnd(colName);
       const qtyStr = String(qty).padStart(colQty);
       const priceStr = Number(price).toFixed(2).padStart(colPrice);
       const totalStr = Number(total).toFixed(2).padStart(colTotal);
@@ -530,35 +456,23 @@
       const qty = Number(item.quantity) || 0;
       const price = Number(item.price) || 0;
       const totalItem = qty * price;
-      const row = formatRow(name, qty, price, totalItem);
-      chunks.push(escposLine(row));
+      chunks.push(escposLine(formatRow(name, qty, price, totalItem)));
     });
     chunks.push(escposLine('-'.repeat(48)));
-    chunks.push(escposAlign(1));
-    chunks.push(escposBoldOn());
-    chunks.push(escposFontSize(0x22));
+    chunks.push(escposAlign(1), escposBoldOn(), escposFontSize(0x22));
     const totalFormatted = total.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
     chunks.push(escposLine(`Total : ${totalFormatted} DA`));
-    chunks.push(escposFontSize(0x00));
-    chunks.push(escposBoldOff());
-    chunks.push(escposLine(''));
-    chunks.push(escposFontSize(0x11));
-    chunks.push(escposLine('Merci pour votre confiance'));
-    chunks.push(escposFontSize(0x00));
-    chunks.push(escposLine(''));
-    chunks.push(escposCut());
+    chunks.push(escposFontSize(0x00), escposBoldOff(), escposLine(''));
+    chunks.push(escposFontSize(0x11), escposLine('Merci pour votre confiance'), escposFontSize(0x00), escposLine(''), escposCut());
     const totalLength = chunks.reduce((s, arr) => s + arr.length, 0);
     const allData = new Uint8Array(totalLength);
     let offset = 0;
-    for (const chunk of chunks) {
-      allData.set(chunk, offset);
-      offset += chunk.length;
-    }
+    for (const chunk of chunks) { allData.set(chunk, offset); offset += chunk.length; }
     return allData;
   }
 
   // ============================================================
-  // Envoi par morceaux
+  // إرسال البيانات على دفعات
   // ============================================================
   async function sendChunked(characteristic, data, chunkSize = 150) {
     const total = data.length;
@@ -574,34 +488,24 @@
   }
 
   // ============================================================
-  // Détection automatique du protocole (améliorée)
+  // كشف البروتوكول
   // ============================================================
   async function detectProtocol(characteristic) {
     try {
-      const testData = new Uint8Array([0x1B, 0x40, 0x1B, 0x64, 0x02, 0x1B, 0x4A, 0x0A]);
-      await characteristic.writeValue(testData);
-      await new Promise(r => setTimeout(r, 500));
-      const testEscpos = new Uint8Array([
-        ...escposInit(),
-        ...escposLine('Test ESC/POS'),
-        ...escposCut()
-      ]);
-      await characteristic.writeValue(testEscpos);
+      await characteristic.writeValue(new Uint8Array([0x1B, 0x40, 0x1B, 0x64, 0x02, 0x1B, 0x4A, 0x0A]));
+      await new Promise(r => setTimeout(r, 300));
+      await characteristic.writeValue(new Uint8Array([...escposInit(), ...escposLine('Test'), ...escposCut()]));
       return 'escpos';
     } catch (e) { console.warn('ESC/POS test failed:', e); }
     try {
-      const testTspl = new Uint8Array([
-        ...new TextEncoder().encode('SIZE 58 mm, 40 mm\nGAP 0 mm, 0 mm\nCLS\n'),
-        ...new TextEncoder().encode('TEXT 10,10,"0",1,1,1,"Test TSPL"\nPRINT 1\n')
-      ]);
-      await characteristic.writeValue(testTspl);
+      await characteristic.writeValue(new TextEncoder().encode('SIZE 58 mm, 40 mm\nGAP 0 mm, 0 mm\nCLS\nTEXT 10,10,"0",1,1,1,"Test TSPL"\nPRINT 1\n'));
       return 'tspl';
     } catch (e) { console.warn('TSPL test failed:', e); }
     return 'raw';
   }
 
   // ============================================================
-  // Impression intelligente (recherche améliorée)
+  // دالة الطباعة الذكية (محفوظة بنفس منطق الكود القديم الناجح)
   // ============================================================
   async function smartPrint(order) {
     if (!selectedPrinterId) {
@@ -620,27 +524,27 @@
       let device = null;
       const printerName = selectedPrinter.name || '';
 
-      // الطريقة 1: البحث بالاسم الكامل
+      // ===== الإستراتيجية 1: البحث بالاسم الكامل (نفس الكود القديم الذي كان ناجحاً) =====
       try {
         device = await navigator.bluetooth.requestDevice({
           filters: [{ name: printerName }],
-          optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb']
+          optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb', '00001101-0000-1000-8000-00805f9b34fb']
         });
       } catch (e1) {
-        console.warn('Échec recherche par nom:', e1);
-        // الطريقة 2: البحث ببادئة الاسم (أول 10 حروف)
+        console.warn('Échec recherche par nom exact:', e1);
+        // ===== الإستراتيجية 2: البحث ببادئة الاسم (أول 10 حروف) =====
         try {
           const prefix = printerName.substring(0, 10);
           device = await navigator.bluetooth.requestDevice({
             filters: [{ namePrefix: prefix }],
-            optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb']
+            optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb', '00001101-0000-1000-8000-00805f9b34fb']
           });
         } catch (e2) {
           console.warn('Échec recherche par préfixe:', e2);
-          // الطريقة 3: البحث عن أي جهاز (الأكثر شمولاً)
+          // ===== الإستراتيجية 3: البحث الشامل (لكن مع تحديد الخدمات الاختيارية) =====
           device = await navigator.bluetooth.requestDevice({
             acceptAllDevices: true,
-            optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb']
+            optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb', '00001101-0000-1000-8000-00805f9b34fb']
           });
         }
       }
@@ -651,36 +555,23 @@
       showStatus(`⏳ Connexion à ${device.name}...`, 'info');
       const server = await device.gatt.connect();
       showStatus('✅ Connecté à l\'imprimante', 'success');
-      let service;
-      let characteristic;
-      const serviceUUID = '000018f0-0000-1000-8000-00805f9b34fb';
-      try {
-        service = await server.getPrimaryService(serviceUUID);
-      } catch (e) {
-        const services = await server.getPrimaryServices();
-        for (const s of services) {
-          const chars = await s.getCharacteristics();
-          for (const c of chars) {
-            if (c.properties.write || c.properties.writeWithoutResponse) {
-              service = s;
-              characteristic = c;
-              break;
-            }
-          }
-          if (characteristic) break;
-        }
-        if (!characteristic) throw new Error('Caractéristique d\'écriture introuvable');
-      }
-      if (!characteristic) {
-        const chars = await service.getCharacteristics();
-        for (const c of chars) {
-          if (c.properties.write || c.properties.writeWithoutResponse) {
-            characteristic = c;
+
+      // ===== البحث الديناميكي عن خاصية الكتابة (لأي خدمة) =====
+      let characteristic = null;
+      const services = await server.getPrimaryServices();
+      for (const service of services) {
+        const characteristics = await service.getCharacteristics();
+        for (const char of characteristics) {
+          if (char.properties.write || char.properties.writeWithoutResponse) {
+            characteristic = char;
             break;
           }
         }
-        if (!characteristic) throw new Error('Caractéristique d\'écriture introuvable');
+        if (characteristic) break;
       }
+      if (!characteristic) throw new Error('Caractéristique d\'écriture introuvable');
+
+      // ===== كشف أو استرجاع البروتوكول =====
       let protocol = selectedPrinter.protocol;
       if (!protocol || protocol === 'unknown') {
         showStatus('⏳ Détection du protocole...', 'info');
@@ -693,6 +584,8 @@
         renderPrinterList();
         showStatus(`✅ Protocole détecté : ${protocol.toUpperCase()}`, 'success');
       }
+
+      // ===== بناء البيانات حسب البروتوكول =====
       let printData;
       if (protocol === 'tspl') {
         const items = order.items || [];
@@ -703,9 +596,7 @@
         const address = order.address || '';
         const date = new Date(order.confirmedAt || Date.now()).toLocaleString('fr-FR');
         const lines = [];
-        lines.push('SIZE 58 mm, 40 mm');
-        lines.push('GAP 0 mm, 0 mm');
-        lines.push('CLS');
+        lines.push('SIZE 58 mm, 40 mm', 'GAP 0 mm, 0 mm', 'CLS');
         let y = 10;
         lines.push(`TEXT 10,${y},"0",2,2,1,"aksel & anais"`); y += 35;
         lines.push(`TEXT 10,${y},"0",1,1,1,"Facture: ${invoiceNumber}"`); y += 25;
@@ -749,6 +640,7 @@
       } else {
         printData = buildInvoice(order);
       }
+
       showStatus(`⏳ Envoi des données (${printData.length} octets)...`, 'info');
       await sendChunked(characteristic, printData, 150);
       await update(ref(db, `users/${currentUser}/printers/${selectedPrinterId}`), { lastUsed: Date.now() });
@@ -764,7 +656,7 @@
   }
 
   // ============================================================
-  // Ajout d'une imprimante (AMÉLIORÉ avec recherche large)
+  // إضافة طابعة (بحث ذكي لجميع الأنواع)
   // ============================================================
   addPrinterBtn.addEventListener('click', () => {
     addModal.style.display = 'flex';
@@ -773,143 +665,101 @@
     addModal.style.display = 'none';
   });
 
-  // ====== دالة إضافة الطابعة (محسنة) ======
-confirmAddBtn.addEventListener('click', async () => {
-  const paperWidth = parseInt(paperSizeSelect.value) || 80;
-  addModal.style.display = 'none';
-  
-  try {
-    showStatus('⏳ تأكد من أن البلوتوث مفعل والطابعة في وضع الاقتران (pairing mode).', 'info');
-    showStatus('⏳ جاري البحث عن الطابعة...', 'info');
+  confirmAddBtn.addEventListener('click', async () => {
+    const paperWidth = parseInt(paperSizeSelect.value) || 80;
+    addModal.style.display = 'none';
     
-    if (!navigator.bluetooth) {
-      throw new Error('متصفحك لا يدعم Web Bluetooth (استخدم Chrome على Android أو Edge على الكمبيوتر).');
-    }
-    
-    let device = null;
-    const serviceUUID = '000018f0-0000-1000-8000-00805f9b34fb';
-    
-    // === المحاولة 1: البحث بأي جهاز (بدون فلتر) ===
     try {
-      showStatus('⏳ المحاولة 1: البحث عن أي جهاز Bluetooth...', 'info');
-      device = await navigator.bluetooth.requestDevice({
-        acceptAllDevices: true,
-        optionalServices: [serviceUUID]
-      });
-    } catch (e1) {
-      console.warn('بحث acceptAllDevices فشل:', e1);
-      
-      // === المحاولة 2: البحث بالخدمة ===
+      showStatus('⏳ Vérification du Bluetooth...', 'info');
+      if (!navigator.bluetooth) {
+        throw new Error('Web Bluetooth non supporté. Utilisez Chrome sur Android ou Edge.');
+      }
+
+      showStatus('⏳ Recherche d\'une imprimante...', 'info');
+      let device;
       try {
-        showStatus('⏳ المحاولة 2: البحث عن أجهزة بها خدمة الطباعة...', 'info');
+        // محاولة البحث بأسماء شائعة للطابعات
         device = await navigator.bluetooth.requestDevice({
-          filters: [{ services: [serviceUUID] }],
-          optionalServices: [serviceUUID]
+          filters: [
+            { namePrefix: 'XP-' },
+            { namePrefix: 'printer' },
+            { namePrefix: 'thermal' },
+            { namePrefix: 'Xprinter' },
+            { namePrefix: 'BT' },
+            { namePrefix: 'Mi' }
+          ],
+          optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb', '00001101-0000-1000-8000-00805f9b34fb']
         });
-      } catch (e2) {
-        console.warn('بحث بالخدمة فشل:', e2);
-        
-        // === المحاولة 3: البحث باسم يحتوي على "printer" أو "thermal" ===
-        try {
-          showStatus('⏳ المحاولة 3: البحث عن طابعة باسم يحتوي على printer/thermal...', 'info');
-          device = await navigator.bluetooth.requestDevice({
-            filters: [
-              { namePrefix: 'printer' },
-              { namePrefix: 'thermal' },
-              { namePrefix: 'bluetooth' }
-            ],
-            optionalServices: [serviceUUID]
-          });
-        } catch (e3) {
-          console.warn('بحث بالاسم فشل:', e3);
-          throw new Error('❌ لم يتم العثور على أي طابعة. تأكد من:\n- تفعيل البلوتوث\n- تشغيل الطابعة\n- وضع الطابعة في وضع الاقتران (Pairing Mode)\n- قرب الهاتف من الطابعة');
-        }
+      } catch (e) {
+        console.warn('البحث بالأسماء فشل، جرب acceptAllDevices', e);
+        device = await navigator.bluetooth.requestDevice({
+          acceptAllDevices: true,
+          optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb', '00001101-0000-1000-8000-00805f9b34fb']
+        });
       }
-    }
-    
-    if (!device) throw new Error('لم يتم العثور على طابعة.');
-    
-    showStatus(`✅ تم العثور على: ${device.name || 'جهاز غير معروف'}`, 'success');
-    showStatus(`⏳ جاري الاتصال بـ ${device.name}...`, 'info');
-    
-    // الاتصال بالجهاز
-    let server;
-    try {
-      server = await device.gatt.connect();
-    } catch (e) {
-      throw new Error(`فشل الاتصال بـ ${device.name}. تأكد من أن الطابعة قيد التشغيل.`);
-    }
-    
-    // البحث عن خاصية الكتابة
-    let characteristic = null;
-    let service = null;
-    try {
-      service = await server.getPrimaryService(serviceUUID);
-      const chars = await service.getCharacteristics();
-      for (const c of chars) {
-        if (c.properties.write || c.properties.writeWithoutResponse) {
-          characteristic = c;
-          break;
-        }
+
+      if (!device) throw new Error('Aucun appareil trouvé');
+      
+      showStatus(`✅ Appareil sélectionné : ${device.name || 'Inconnu'}`, 'success');
+      showStatus(`⏳ Connexion à ${device.name}...`, 'info');
+
+      let server;
+      try {
+        server = await device.gatt.connect();
+      } catch (e) {
+        throw new Error(`Impossible de se connecter à ${device.name}. Vérifiez qu'elle est allumée.`);
       }
-    } catch (e) {
-      // البحث في جميع الخدمات
+
+      let characteristic = null;
       const services = await server.getPrimaryServices();
-      for (const s of services) {
-        const chars = await s.getCharacteristics();
+      for (const service of services) {
+        const chars = await service.getCharacteristics();
         for (const c of chars) {
           if (c.properties.write || c.properties.writeWithoutResponse) {
-            service = s;
             characteristic = c;
             break;
           }
         }
         if (characteristic) break;
       }
+
+      if (!characteristic) {
+        throw new Error('Cet appareil ne semble pas être une imprimante (pas de caractéristique d\'écriture).');
+      }
+
+      showStatus('⏳ Détection du protocole...', 'info');
+      const protocol = await detectProtocol(characteristic);
+
+      const newPrinterRef = push(printersRef);
+      const printerData = {
+        name: device.name || 'Imprimante inconnue',
+        protocol: protocol,
+        paperWidth: paperWidth,
+        deviceId: device.id || 'unknown',
+        lastUsed: Date.now(),
+        createdAt: Date.now(),
+        detectedAt: Date.now()
+      };
+      await set(newPrinterRef, printerData);
+      selectedPrinterId = newPrinterRef.key;
+      renderPrinterList();
+      showStatus(`✅ Imprimante "${printerData.name}" ajoutée (${protocol.toUpperCase()}, ${paperWidth}mm)`, 'success');
+
+    } catch (e) {
+      console.error(e);
+      let errorMsg = e.message || 'Erreur inconnue';
+      if (errorMsg.includes('user cancelled')) {
+        errorMsg = '❌ Recherche annulée par l\'utilisateur.';
+      } else if (errorMsg.includes('No devices')) {
+        errorMsg = '❌ Aucune imprimante trouvée. Vérifiez le Bluetooth et le mode appairage.';
+      }
+      showStatus(errorMsg, 'error');
+      if (confirm('❌ Échec de la recherche. Voulez-vous réessayer avec des instructions supplémentaires ?')) {
+        addModal.style.display = 'flex';
+        showStatus('💡 Assurez-vous que l\'imprimante est allumée et en mode appairage (voyant clignotant).', 'warning');
+      }
     }
-    
-    if (!characteristic) {
-      throw new Error('لم نجد خاصية كتابة على هذه الطابعة. قد تكون غير متوافقة.');
-    }
-    
-    showStatus('⏳ جاري اكتشاف البروتوكول...', 'info');
-    const protocol = await detectProtocol(characteristic);
-    
-    // حفظ الطابعة
-    const newPrinterRef = push(printersRef);
-    const printerData = {
-      name: device.name || 'Imprimante inconnue',
-      protocol: protocol,
-      paperWidth: paperWidth,
-      deviceId: device.id || 'unknown',
-      lastUsed: Date.now(),
-      createdAt: Date.now(),
-      detectedAt: Date.now()
-    };
-    await set(newPrinterRef, printerData);
-    selectedPrinterId = newPrinterRef.key;
-    renderPrinterList();
-    showStatus(`✅ تم تسجيل الطابعة "${printerData.name}" (${protocol.toUpperCase()}, ${paperWidth}mm)`, 'success');
-    
-  } catch (e) {
-    console.error(e);
-    let errorMsg = e.message || 'حدث خطأ غير متوقع';
-    if (errorMsg.includes('user cancelled')) {
-      errorMsg = '❌ تم إلغاء البحث من قبل المستخدم.';
-    } else if (errorMsg.includes('not found')) {
-      errorMsg = '❌ لم يتم العثور على طابعة. تأكد من أن الطابعة في وضع الاقتران.';
-    }
-    showStatus(errorMsg, 'error');
-    
-    // عرض زر "إعادة المحاولة"
-    if (confirm('❌ فشل البحث. هل تريد إعادة المحاولة مع تعليمات إضافية؟')) {
-      // إعادة فتح المودال
-      addModal.style.display = 'flex';
-      // عرض تعليمات
-      showStatus('💡 تأكد من أن الطابعة مشغّلة وفي وضع الاقتران (عادةً بالضغط على زر الطاقة لمدة 3 ثوان).', 'warning');
-    }
-  }
-});
+  });
 
   // ============================================================
   // Supprimer toutes les imprimantes
@@ -926,7 +776,7 @@ confirmAddBtn.addEventListener('click', async () => {
   });
 
   // ============================================================
-  // Affichage de la liste des factures
+  // عرض قائمة الفواتير
   // ============================================================
   function renderInvoicesList(confirmedData) {
     const container = document.getElementById('app');
@@ -962,7 +812,7 @@ confirmAddBtn.addEventListener('click', async () => {
   }
 
   // ============================================================
-  // Fonctions d'impression
+  // دوال الطباعة ومعاينة الفاتورة
   // ============================================================
   window.printInvoice = async (key) => {
     try {
@@ -1008,11 +858,11 @@ confirmAddBtn.addEventListener('click', async () => {
   };
 
   // ============================================================
-  // Initialisation
+  // بدء التشغيل
   // ============================================================
   loadPrintersFromFirebase();
   onValue(ref(db, 'confirmedOrders'), (snap) => renderInvoicesList(snap.val()));
-  console.log('✅ Impression des factures (LTR, tout en grand format, espaces élargis) initialisée');
+  console.log('✅ Impression des factures - Version compatible avec Xprinter ET Xiaomi (sans modifier le fonctionnement original)');
 </script>
 </body>
 </html>
