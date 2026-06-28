@@ -1,381 +1,256 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="fr" dir="ltr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, shrink-to-fit=yes" />
-  <title>لوحة الإدارة - aksel & anais</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
+  <title>Impression des factures - aksel & anais</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/esc-pos-encoder@1.3.0/dist/esc-pos-encoder.umd.js"></script>
   <style>
-    /* ====== جميع الأنماط كما هي (بدون تغيير) ====== */
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Cairo', sans-serif; background: #fafafa; color: #262626; padding-bottom: 80px; }
-    .top-bar { background: white; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #dbdbdb; position: sticky; top: 0; z-index: 100; }
-    .logo { font-size: 22px; font-weight: 800; background: linear-gradient(135deg, #10b981, #059669); -webkit-background-clip: text; background-clip: text; color: transparent; }
-    .user-info { display: flex; align-items: center; gap: 12px; }
-    .username { font-weight: 600; background: #efefef; padding: 6px 14px; border-radius: 30px; font-size: 14px; }
-    .menu-btn { background: none; border: none; font-size: 24px; cursor: pointer; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-    .menu-btn:hover { background: #efefef; }
-    .dropdown-menu { position: absolute; top: 60px; left: 16px; background: white; border-radius: 20px; box-shadow: 0 6px 20px rgba(0,0,0,0.15); width: 240px; z-index: 200; display: none; overflow: hidden; border: 1px solid #efefef; }
-    .dropdown-menu button { width: 100%; padding: 14px 16px; text-align: right; background: none; border: none; font-family: 'Cairo', sans-serif; font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 12px; cursor: pointer; border-bottom: 1px solid #f0f0f0; }
-    .dropdown-menu button i { width: 24px; color: #262626; }
-    .dropdown-menu button:hover { background: #f8f8f8; }
-    .tabs { display: flex; gap: 8px; padding: 12px 16px; background: white; border-bottom: 1px solid #dbdbdb; overflow-x: auto; }
-    .tabs::-webkit-scrollbar { display: none; }
-    .tab { background: none; border: none; padding: 8px 20px; font-family: 'Cairo', sans-serif; font-weight: 600; font-size: 15px; border-radius: 30px; cursor: pointer; color: #8e8e8e; white-space: nowrap; }
-    .tab.active { background: #262626; color: white; }
-    .filter-section { padding: 8px 16px; background: white; border-bottom: 1px solid #efefef; display: flex; align-items: center; gap: 8px; overflow-x: auto; flex-wrap: nowrap; }
-    .filter-section::-webkit-scrollbar { display: none; }
-    .filter-btn { padding: 6px 16px; border-radius: 30px; border: 2px solid #e5e7eb; background: white; font-family: 'Cairo', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; transition: all 0.2s; color: #4b5563; min-width: fit-content; }
-    .filter-btn:hover { border-color: #10b981; color: #10b981; }
-    .filter-btn.active { background: #10b981; color: white; border-color: #10b981; }
-    .filter-btn i { margin-left: 4px; }
-    .filter-clear { background: none; border: none; color: #ef4444; font-weight: 600; cursor: pointer; padding: 4px 8px; font-size: 12px; display: none; }
-    .filter-clear.show { display: inline-block; }
-    .filter-count { font-size: 11px; color: #9ca3af; margin-right: 4px; background: #f3f4f6; padding: 0 8px; border-radius: 20px; }
-    .family-item-wrapper { display: inline-flex; align-items: center; gap: 2px; position: relative; }
-    .family-actions { display: none; align-items: center; gap: 2px; background: white; border-radius: 30px; padding: 2px 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); position: absolute; left: -5px; top: 50%; transform: translateY(-50%); z-index: 10; }
-    .family-item-wrapper:hover .family-actions { display: inline-flex; }
-    .family-item-wrapper .filter-btn.active + .family-actions { display: inline-flex; }
-    .family-action-btn { background: none; border: none; width: 26px; height: 26px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 11px; transition: 0.2s; color: #64748b; }
-    .family-action-btn:hover { transform: scale(1.1); }
-    .family-action-btn.edit-btn:hover { background: #eef2ff; color: #10b981; }
-    .family-action-btn.delete-btn:hover { background: #fee2e2; color: #dc2626; }
-    .family-action-btn i { font-size: 11px; }
-    .search-box { padding: 8px 16px 12px 16px; background: white; }
-    .search-box input { width: 100%; padding: 10px 16px; border-radius: 30px; border: 1px solid #dbdbdb; background: #fafafa; font-family: 'Cairo', sans-serif; font-size: 14px; outline: none; }
-    .search-box input:focus { border-color: #10b981; }
-    .products-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 12px; }
-    @media (min-width: 640px) { .products-grid { grid-template-columns: repeat(3, 1fr); } }
-    @media (min-width: 1024px) { .products-grid { grid-template-columns: repeat(4, 1fr); } }
-    .product-card { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #efefef; transition: all 0.2s; position: relative; }
-    .product-card:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
-    .product-card img { width: 100%; height: 180px; object-fit: cover; background: #f0f0f0; }
-    .product-info { padding: 12px; }
-    .product-name { font-weight: 700; font-size: 14px; margin-bottom: 6px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-    .product-price { color: #10b981; font-weight: 800; font-size: 16px; margin-bottom: 4px; }
-    .product-wholesale-price { color: #8e44ad; font-weight: 600; font-size: 13px; margin-bottom: 4px; }
-    .product-family { font-size: 11px; color: #6b7280; margin-bottom: 8px; background: #f3f4f6; padding: 2px 10px; border-radius: 20px; display: inline-block; }
-    .product-actions { display: flex; gap: 8px; flex-wrap: wrap; }
-    .btn-icon { flex: 1; padding: 8px; border-radius: 30px; border: none; font-weight: 600; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
-    .btn-edit { background: #eef2ff; color: #10b981; }
-    .btn-delete { background: #ffeaea; color: #e74c3c; }
-    .btn-discount { background: #fef3c7; color: #d97706; }
-    .btn-discount.active-discount { background: #dc2626; color: white; }
-    .product-card.on-sale { border: 3px solid #dc2626; background: #fff5f5; box-shadow: 0 0 20px rgba(220, 38, 38, 0.15); }
-    .product-card.on-sale .product-price { color: #dc2626; font-size: 1.2rem; }
-    .product-card.on-sale .old-price { text-decoration: line-through; color: #999; font-size: 0.8rem; margin-left: 6px; }
-    .sale-badge { position: absolute; top: 8px; left: 8px; background: #dc2626; color: #ffdd00; padding: 4px 12px; border-radius: 30px; font-weight: 700; font-size: 11px; box-shadow: 0 2px 8px rgba(220,38,38,0.3); z-index: 5; display: flex; align-items: center; gap: 4px; }
-    .sale-badge i { font-size: 10px; }
-    .discount-timer { font-size: 11px; color: #dc2626; font-weight: 600; margin-top: 4px; background: #fee2e2; padding: 2px 10px; border-radius: 20px; display: inline-block; }
-    .discount-timer.unlimited { background: #dbeafe; color: #2563eb; }
-    .order-card { background: white; margin: 12px 16px; padding: 16px; border-radius: 24px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); border-right: 4px solid #10b981; }
-    .confirmed-card { border-right-color: #f39c12 !important; background: #fffef7; }
-    .order-header { display: flex; justify-content: space-between; margin-bottom: 12px; font-weight: 700; }
-    .order-items { background: #fafafa; padding: 10px; border-radius: 16px; margin: 10px 0; font-size: 14px; }
-    .order-footer { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
-    .fab { position: fixed; bottom: 20px; left: 20px; background: #10b981; color: white; width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 26px; border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.2); cursor: pointer; z-index: 150; }
-    .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(6px); display: flex; align-items: center; justify-content: center; z-index: 1000; display: none; }
-    .modal-content { background: white; width: 90%; max-width: 450px; border-radius: 28px; padding: 24px; max-height: 85vh; overflow-y: auto; position: relative; }
-    input, textarea, select { width: 100%; padding: 12px; margin-bottom: 12px; border: 1px solid #dbdbdb; border-radius: 16px; font-family: 'Cairo', sans-serif; background: #fafafa; }
-    .btn-primary { background: #10b981; color: white; border: none; padding: 12px; border-radius: 40px; font-weight: 600; width: 100%; cursor: pointer; }
-    .btn-secondary { background: #e5e7eb; color: #1f2937; border: none; padding: 12px; border-radius: 40px; font-weight: 600; width: 100%; cursor: pointer; }
-    .toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: #262626; color: white; padding: 10px 24px; border-radius: 40px; font-size: 14px; z-index: 1100; display: none; }
-    .hidden-product { opacity: 0.6; filter: grayscale(0.2); }
-    .no-data { text-align: center; padding: 40px; color: #8e8e8e; }
-    .no-data i { font-size: 40px; display: block; margin-bottom: 12px; color: #d1d5db; }
-    html, body { width: 100%; overflow-x: hidden; }
-    body { font-size: 14px; }
-    @media (max-width: 640px) { body { font-size: 13px; } .products-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; padding: 8px; } .product-card img { height: 120px; } .product-info { padding: 6px; } .product-name { font-size: 11px; } .product-price { font-size: 13px; } .btn-icon { padding: 5px; font-size: 11px; } .tab { padding: 5px 12px; font-size: 12px; } .top-bar { padding: 8px 12px; } .logo { font-size: 18px; } .order-card { margin: 8px 12px; padding: 12px; } .modal-content { padding: 16px; width: 95%; } .fab { width: 48px; height: 48px; font-size: 22px; bottom: 15px; left: 15px; } .filter-btn { font-size: 11px; padding: 4px 12px; } .filter-section { padding: 6px 12px; gap: 4px; } .family-actions { left: 0px; } }
-    @media (min-width: 641px) and (max-width: 1024px) { .products-grid { grid-template-columns: repeat(3, 1fr); gap: 12px; } .product-card img { height: 160px; } }
-    @media (min-width: 1025px) { .products-grid { grid-template-columns: repeat(4, 1fr); gap: 16px; padding: 16px; } body { max-width: 1400px; margin: 0 auto; } }
-    #pagination { text-align: center; margin: 20px 0; padding: 10px; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 4px; }
-    #pagination button { min-width: 38px; height: 38px; border: none; border-radius: 10px; margin: 0 2px; background: white; color: #333; font-weight: 600; font-size: 14px; box-shadow: 0 2px 6px rgba(0,0,0,0.08); cursor: pointer; }
-    #pagination button:hover { transform: translateY(-2px); background: #10b981; color: white; }
-    #pagination span { margin: 0 4px; color: #64748b; font-weight: 500; }
-    .whatsapp-orders { background: #f0fdf4; border-right-color: #25D366 !important; }
-    .whatsapp-badge { background: #25D366; color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; display: inline-block; }
-    .confirmed-badge { background: #f39c12; color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; display: inline-block; }
-    .notification-badge { background: #25D366; color: white; border-radius: 50%; padding: 2px 6px; font-size: 11px; margin-right: 5px; display: inline-block; animation: pulse 1s infinite; }
-    @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.2); opacity: 0.8; } 100% { transform: scale(1); opacity: 1; } }
-    .delete-all-btn { background: #e74c3c; color: white; border: none; padding: 10px 20px; border-radius: 30px; margin: 12px; cursor: pointer; font-weight: bold; }
-    .family-field-wrapper { position: relative; width: 100%; margin-bottom: 12px; }
-    .family-field-wrapper select { width: 100%; padding: 12px 16px; padding-left: 48px; border: 1px solid #dbdbdb; border-radius: 16px; font-family: 'Cairo', sans-serif; background: #fafafa; appearance: none; -webkit-appearance: none; outline: none; cursor: pointer; font-size: 14px; }
-    .family-field-wrapper select:focus { border-color: #10b981; }
-    .family-add-btn { position: absolute; left: 6px; top: 50%; transform: translateY(-50%); background: #10b981; color: white; border: none; border-radius: 30px; padding: 6px 12px; font-size: 11px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 4px; white-space: nowrap; transition: 0.2s; z-index: 2; }
-    .family-add-btn:hover { background: #059669; transform: translateY(-50%) scale(1.05); }
-    .family-add-btn i { font-size: 12px; }
-    .discount-modal .modal-content { max-width: 500px; }
-    .discount-modal .form-group { margin-bottom: 12px; }
-    .discount-modal .form-group label { display: block; font-weight: 600; font-size: 13px; margin-bottom: 4px; color: #374151; }
-    .discount-modal .form-group .hint { font-size: 11px; color: #6b7280; margin-top: 2px; }
-    .discount-modal .checkbox-group { display: flex; align-items: center; gap: 8px; margin: 8px 0; }
-    .discount-modal .checkbox-group input[type="checkbox"] { width: 18px; height: 18px; margin: 0; cursor: pointer; }
-    .discount-modal .checkbox-group label { font-weight: 500; font-size: 14px; cursor: pointer; }
-    .discount-modal .date-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .discount-modal .date-fields input[type="datetime-local"] { padding: 10px; }
-    .discount-modal .btn-danger { background: #dc2626; color: white; border: none; padding: 12px; border-radius: 40px; font-weight: 600; width: 100%; cursor: pointer; }
-    .discount-modal .btn-warning { background: #f59e0b; color: white; border: none; padding: 12px; border-radius: 40px; font-weight: 600; width: 100%; cursor: pointer; }
-    .discount-modal .btn-success { background: #10b981; color: white; border: none; padding: 12px; border-radius: 40px; font-weight: 600; width: 100%; cursor: pointer; }
-    #discountsSection { display: none; }
-    .discounts-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px; padding: 12px; }
-    .discount-card { background: white; border-radius: 20px; padding: 16px; border-right: 6px solid #dc2626; box-shadow: 0 2px 8px rgba(0,0,0,0.05); position: relative; transition: 0.2s; }
-    .discount-card:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
-    .discount-card .product-name-discount { font-weight: 700; font-size: 15px; margin-bottom: 4px; }
-    .discount-card .discount-prices { display: flex; align-items: center; gap: 12px; margin: 6px 0; }
-    .discount-card .discount-prices .new-price { color: #dc2626; font-weight: 800; font-size: 1.2rem; }
-    .discount-card .discount-prices .old-price-discount { text-decoration: line-through; color: #9ca3af; font-size: 0.9rem; }
-    .discount-card .discount-timer-card { background: #fee2e2; padding: 4px 12px; border-radius: 30px; font-size: 12px; font-weight: 600; color: #dc2626; display: inline-block; margin-top: 6px; }
-    .discount-card .discount-timer-card.unlimited { background: #dbeafe; color: #2563eb; }
-    .discount-card .discount-actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
-    .discount-card .discount-actions button { flex: 1; padding: 6px; border: none; border-radius: 30px; font-weight: 600; font-size: 12px; cursor: pointer; transition: 0.2s; }
-    .discount-card .discount-actions .btn-remove-discount { background: #fee2e2; color: #dc2626; }
-    .discount-card .discount-actions .btn-remove-discount:hover { background: #dc2626; color: white; }
-    .discount-card .discount-actions .btn-reactivate { background: #dbeafe; color: #2563eb; }
-    .discount-card .discount-actions .btn-reactivate:hover { background: #2563eb; color: white; }
-    .badge-unlimited { background: #2563eb; color: white; padding: 2px 10px; border-radius: 20px; font-size: 10px; }
-    .badge-expired { background: #6b7280; color: white; padding: 2px 10px; border-radius: 20px; font-size: 10px; }
-    @media (max-width: 640px) { .discounts-grid { grid-template-columns: 1fr; } }
+    body {
+      font-family: 'Cairo', 'Segoe UI', sans-serif;
+      background: #f3f4f6;
+      color: #1e293b;
+      padding: 16px;
+      direction: rtl;
+    }
+    .header {
+      background: white;
+      padding: 16px 20px;
+      border-radius: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .header h1 { font-size: 1.2rem; color: #10b981; }
+    .header .actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .btn {
+      padding: 8px 18px;
+      border: none;
+      border-radius: 30px;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      font-family: 'Cairo', sans-serif;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: 0.2s;
+      text-decoration: none;
+    }
+    .btn-primary { background: #10b981; color: white; }
+    .btn-primary:hover { background: #059669; transform: scale(0.97); }
+    .btn-print { background: #1e293b; color: white; }
+    .btn-print:hover { background: #0f172a; }
+    .btn-back { background: #e2e8f0; color: #1e293b; }
+    .btn-back:hover { background: #cbd5e1; }
+    .btn-bluetooth { background: #2563eb; color: white; }
+    .btn-bluetooth:hover { background: #1d4ed8; }
+    .btn-danger { background: #dc2626; color: white; }
+    .btn-danger:hover { background: #b91c1c; }
+    .btn-success { background: #10b981; color: white; }
+    .btn-success:hover { background: #059669; }
+    .btn-warning { background: #f59e0b; color: white; }
+    .btn-warning:hover { background: #d97706; }
+    .btn-outline { background: transparent; border: 2px solid #e2e8f0; color: #1e293b; }
+    .btn-outline:hover { background: #f1f5f9; }
+    .printer-panel {
+      background: white;
+      border-radius: 20px;
+      padding: 16px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .printer-panel .section-title {
+      font-weight: 700;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 15px;
+      color: #0f172a;
+    }
+    .printer-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .printer-chip {
+      background: #f1f5f9;
+      padding: 6px 16px;
+      border-radius: 30px;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: 0.2s;
+    }
+    .printer-chip:hover { background: #e2e8f0; }
+    .printer-chip.active {
+      border-color: #10b981;
+      background: #d1fae5;
+      font-weight: 700;
+    }
+    .printer-chip .delete-printer {
+      background: none;
+      border: none;
+      color: #ef4444;
+      cursor: pointer;
+      font-size: 14px;
+      padding: 0 4px;
+    }
+    .printer-chip .delete-printer:hover { color: #b91c1c; }
+    .printer-chip .protocol-badge {
+      font-size: 9px;
+      background: #64748b;
+      color: white;
+      padding: 0 6px;
+      border-radius: 20px;
+      text-transform: uppercase;
+    }
+    .printer-chip .paper-badge {
+      font-size: 9px;
+      background: #10b981;
+      color: white;
+      padding: 0 6px;
+      border-radius: 20px;
+    }
+    .empty-printers {
+      color: #94a3b8;
+      font-size: 13px;
+      padding: 4px 0;
+    }
+    .printer-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      border-top: 1px solid #e2e8f0;
+      padding-top: 12px;
+      margin-top: 4px;
+    }
+    #statusMessage {
+      padding: 10px 16px;
+      border-radius: 12px;
+      margin-bottom: 16px;
+      display: none;
+      font-weight: 600;
+    }
+    #statusMessage.success { background: #d1fae5; color: #065f46; display: block; }
+    #statusMessage.error { background: #fee2e2; color: #991b1b; display: block; }
+    #statusMessage.info { background: #dbeafe; color: #1e40af; display: block; }
+    #statusMessage.warning { background: #fef3c7; color: #92400e; display: block; }
+    .invoice-list { display: flex; flex-direction: column; gap: 16px; }
+    .invoice-card {
+      background: white;
+      border-radius: 20px;
+      padding: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      border-right: 4px solid #10b981;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .invoice-card .info { display: flex; flex-wrap: wrap; gap: 16px; font-size: 14px; }
+    .invoice-card .info strong { color: #0f172a; }
+    .invoice-card .total { font-weight: 800; color: #10b981; font-size: 1.1rem; }
+    .no-data { text-align: center; padding: 40px; color: #94a3b8; background: white; border-radius: 20px; }
+    .no-data i { font-size: 40px; display: block; margin-bottom: 12px; }
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(6px);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-content {
+      background: white;
+      width: 100%;
+      max-width: 420px;
+      border-radius: 28px;
+      padding: 24px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    }
+    .modal-content h3 { text-align: center; margin-bottom: 16px; color: #0f172a; }
+    .modal-content label { display: block; font-weight: 600; margin-bottom: 4px; font-size: 13px; }
+    .modal-content select, .modal-content input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      font-family: inherit;
+      margin-bottom: 12px;
+    }
+    .modal-content .btn-group { display: flex; gap: 10px; }
+    .modal-content .btn-group button { flex: 1; }
+    .modal-content .hint {
+      font-size: 12px;
+      color: #6b7280;
+      margin-top: -8px;
+      margin-bottom: 12px;
+    }
+    @media (max-width: 640px) {
+      .invoice-card { flex-direction: column; align-items: stretch; }
+      .invoice-card .info { gap: 8px; font-size: 13px; }
+      .printer-chip { font-size: 12px; padding: 4px 12px; }
+    }
   </style>
 </head>
 <body>
-
-<div class="top-bar">
-  <div class="logo" onclick="toggleVIPBox()">
-    <img src="https://i.postimg.cc/3J7HQ20j/1000022206-removebg-preview.png" alt="Logo" style="height: 3.3rem; width: auto; margin-left: 8px; display: inline-block; vertical-align: middle;">
-    <span style="display: inline-block; vertical-align: middle;">aksel & anais</span>
-  </div>
-  <div class="user-info">
-    <span class="username" id="userNameDisplay"></span>
-    <button class="menu-btn" id="menuToggleBtn"><i class="fas fa-ellipsis-h"></i></button>
+<div class="header no-print">
+  <h1><i class="fas fa-print"></i> Impression des factures</h1>
+  <div class="actions">
+    <a href="admin.html" class="btn btn-back"><i class="fas fa-arrow-right"></i> Retour à l'admin</a>
   </div>
 </div>
-
-<div class="dropdown-menu" id="dropdownMenu">
-  <button id="btnCover"><i class="fas fa-image"></i> تغيير الغلاف</button>
-  <button id="btnUsers"><i class="fas fa-users"></i> إدارة المستخدمين</button>
-  <button id="btnOwnerSettings"><i class="fas fa-crown"></i> إعدادات المالك</button>
-  <!-- هذا الزر سيظهر فقط للمالك (تم تعديله في الكود) -->
-  <button id="btnWholesaleCode"><i class="fas fa-key"></i>  تغيير الرقم السري للجملة</button>
-  <button id="btnDeleteAllProducts"><i class="fas fa-trash-alt"></i> حذف كل المنتجات</button>
-  <button id="btnLogout"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</button>
-</div>
-
-<div class="tabs" id="tabsContainer" style="display: none;">
-  <button class="tab active" data-tab="products">📦 المنتجات</button>
-  <button class="tab" data-tab="discounts">🏷️ التخفيضات</button>
-  <button class="tab" data-tab="hidden">🔒 المخفية</button>
-  <button class="tab" data-tab="whatsapp">💚 طلبات واتساب <span id="whatsappBadge" class="notification-badge" style="display:none;">0</span></button>
-  <button class="tab" data-tab="confirmed">✅ الطلبات المؤكدة <span id="confirmedBadge" style="background:#f39c12; border-radius:20px; padding:2px 8px; font-size:12px; margin-right:5px; display:none;">0</span></button>
-</div>
-
-<div id="productsSection">
-  <div class="filter-section" id="familyFilterSection">
-    <button class="filter-btn active" data-family="الكل" id="filterAll">
-      <i class="fas fa-th-list"></i> الكل
-      <span class="filter-count" id="countAll">0</span>
-    </button>
-    <button class="filter-clear" id="clearFilterBtn">
-      <i class="fas fa-times"></i> إلغاء التصفية
-    </button>
+<div class="printer-panel no-print" id="printerPanel">
+  <div class="section-title"><i class="fas fa-bluetooth"></i> Imprimantes enregistrées</div>
+  <div id="printerListContainer" class="printer-list"><div class="empty-printers">⏳ Chargement...</div></div>
+  <div class="printer-actions">
+    <button class="btn btn-bluetooth" id="addPrinterBtn"><i class="fas fa-plus"></i> Ajouter une imprimante</button>
+    <button class="btn btn-danger" id="clearAllPrintersBtn"><i class="fas fa-trash"></i> Tout supprimer</button>
   </div>
-  <div class="search-box">
-    <input type="text" id="searchInput" placeholder="🔍 بحث عن منتج...">
-  </div>
-  <div id="coverBanner" style="display:none; padding:12px;">
-    <img id="coverImage" style="width:100%; border-radius:24px; max-height:180px; object-fit:cover;">
-  </div>
-  <div class="products-grid" id="productsContainer"></div>
-  <div id="pagination"></div>
-</div>
-
-<div id="discountsSection">
-  <div style="padding: 12px; background: #fef3c7; margin: 12px; border-radius: 16px; text-align: center; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
-    <div>
-      <i class="fas fa-tags" style="color:#d97706; font-size:20px;"></i>
-      <span style="font-weight:700; margin-right:8px;">إدارة التخفيضات</span>
-    </div>
-    <span style="font-size:13px; color:#92400e;">يمكنك إدارة التخفيضات من خلال أزرار "تخفيض" على المنتجات</span>
-  </div>
-  <div class="discounts-grid" id="discountsContainer">
-    <div class="no-data">لا توجد تخفيضات حالياً</div>
+  <div style="font-size:11px; color:#94a3b8; margin-top:6px;">
+    <i class="fas fa-info-circle"></i> Sélectionnez une imprimante, puis appuyez sur "Imprimer" sur la facture.
   </div>
 </div>
-
-<div id="hiddenSection" style="display: none;">
-  <div class="products-grid" id="hiddenProductsContainer"></div>
-</div>
-
-<div id="whatsappSection" style="display: none;">
-  <div style="padding: 12px; background: #f0fdf4; margin: 12px; border-radius: 16px; text-align: center;">
-    <i class="fab fa-whatsapp" style="color:#25D366; font-size:24px;"></i>
-    <p style="margin-top:8px;">الطلبات تصل مباشرة إلى <strong>واتساب</strong> على الرقم <strong dir="ltr">0781554885</strong></p>
-    <p style="font-size:12px; color:#666;">يمكنك طباعة الفاتورة من هنا</p>
-  </div>
-  <div id="whatsappOrdersContainer"></div>
-</div>
-
-<div id="confirmedSection" style="display: none;">
-  <!-- زر حذف الطلبات سيظهر فقط للمالك (تم تعديله في الكود) -->
-  <div style="text-align:center; margin:12px;">
-    <button id="deleteAllConfirmedBtn" class="delete-all-btn">🗑️ حذف جميع الطلبات المؤكدة</button>
-  </div>
-  <div id="confirmedOrdersContainer"></div>
-</div>
-
-<button class="fab" id="addProductBtn" style="display: none;">+</button>
-
-<div id="loginModal" class="modal" onclick="closeModalOnOutsideClick(event, 'loginModal')" style="display: flex;">
-  <div class="modal-content" onclick="event.stopPropagation()" style="text-align:center;">
-    <img src="https://i.postimg.cc/3J7HQ20j/1000022206-removebg-preview.png" style="width:80px; margin-bottom:16px;">
-    <h3>تسجيل الدخول</h3>
-    <input type="text" id="adminUser" placeholder="اسم المستخدم">
-    <input type="password" id="adminPassword" placeholder="كلمة المرور">
-    <button class="btn-primary" onclick="checkPassword()">دخول</button>
-  </div>
-</div>
-
-<div id="productModal" class="modal" onclick="closeModalOnOutsideClick(event, 'productModal')">
-  <div class="modal-content" onclick="event.stopPropagation()">
-    <span onclick="closeModal('productModal')" style="position: absolute; top: 15px; left: 20px; font-size: 24px; cursor: pointer; color: #aaa;">&times;</span>
-    <h3 id="formTitle" style="margin-bottom: 18px; color: #10b981; text-align: center;">إضافة منتج</h3>
-    <form id="productForm">
-      <input type="hidden" id="editId">
-      <input type="text" id="serial" placeholder="الرقم التسلسلي" required>
-      <input type="text" id="name" placeholder="اسم المنتج" required>
-      <input type="number" id="price" placeholder="سعر البيع (دج)" required>
-      <!-- ====== حقل سعر الجملة الجديد ====== -->
-      <input type="number" id="wholesalePrice" placeholder="سعر الجملة (دج) - اختياري">
-      <div class="family-field-wrapper">
-        <select id="familySelect">
-          <option value="">-- اختر عائلة --</option>
-        </select>
-        <button type="button" class="family-add-btn" id="addFamilyBtn">
-          <i class="fas fa-plus"></i> إضافة
-        </button>
-      </div>
-      <input type="text" id="newFamilyInput" placeholder="اسم العائلة الجديدة" style="display:none; margin-bottom:8px;">
-      <div style="display:flex; gap:8px;">
-        <input type="file" id="imageFile" accept="image/*" style="flex:1;">
-        <label for="cameraInput" style="background:#efefef; padding:12px; border-radius:16px; cursor:pointer;">📷 كاميرا</label>
-        <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none;">
-      </div>
-      <div style="display:flex; gap:10px; margin-top:10px;">
-        <button type="submit" class="btn-primary">💾 حفظ</button>
-        <button type="button" id="toggleVisibilityBtn" style="display:none; background:orange; border:none; border-radius:40px; padding:0 16px;">👁️ إظهار/إخفاء</button>
-      </div>
-    </form>
-  </div>
-</div>
-
-<!-- ====== مودال التخفيض ====== -->
-<div id="discountModal" class="modal discount-modal" onclick="closeModalOnOutsideClick(event, 'discountModal')">
-  <div class="modal-content" onclick="event.stopPropagation()">
-    <span onclick="closeModal('discountModal')" style="position: absolute; top: 15px; left: 20px; font-size: 24px; cursor: pointer; color: #aaa;">&times;</span>
-    <h3 style="margin-bottom: 18px; color: #dc2626; text-align: center;">🏷️ إدارة التخفيض</h3>
-    <div id="discountFormContainer">
-      <input type="hidden" id="discountProductId">
-      <div class="form-group">
-        <label>المنتج: <span id="discountProductName" style="font-weight:700; color:#10b981;"></span></label>
-      </div>
-      <div class="form-group">
-        <label>السعر بعد التخفيض (دج)</label>
-        <input type="number" id="discountNewPrice" placeholder="أدخل السعر الجديد" required>
-      </div>
-      <div class="form-group">
-        <div class="checkbox-group">
-          <input type="checkbox" id="discountUnlimited">
-          <label for="discountUnlimited">تخفيض بدون وقت محدد (دائم)</label>
-        </div>
-      </div>
-      <div class="form-group" id="discountDateGroup">
-        <label>المدة (من - إلى)</label>
-        <div class="date-fields">
-          <div>
-            <label style="font-weight:400; font-size:12px;">من</label>
-            <input type="datetime-local" id="discountStartDate">
-          </div>
-          <div>
-            <label style="font-weight:400; font-size:12px;">إلى</label>
-            <input type="datetime-local" id="discountEndDate">
-          </div>
-        </div>
-        <div class="hint">⚠️ إذا تركت الحقول فارغة سيتم تفعيل التخفيض فوراً ولن ينتهي تلقائياً.</div>
-      </div>
-      <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:12px;">
-        <button type="button" id="saveDiscountBtn" class="btn-success" style="flex:2;">💾 حفظ التخفيض</button>
-        <button type="button" id="removeDiscountBtn" class="btn-danger" style="flex:1; display:none;">🗑️ إزالة</button>
-      </div>
+<div id="statusMessage"></div>
+<div id="app"></div>
+<div id="addPrinterModal" class="modal">
+  <div class="modal-content">
+    <h3><i class="fas fa-bluetooth"></i> Ajouter une imprimante</h3>
+    <label>Choisissez la taille du papier :</label>
+    <select id="paperSizeSelect">
+      <option value="80">80 mm (standard)</option>
+      <option value="58">58 mm (petit)</option>
+    </select>
+    <p class="hint">⚠️ Assurez-vous que le Bluetooth de votre appareil est activé et que l'imprimante est allumée et en mode appairage.</p>
+    <div class="btn-group">
+      <button class="btn btn-success" id="confirmAddPrinter"><i class="fas fa-bluetooth"></i> Rechercher</button>
+      <button class="btn btn-outline" id="cancelAddPrinter"><i class="fas fa-times"></i> Annuler</button>
     </div>
   </div>
 </div>
-
-<div id="usersModal" class="modal" onclick="closeModalOnOutsideClick(event, 'usersModal')">
-  <div class="modal-content" onclick="event.stopPropagation()">
-    <span onclick="closeModal('usersModal')" style="position: absolute; top: 15px; left: 20px; font-size: 24px; cursor: pointer; color: #aaa;">&times;</span>
-    <h3 style="margin-bottom: 12px; color: #1f2937; font-size: 18px;">👥 إدارة المستخدمين</h3>
-    <input id="newUserName" placeholder="اسم المستخدم" style="width:100%; padding:12px; margin-bottom:10px; border-radius:14px; border:1px solid #e5e7eb; background:#f8fafc;">
-    <input id="newUserPass" placeholder="كلمة المرور" style="width:100%; padding:12px; margin-bottom:10px; border-radius:14px; border:1px solid #e5e7eb; background:#f8fafc;">
-    <label style="display: flex; align-items: center; gap: 8px; margin: 10px 0; cursor: pointer;">
-      <input type="checkbox" id="isAdminCheck" style="width: 18px; height: 18px; margin: 0; cursor: pointer;">
-      <span style="font-size: 14px; color: #374151;">مدير (Admin)</span>
-    </label>
-    <button id="addUserBtn" class="btn-primary" style="margin-bottom: 12px;">➕ إضافة</button>
-    <div id="usersList" style="max-height: 200px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;"></div>
-    <button onclick="closeModal('usersModal')" style="width:100%; margin-top:12px; padding:12px; border:none; border-radius:14px; background:#e74c3c; color:white; font-weight:700; cursor:pointer;">إغلاق</button>
-  </div>
-</div>
-
-<div id="ownerModal" class="modal" onclick="closeModalOnOutsideClick(event, 'ownerModal')">
-  <div class="modal-content" onclick="event.stopPropagation()">
-    <span onclick="closeModal('ownerModal')" style="position: absolute; top: 15px; left: 20px; font-size: 24px; cursor: pointer; color: #aaa;">&times;</span>
-    <h3 style="margin-bottom: 14px; font-size: 18px; color: #1f2937;">🔐 إعدادات المالك</h3>
-    <input id="newOwnerName" placeholder="الاسم الجديد" style="width:100%; padding:12px; margin-bottom:10px; border-radius:14px; border:1px solid #e5e7eb; background:#f8fafc; outline:none;">
-    <input id="newOwnerPass" placeholder="كلمة المرور الجديدة" style="width:100%; padding:12px; margin-bottom:10px; border-radius:14px; border:1px solid #e5e7eb; background:#f8fafc; outline:none;">
-    <button onclick="closeModal('ownerModal')" style="width:100%; padding:12px; border:none; border-radius:14px; background:#e74c3c; color:white; font-weight:700; cursor:pointer;">❌ إلغاء</button>
-  </div>
-</div>
-
-<div id="orderDetailModal" class="modal" onclick="closeModalOnOutsideClick(event, 'orderDetailModal')">
-  <div class="modal-content" onclick="event.stopPropagation()" style="max-width: 700px;">
-    <span onclick="closeModal('orderDetailModal')" style="position: absolute; top: 15px; left: 20px; font-size: 28px; cursor: pointer; color: #aaa;">&times;</span>
-    <div id="orderDetailContent"></div>
-  </div>
-</div>
-<!-- ====== مودال تغيير الرقم السري للجملة (مستقل) ====== -->
-<div id="wholesaleCodeModal" class="modal" onclick="closeModalOnOutsideClick(event, 'wholesaleCodeModal')">
-  <div class="modal-content" onclick="event.stopPropagation()">
-    <span onclick="closeModal('wholesaleCodeModal')" style="position: absolute; top: 15px; left: 20px; font-size: 24px; cursor: pointer; color: #aaa;">&times;</span>
-    <h3 style="margin-bottom: 18px; font-size: 18px; color: #8e44ad; text-align: center;">🔑 تغيير الرقم السري للجملة</h3>
-    <p style="font-size: 13px; color: #6b7280; margin-bottom: 14px; text-align: center;">
-      هذا الرقم السري يستخدمه زبائن الجملة لتفعيل أسعار الجملة في المتجر.
-    </p>
-    <input id="wholesaleCodeInput" placeholder="الرقم السري الجديد" style="width:100%; padding:12px; margin-bottom:14px; border-radius:14px; border:1px solid #e5e7eb; background:#f8fafc; outline:none; direction:ltr; font-size:16px;">
-    <button id="saveWholesaleCodeBtn" class="btn-primary" style="margin-bottom:10px; background: linear-gradient(135deg, #8e44ad, #9b59b6);">💾 حفظ الرقم السري</button>
-    <button onclick="closeModal('wholesaleCodeModal')" style="width:100%; padding:12px; border:none; border-radius:14px; background:#e74c3c; color:white; font-weight:700; cursor:pointer;">❌ إلغاء</button>
-  </div>
-</div>
-<!-- ====== مودال اختيار طريقة الطباعة ====== -->
-<div id="printOptionModal" class="modal" onclick="closeModalOnOutsideClick(event, 'printOptionModal')">
-  <div class="modal-content" onclick="event.stopPropagation()" style="max-width:400px; text-align:center;">
-    <h3 style="margin-bottom:16px;">🖨️ اختر طريقة الطباعة</h3>
-    <button id="thermalPrintBtn" class="btn" style="background:#1e293b; color:white; padding:12px; border-radius:30px; width:100%; margin-bottom:10px; border:none; font-weight:bold; cursor:pointer;">
-      <i class="fas fa-bluetooth"></i> طباعة حرارية (بلوتوث)
-    </button>
-    <button id="normalPrintBtn" class="btn" style="background:#10b981; color:white; padding:12px; border-radius:30px; width:100%; border:none; font-weight:bold; cursor:pointer;">
-      <i class="fas fa-print"></i> طباعة عادية (حاسوب)
-    </button>
-    <button onclick="closeModal('printOptionModal')" style="background:none; border:none; color:#94a3b8; margin-top:16px; cursor:pointer; font-size:14px;">إلغاء</button>
-  </div>
-</div>
-
-<div class="toast" id="toastMessage">✅ تم بنجاح</div>
-
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-  import { getDatabase, ref, onValue, set, remove, update, push, get } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+  import { getDatabase, ref, onValue, set, remove, push, get, update } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
   import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 
+  // ====== إعدادات Firebase ======
   const firebaseConfig = {
     apiKey: "AIzaSyAr3Opxs_ikZZ4JZqArcnM8T_YEeyzS_mI",
     authDomain: "aksel-ff2ef.firebaseapp.com",
@@ -390,1777 +265,813 @@
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   signInAnonymously(auth)
-    .then(() => console.log("✅ تم الدخول المجهول بنجاح"))
+    .then(() => console.log("✅ تم الدخول المجهول بنجاح (صفحة الطباعة)"))
     .catch((error) => console.warn("⚠️ فشل الدخول المجهول، لكن الموقع سيستمر في العمل للقراءة فقط:", error));
   window.auth = auth;
 
   const db = getDatabase(app);
-  const productsRef = ref(db, "products");
-  const ordersRef = ref(db, "whatsappOrders");
-  const confirmedRef = ref(db, "confirmedOrders");
-  const invoiceCounterRef = ref(db, "settings/invoiceCounter");
-  const familiesRef = ref(db, "families");
-  const discountsRef = ref(db, "discounts");
-  const wholesaleCodeRef = ref(db, "store/wholesaleCode");
+  const currentUser = localStorage.getItem("user") || "default_user";
+  const printersRef = ref(db, `users/${currentUser}/printers`);
+  let printersList = [];
+  let selectedPrinterId = null;
+  let storePhoneNumber = "0781-554-885"; // قيمة افتراضية
+  let storeName = "aksel & anais";
 
-  const IMGBB_KEY = "7a64e5d9dc491bbce3ab42186c17e006";
-  const WHATSAPP_NUMBER = "2130781554885";
-  const STORE_NAME = "aksel & anais";
+  const printerListContainer = document.getElementById('printerListContainer');
+  const addPrinterBtn = document.getElementById('addPrinterBtn');
+  const clearAllBtn = document.getElementById('clearAllPrintersBtn');
+  const statusMsg = document.getElementById('statusMessage');
+  const addModal = document.getElementById('addPrinterModal');
+  const paperSizeSelect = document.getElementById('paperSizeSelect');
+  const confirmAddBtn = document.getElementById('confirmAddPrinter');
+  const cancelAddBtn = document.getElementById('cancelAddPrinter');
 
-  let allProducts = {};
-  let allDiscounts = {};
-  let filtered = {};
-  let currentPage = 1;
-  const PER_PAGE = 20;
-  
-  let lastSeenCount = parseInt(localStorage.getItem('lastSeenOrderCount')) || 0;
-  let currentOrderCount = 0;
-  let newOrdersCount = 0;
-  let isWhatsappTabOpen = false;
-
-  let familiesList = [];
-  let editingProductId = null;
-  let currentFamilyFilter = 'الكل';
+  // ====== تحميل إعدادات المتجر من Firebase ======
+  function loadStoreSettings() {
+    const storeRef = ref(db, 'store');
+    onValue(storeRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        if (data.phone) storePhoneNumber = data.phone;
+        if (data.storeName) storeName = data.storeName;
+        console.log(`📱 رقم الهاتف المحمل: ${storePhoneNumber}`);
+        console.log(`🏷️ اسم المتجر: ${storeName}`);
+      }
+    });
+  }
 
   // ====== دوال مساعدة ======
-  function showToast(msg) {
-    const toast = document.getElementById("toastMessage");
-    toast.textContent = msg;
-    toast.style.display = "block";
-    setTimeout(() => toast.style.display = "none", 2500);
+  function showStatus(message, type = 'info') {
+    statusMsg.textContent = message;
+    statusMsg.className = type;
+    statusMsg.style.display = 'block';
+    setTimeout(() => { statusMsg.style.display = 'none'; }, 6000);
   }
-
-  function getRole() { return localStorage.getItem("role") || "seller"; }
-  function isOwner() { return getRole() === "owner"; }
-  function isAdmin() { return getRole() === "admin"; }
-
-  window.closeModalOnOutsideClick = function(event, modalId) {
-    if (event.target === event.currentTarget) {
-      closeModal(modalId);
-    }
-  }
-
-  // ====== تحديث صلاحيات الأزرار (التعديل المطلوب) ======
-  function updateMenuPermissions() {
-    const role = getRole();
-    const isOwnerRole = role === "owner";
-    const isAdminRole = role === "admin";
-
-    // أزرار خاصة بالمالك فقط
-    const ownerOnlyBtns = {
-      btnUsers: true,
-      btnOwnerSettings: true,
-      btnDeleteAllProducts: true,
-      btnWholesaleCode: true,   // ✅ زر تغيير الرقم السري للمالك فقط
-    };
-    for (let [id, show] of Object.entries(ownerOnlyBtns)) {
-      const btn = document.getElementById(id);
-      if (btn) btn.style.display = isOwnerRole ? "flex" : "none";
-    }
-
-    // زر تغيير الغلاف للمالك والمدير
-    const coverBtn = document.getElementById("btnCover");
-    if (coverBtn) coverBtn.style.display = (isOwnerRole || isAdminRole) ? "flex" : "none";
-
-    // زر تسجيل الخروج للجميع
-    const logoutBtn = document.getElementById("btnLogout");
-    if (logoutBtn) logoutBtn.style.display = "flex";
-
-    // زر إضافة منتج للمالك والمدير
-    document.getElementById("addProductBtn").style.display = (isOwnerRole || isAdminRole) ? "flex" : "none";
-
-    // زر حذف جميع الطلبات المؤكدة للمالك فقط ✅
-    const deleteAllConfirmedBtn = document.getElementById("deleteAllConfirmedBtn");
-    if (deleteAllConfirmedBtn) {
-      deleteAllConfirmedBtn.style.display = isOwnerRole ? "inline-block" : "none";
-    }
-  }
-
-  function updateNotificationBadge() {
-    const badge = document.getElementById("whatsappBadge");
-    if (badge) {
-      if (newOrdersCount > 0 && !isWhatsappTabOpen) {
-        badge.style.display = "inline-block";
-        badge.textContent = newOrdersCount;
-      } else {
-        badge.style.display = "none";
-      }
-    }
-  }
-
-  function updateConfirmedBadge(count) {
-    const badge = document.getElementById("confirmedBadge");
-    if (badge) {
-      if (count > 0) {
-        badge.style.display = "inline-block";
-        badge.textContent = count;
-      } else {
-        badge.style.display = "none";
-      }
-    }
-  }
-
-  function escapeHtml(str) { 
+  function escapeHtml(str) {
     if (!str) return '';
-    return String(str).replace(/[&<>]/g, function(m){
-      if(m==='&') return '&amp;'; 
-      if(m==='<') return '&lt;'; 
-      if(m==='>') return '&gt;'; 
+    return String(str).replace(/[&<>]/g, function(m) {
+      if (m === '&') return '&amp;';
+      if (m === '<') return '&lt;';
+      if (m === '>') return '&gt;';
       return m;
-    }); 
+    });
   }
 
-  // ====== دوال العائلات (بدون تغيير) ======
-  function loadFamilies() {
-    onValue(familiesRef, (snap) => {
-      const data = snap.val();
+  // ====== دوال الطابعات ======
+  function loadPrintersFromFirebase() {
+    onValue(printersRef, (snapshot) => {
+      const data = snapshot.val();
+      printersList = [];
       if (data) {
-        familiesList = Object.entries(data).map(([key, value]) => {
-          const name = typeof value === 'string' ? value : value.name || value;
-          return { key, name };
-        });
-      } else {
-        familiesList = [];
+        printersList = Object.entries(data).map(([id, printer]) => ({ id, ...printer }));
+        printersList.sort((a, b) => (b.lastUsed || 0) - (a.lastUsed || 0));
       }
-      populateFamilySelect();
-      renderFamilyFilters();
+      renderPrinterList();
+      if (printersList.length > 0 && !selectedPrinterId) {
+        selectedPrinterId = printersList[0].id;
+      }
+      if (selectedPrinterId && !printersList.find(p => p.id === selectedPrinterId)) {
+        selectedPrinterId = printersList.length > 0 ? printersList[0].id : null;
+      }
+      renderPrinterList();
     });
   }
-
-  function populateFamilySelect() {
-    const select = document.getElementById("familySelect");
-    if (!select) return;
-    const currentValue = select.value;
-    select.innerHTML = '<option value="">-- اختر عائلة --</option>';
-    familiesList.forEach(({ name }) => {
-      const option = document.createElement("option");
-      option.value = name;
-      option.textContent = name;
-      select.appendChild(option);
+  function renderPrinterList() {
+    if (printersList.length === 0) {
+      printerListContainer.innerHTML = `<div class="empty-printers">📭 Aucune imprimante enregistrée.</div>`;
+      return;
+    }
+    let html = '';
+    printersList.forEach(printer => {
+      const isActive = (printer.id === selectedPrinterId);
+      const protocolLabel = printer.protocol || 'escpos';
+      const paperLabel = printer.paperWidth ? `${printer.paperWidth}mm` : '80mm';
+      html += `
+        <div class="printer-chip ${isActive ? 'active' : ''}" data-id="${printer.id}" onclick="selectPrinter('${printer.id}')">
+          <i class="fas fa-print"></i>
+          <span>${escapeHtml(printer.name || 'Imprimante')}</span>
+          <span class="protocol-badge">${escapeHtml(protocolLabel)}</span>
+          <span class="paper-badge">${paperLabel}</span>
+          <button class="delete-printer" onclick="event.stopPropagation(); deletePrinter('${printer.id}')" title="Supprimer">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      `;
     });
-    if (currentValue && familiesList.some(f => f.name === currentValue)) {
-      select.value = currentValue;
+    printerListContainer.innerHTML = html;
+  }
+  window.selectPrinter = function(printerId) {
+    selectedPrinterId = printerId;
+    const printer = printersList.find(p => p.id === printerId);
+    if (printer) {
+      update(ref(db, `users/${currentUser}/printers/${printerId}`), { lastUsed: Date.now() });
+    }
+    renderPrinterList();
+    showStatus(`✅ Imprimante sélectionnée : "${printer?.name || 'Imprimante'}"`, 'success');
+  };
+  window.deletePrinter = async function(printerId) {
+    if (!confirm('⚠️ Supprimer cette imprimante définitivement ?')) return;
+    try {
+      await remove(ref(db, `users/${currentUser}/printers/${printerId}`));
+      showStatus('✅ Imprimante supprimée', 'success');
+      if (selectedPrinterId === printerId) {
+        selectedPrinterId = printersList.length > 1 ? printersList[0].id : null;
+      }
+    } catch (e) {
+      console.error(e);
+      showStatus('❌ Échec de la suppression', 'error');
+    }
+  };
+
+  // ============================================================
+  // أوامر ESC/POS الأساسية
+  // ============================================================
+  const ESC = 0x1B;
+  const GS = 0x1D;
+  function escposInit() { return new Uint8Array([ESC, 0x40]); }
+  function escposLine(text) {
+    const encoder = new TextEncoder();
+    return encoder.encode(text + '\n');
+  }
+  function escposCut() { return new Uint8Array([GS, 0x56, 0x00]); }
+  function escposBoldOn() { return new Uint8Array([ESC, 0x45, 0x01]); }
+  function escposBoldOff() { return new Uint8Array([ESC, 0x45, 0x00]); }
+  function escposFontSize(n) { return new Uint8Array([GS, 0x21, n]); }
+  function escposAlign(align) { return new Uint8Array([ESC, 0x61, align]); }
+
+  // ============================================================
+  // بناء الفاتورة (ESC/POS) - معدل حسب الطلب
+  // ============================================================
+  function buildInvoice(order) {
+    const items = order.items || [];
+    const total = items.reduce((sum, it) => sum + (Number(it.price) * Number(it.quantity)), 0);
+    const invoiceNumber = order.invoiceNumber ? order.invoiceNumber.toString().padStart(4, '0') : '----';
+    const customer = order.customerName || 'Client';
+    const phone = order.phone || '';
+    // إزالة رابط Google Maps من العنوان
+    let address = order.address || '';
+    if (address.includes('http')) {
+      address = address.split('http')[0].trim();
+    }
+    const date = new Date(order.confirmedAt || Date.now()).toLocaleString('fr-FR');
+    
+    if (typeof EscPosEncoder === 'undefined') {
+      console.warn('Bibliothèque esc-pos-encoder non chargée, utilisation du fallback.');
+      return buildInvoiceFallback(order);
+    }
+    
+    const encoder = new EscPosEncoder();
+    encoder.initialize();
+    
+    // ====== 1. اسم المتجر (كبير جداً) ======
+    encoder
+      .align('center')
+      .bold(true)
+      .size(2, 2)
+      .text(storeName)
+      .size(1, 1)
+      .bold(false)
+      .newline();
+    
+    // ====== 2. خط فاصل ======
+    encoder
+      .align('center')
+      .text('='.repeat(48))
+      .newline();
+    
+    // ====== 3. معلومات العميل (حجم 2x1) ======
+    encoder.align('left');
+    encoder.size(2, 1);
+    encoder.text(`N° Facture : ${invoiceNumber}`);
+    encoder.text(`Date : ${date}`);
+    encoder.text(`Client : ${customer}`);
+    if (phone) encoder.text(`Tél : ${phone}`);
+    if (address) encoder.text(`Adresse : ${address}`);
+    encoder.newline();
+    encoder.size(1, 1);
+    
+    // ====== 4. خط فاصل ======
+    encoder
+      .align('center')
+      .text('-'.repeat(48))
+      .newline();
+    
+    // ====== 5. رأس الجدول ======
+    encoder
+      .align('center')
+      .bold(true)
+      .size(2, 1)
+      .text('Produit          Qté   Prix    Total')
+      .size(1, 1)
+      .bold(false)
+      .newline();
+    
+    // ====== 6. صفوف المنتجات (حجم عادي) ======
+    encoder.align('left');
+    encoder.size(1, 1);
+    const colName = 16;
+    const colQty = 5;
+    const colPrice = 7;
+    const colTotal = 8;
+    items.forEach(item => {
+      const name = (item.name || 'Produit').substring(0, colName);
+      const qty = Number(item.quantity) || 0;
+      const price = Number(item.price) || 0;
+      const totalItem = qty * price;
+      const namePadded = name.padEnd(colName);
+      const qtyPadded = String(qty).padStart(colQty);
+      const pricePadded = Number(price).toFixed(2).padStart(colPrice);
+      const totalPadded = Number(totalItem).toFixed(2).padStart(colTotal);
+      const row = `${namePadded}  ${qtyPadded}   ${pricePadded}   ${totalPadded}`;
+      encoder.text(row);
+    });
+    
+    // ====== 7. خط فاصل ======
+    encoder
+      .align('center')
+      .text('-'.repeat(48))
+      .newline();
+    
+    // ====== 8. المبلغ الإجمالي (Total في اليسار، المبلغ في اليمين) ======
+    encoder.align('left');
+    encoder.bold(true);
+    encoder.size(2, 1);
+    encoder.text('Total :');
+    encoder.align('right');
+    const totalFormatted = total.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+    encoder.text(`${totalFormatted} DA`);
+    encoder.size(1, 1);
+    encoder.bold(false);
+    encoder.newline();
+    
+    // ====== 9. رقم هاتف المحل ======
+    encoder.align('center');
+    encoder.size(1, 1);
+    encoder.text(`📞 ${storePhoneNumber}`);
+    encoder.newline();
+    
+    // ====== 10. عبارة الشكر (بحجم أصغر) ======
+    encoder.align('center');
+    encoder.size(1, 1);
+    encoder.text('Merci pour votre confiance');
+    encoder.newline();
+    encoder.newline();
+    
+    // ====== 11. قص الورق ======
+    encoder.cut();
+    
+    return encoder.encode();
+  }
+
+  // ============================================================
+  // Fallback (بدون مكتبة) - معدل حسب الطلب
+  // ============================================================
+  function buildInvoiceFallback(order) {
+    const items = order.items || [];
+    const total = items.reduce((sum, it) => sum + (Number(it.price) * Number(it.quantity)), 0);
+    const invoiceNumber = order.invoiceNumber ? order.invoiceNumber.toString().padStart(4, '0') : '----';
+    const customer = order.customerName || 'Client';
+    const phone = order.phone || '';
+    let address = order.address || '';
+    if (address.includes('http')) {
+      address = address.split('http')[0].trim();
+    }
+    const date = new Date(order.confirmedAt || Date.now()).toLocaleString('fr-FR');
+    const chunks = [];
+    chunks.push(escposInit());
+    chunks.push(escposAlign(1));
+    chunks.push(escposFontSize(0x22));
+    chunks.push(escposBoldOn());
+    chunks.push(escposLine(storeName));
+    chunks.push(escposBoldOff());
+    chunks.push(escposFontSize(0x00));
+    chunks.push(escposLine('='.repeat(48)));
+    // معلومات العميل بحجم 2x1
+    chunks.push(escposAlign(0));
+    chunks.push(escposFontSize(0x11));
+    chunks.push(escposLine(`N° Facture : ${invoiceNumber}`));
+    chunks.push(escposLine(`Date : ${date}`));
+    chunks.push(escposLine(`Client : ${customer}`));
+    if (phone) chunks.push(escposLine(`Tél : ${phone}`));
+    if (address) chunks.push(escposLine(`Adresse : ${address}`));
+    chunks.push(escposFontSize(0x00));
+    chunks.push(escposLine('-'.repeat(48)));
+    chunks.push(escposAlign(1));
+    chunks.push(escposBoldOn());
+    chunks.push(escposFontSize(0x11));
+    chunks.push(escposLine('  Produit   Qté  Prix  Total  '));
+    chunks.push(escposBoldOff());
+    chunks.push(escposFontSize(0x00));
+    chunks.push(escposAlign(0));
+    const colName = 16, colQty = 5, colPrice = 7, colTotal = 8;
+    function formatRow(name, qty, price, total) {
+      let nameStr = name.substring(0, colName).padEnd(colName);
+      const qtyStr = String(qty).padStart(colQty);
+      const priceStr = Number(price).toFixed(2).padStart(colPrice);
+      const totalStr = Number(total).toFixed(2).padStart(colTotal);
+      return nameStr + '  ' + qtyStr + '   ' + priceStr + '   ' + totalStr;
+    }
+    items.forEach(item => {
+      const name = item.name || 'Produit';
+      const qty = Number(item.quantity) || 0;
+      const price = Number(item.price) || 0;
+      const totalItem = qty * price;
+      chunks.push(escposLine(formatRow(name, qty, price, totalItem)));
+    });
+    chunks.push(escposLine('-'.repeat(48)));
+    // Total
+    chunks.push(escposAlign(0));
+    chunks.push(escposBoldOn());
+    chunks.push(escposFontSize(0x11));
+    chunks.push(escposLine(`Total : ${total.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ')} DA`));
+    chunks.push(escposBoldOff());
+    chunks.push(escposFontSize(0x00));
+    chunks.push(escposLine(''));
+    chunks.push(escposAlign(1));
+    chunks.push(escposLine(`📞 ${storePhoneNumber}`));
+    chunks.push(escposLine(''));
+    chunks.push(escposLine('Merci pour votre confiance'));
+    chunks.push(escposLine(''));
+    chunks.push(escposCut());
+    const totalLength = chunks.reduce((s, arr) => s + arr.length, 0);
+    const allData = new Uint8Array(totalLength);
+    let offset = 0;
+    for (const chunk of chunks) {
+      allData.set(chunk, offset);
+      offset += chunk.length;
+    }
+    return allData;
+  }
+
+  // ============================================================
+  // إرسال البيانات على دفعات
+  // ============================================================
+  async function sendChunked(characteristic, data, chunkSize = 150) {
+    const total = data.length;
+    let sent = 0;
+    while (sent < total) {
+      const end = Math.min(sent + chunkSize, total);
+      const chunk = data.slice(sent, end);
+      await characteristic.writeValue(chunk);
+      sent = end;
+      await new Promise(r => setTimeout(r, 30));
+      showStatus(`⏳ Envoi... ${Math.round((sent/total)*100)}%`, 'info');
     }
   }
 
-  async function addNewFamily(familyName) {
-    if (!familyName.trim()) return false;
-    const trimmedName = familyName.trim();
-    if (familiesList.some(f => f.name === trimmedName)) {
-      showToast("⚠️ هذه العائلة موجودة بالفعل");
+  // ============================================================
+  // كشف البروتوكول
+  // ============================================================
+  async function detectProtocol(characteristic) {
+    try {
+      await characteristic.writeValue(new Uint8Array([0x1B, 0x40, 0x1B, 0x64, 0x02, 0x1B, 0x4A, 0x0A]));
+      await new Promise(r => setTimeout(r, 300));
+      await characteristic.writeValue(new Uint8Array([...escposInit(), ...escposLine('Test'), ...escposCut()]));
+      return 'escpos';
+    } catch (e) { console.warn('ESC/POS test failed:', e); }
+    try {
+      await characteristic.writeValue(new TextEncoder().encode('SIZE 58 mm, 40 mm\nGAP 0 mm, 0 mm\nCLS\nTEXT 10,10,"0",1,1,1,"Test TSPL"\nPRINT 1\n'));
+      return 'tspl';
+    } catch (e) { console.warn('TSPL test failed:', e); }
+    return 'raw';
+  }
+
+  // ============================================================
+  // دالة الطباعة الذكية (مع deviceId)
+  // ============================================================
+  async function smartPrint(order) {
+    if (!selectedPrinterId) {
+      showStatus('⚠️ Veuillez sélectionner une imprimante', 'warning');
+      return false;
+    }
+    const selectedPrinter = printersList.find(p => p.id === selectedPrinterId);
+    if (!selectedPrinter) {
+      showStatus('⚠️ Imprimante introuvable', 'error');
       return false;
     }
     try {
-      const newRef = push(familiesRef);
-      await set(newRef, trimmedName);
-      showToast(`✅ تم إضافة عائلة "${trimmedName}"`);
+      showStatus('⏳ Connexion à l\'imprimante...', 'info');
+      if (!navigator.bluetooth) throw new Error('Votre navigateur ne supporte pas Web Bluetooth');
+
+      let device = null;
+      const deviceId = selectedPrinter.deviceId;
+      const printerName = selectedPrinter.name || '';
+
+      // ===== المحاولة 1: الاتصال المباشر =====
+      if (deviceId) {
+        try {
+          device = await navigator.bluetooth.getDevice({ id: deviceId });
+          console.log('✅ تم استرجاع الجهاز باستخدام deviceId');
+        } catch (e) {
+          console.warn('⚠️ فشل استرجاع الجهاز باستخدام deviceId:', e);
+          device = null;
+        }
+      }
+
+      // ===== المحاولة 2: البحث بالاسم =====
+      if (!device) {
+        showStatus('⏳ Recherche de l\'imprimante par nom...', 'info');
+        try {
+          device = await navigator.bluetooth.requestDevice({
+            filters: [{ name: printerName }],
+            optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb', '00001101-0000-1000-8000-00805f9b34fb']
+          });
+        } catch (e1) {
+          console.warn('Échec recherche par nom:', e1);
+          try {
+            const prefix = printerName.substring(0, 10);
+            device = await navigator.bluetooth.requestDevice({
+              filters: [{ namePrefix: prefix }],
+              optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb', '00001101-0000-1000-8000-00805f9b34fb']
+            });
+          } catch (e2) {
+            console.warn('Échec recherche par préfixe:', e2);
+            device = await navigator.bluetooth.requestDevice({
+              acceptAllDevices: true,
+              optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb', '00001101-0000-1000-8000-00805f9b34fb']
+            });
+          }
+        }
+        if (!device) throw new Error('Aucun appareil trouvé');
+        await update(ref(db, `users/${currentUser}/printers/${selectedPrinterId}`), {
+          deviceId: device.id
+        });
+        selectedPrinter.deviceId = device.id;
+      }
+
+      if (!device) throw new Error('لم يتم العثور على الطابعة');
+
+      showStatus(`✅ Appareil trouvé : ${device.name || 'Inconnu'}`, 'success');
+      showStatus(`⏳ Connexion à ${device.name}...`, 'info');
+      const server = await device.gatt.connect();
+      showStatus('✅ Connecté à l\'imprimante', 'success');
+
+      // ===== البحث الديناميكي عن خاصية الكتابة =====
+      let characteristic = null;
+      const services = await server.getPrimaryServices();
+      for (const service of services) {
+        const characteristics = await service.getCharacteristics();
+        for (const char of characteristics) {
+          if (char.properties.write || char.properties.writeWithoutResponse) {
+            characteristic = char;
+            break;
+          }
+        }
+        if (characteristic) break;
+      }
+      if (!characteristic) throw new Error('Caractéristique d\'écriture introuvable');
+
+      // ===== كشف أو استرجاع البروتوكول =====
+      let protocol = selectedPrinter.protocol;
+      if (!protocol || protocol === 'unknown') {
+        showStatus('⏳ Détection du protocole...', 'info');
+        protocol = await detectProtocol(characteristic);
+        await update(ref(db, `users/${currentUser}/printers/${selectedPrinterId}`), {
+          protocol: protocol,
+          detectedAt: Date.now()
+        });
+        selectedPrinter.protocol = protocol;
+        renderPrinterList();
+        showStatus(`✅ Protocole détecté : ${protocol.toUpperCase()}`, 'success');
+      }
+
+      // ============================================================
+      // بناء البيانات حسب البروتوكول (مع التعديلات)
+      // ============================================================
+      let printData;
+
+      if (protocol === 'tspl') {
+        const items = order.items || [];
+        const total = items.reduce((sum, it) => sum + (Number(it.price) * Number(it.quantity)), 0);
+        const invoiceNumber = order.invoiceNumber ? order.invoiceNumber.toString().padStart(4, '0') : '----';
+        const customer = order.customerName || 'Client';
+        const phone = order.phone || '';
+        let address = order.address || '';
+        if (address.includes('http')) {
+          address = address.split('http')[0].trim();
+        }
+        const date = new Date(order.confirmedAt || Date.now()).toLocaleString('fr-FR');
+        const lines = [];
+        lines.push('SIZE 58 mm, 40 mm', 'GAP 0 mm, 0 mm', 'CLS');
+        let y = 10;
+        // اسم المتجر
+        lines.push(`TEXT 10,${y},"0",2,2,1,"${storeName}"`); y += 40;
+        // خط فاصل
+        lines.push(`TEXT 10,${y},"0",1,1,1,"========================"`); y += 25;
+        // معلومات العميل بحجم 2x1 (نفس المبلغ الإجمالي)
+        lines.push(`TEXT 10,${y},"0",2,1,1,"N° Facture : ${invoiceNumber}"`); y += 30;
+        lines.push(`TEXT 10,${y},"0",2,1,1,"Date : ${date}"`); y += 30;
+        lines.push(`TEXT 10,${y},"0",2,1,1,"Client : ${customer}"`); y += 30;
+        if (phone) lines.push(`TEXT 10,${y},"0",2,1,1,"Tél : ${phone}"`); y += 30;
+        if (address) lines.push(`TEXT 10,${y},"0",2,1,1,"Adr : ${address}"`); y += 30;
+        lines.push(`TEXT 10,${y},"0",1,1,1,"------------------------"`); y += 25;
+        // رأس الجدول
+        lines.push(`TEXT 10,${y},"0",2,1,1,"Produit       Qté Prix Total"`); y += 30;
+        // المنتجات بحجم عادي
+        items.forEach(item => {
+          const name = (item.name || 'Produit').substring(0, 12);
+          const qty = Number(item.quantity) || 0;
+          const price = Number(item.price) || 0;
+          const totalItem = qty * price;
+          const line = `${name.padEnd(12)} ${String(qty).padStart(3)} ${price.toFixed(0).padStart(5)} ${totalItem.toFixed(0).padStart(6)}`;
+          lines.push(`TEXT 10,${y},"0",1,1,1,"${line}"`); y += 25;
+        });
+        lines.push(`TEXT 10,${y},"0",1,1,1,"------------------------"`); y += 25;
+        // المبلغ الإجمالي (بحجم 2x1)
+        const totalFormatted = total.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+        lines.push(`TEXT 10,${y},"0",2,1,1,"Total : ${totalFormatted} DA"`); y += 35;
+        // رقم الهاتف
+        lines.push(`TEXT 10,${y},"0",1,1,1,"📞 ${storePhoneNumber}"`); y += 25;
+        // عبارة الشكر
+        lines.push(`TEXT 10,${y},"0",1,1,1,"Merci pour votre confiance"`); y += 25;
+        lines.push('PRINT 1');
+        printData = new TextEncoder().encode(lines.join('\n') + '\n');
+      } 
+      else if (protocol === 'raw') {
+        const items = order.items || [];
+        const total = items.reduce((sum, it) => sum + (Number(it.price) * Number(it.quantity)), 0);
+        const invoiceNumber = order.invoiceNumber ? order.invoiceNumber.toString().padStart(4, '0') : '----';
+        const customer = order.customerName || 'Client';
+        const phone = order.phone || '';
+        let address = order.address || '';
+        if (address.includes('http')) {
+          address = address.split('http')[0].trim();
+        }
+        const date = new Date(order.confirmedAt || Date.now()).toLocaleString('fr-FR');
+        let text = `${storeName}\n`;
+        text += '='.repeat(48) + '\n';
+        text += `N° Facture : ${invoiceNumber}\n`;
+        text += `Date : ${date}\n`;
+        text += `Client : ${customer}\n`;
+        if (phone) text += `Tél : ${phone}\n`;
+        if (address) text += `Adresse : ${address}\n`;
+        text += '-'.repeat(48) + '\n';
+        text += 'Produit          Qté   Prix    Total\n';
+        items.forEach(item => {
+          const name = (item.name || 'Produit').padEnd(16);
+          const qty = String(Number(item.quantity) || 0).padStart(5);
+          const price = Number(item.price).toFixed(2).padStart(7);
+          const totalItem = (Number(item.quantity) * Number(item.price)).toFixed(2).padStart(8);
+          text += `${name}  ${qty}   ${price}   ${totalItem}\n`;
+        });
+        text += '-'.repeat(48) + '\n';
+        const totalFormatted = total.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+        text += `Total : ${totalFormatted} DA\n\n`;
+        text += `📞 ${storePhoneNumber}\n`;
+        text += 'Merci pour votre confiance\n\n\n';
+        printData = new TextEncoder().encode(text);
+      } 
+      else {
+        // ESC/POS
+        printData = buildInvoice(order);
+      }
+
+      showStatus(`⏳ Envoi des données (${printData.length} octets)...`, 'info');
+      await sendChunked(characteristic, printData, 150);
+      await update(ref(db, `users/${currentUser}/printers/${selectedPrinterId}`), { lastUsed: Date.now() });
+      showStatus('✅ Impression réussie !', 'success');
       return true;
-    } catch (error) {
-      console.error("خطأ في الحفظ:", error);
-      showToast("❌ حدث خطأ أثناء الحفظ");
+    } catch (e) {
+      console.error(e);
+      let errorMsg = e.message || 'Erreur inconnue';
+      if (errorMsg.includes('user cancelled')) errorMsg = 'Impression annulée';
+      showStatus(`❌ Échec : ${errorMsg}`, 'error');
       return false;
     }
   }
 
-  function setFamilyInForm(familyName) {
-    const select = document.getElementById("familySelect");
-    if (familyName && familiesList.some(f => f.name === familyName)) {
-      select.value = familyName;
-    } else {
-      select.value = "";
-    }
-  }
-
-  function renderFamilyFilters() {
-    const section = document.getElementById("familyFilterSection");
-    if (!section) return;
-    const existingWrappers = section.querySelectorAll('.family-item-wrapper');
-    existingWrappers.forEach(el => el.remove());
-    const canManage = (isOwner() || isAdmin());
-    familiesList.forEach(({ key, name }) => {
-      const wrapper = document.createElement("div");
-      wrapper.className = "family-item-wrapper";
-      const btn = document.createElement("button");
-      btn.className = "filter-btn";
-      if (currentFamilyFilter === name) btn.classList.add("active");
-      btn.dataset.family = name;
-      btn.innerHTML = `
-        <i class="fas fa-tag"></i> ${escapeHtml(name)}
-        <span class="filter-count" id="count_${escapeHtml(name)}">0</span>
-      `;
-      btn.addEventListener("click", () => {
-        filterByFamily(name);
-      });
-      wrapper.appendChild(btn);
-      if (canManage) {
-        const actions = document.createElement("div");
-        actions.className = "family-actions";
-        const editBtn = document.createElement("button");
-        editBtn.className = "family-action-btn edit-btn";
-        editBtn.innerHTML = `<i class="fas fa-pen"></i>`;
-        editBtn.title = `تعديل عائلة "${name}"`;
-        editBtn.addEventListener("click", (e) => {
-          e.stopPropagation();
-          editFamilyName(key, name);
-        });
-        actions.appendChild(editBtn);
-        const deleteBtn = document.createElement("button");
-        deleteBtn.className = "family-action-btn delete-btn";
-        deleteBtn.innerHTML = `<i class="fas fa-trash"></i>`;
-        deleteBtn.title = `حذف عائلة "${name}"`;
-        deleteBtn.addEventListener("click", (e) => {
-          e.stopPropagation();
-          deleteFamily(key, name);
-        });
-        actions.appendChild(deleteBtn);
-        wrapper.appendChild(actions);
-      }
-      section.insertBefore(wrapper, document.getElementById("clearFilterBtn"));
-    });
-    updateFamilyCounts();
-  }
-
-  async function editFamilyName(key, oldName) {
-    const newName = prompt(`تعديل اسم العائلة "${oldName}"`, oldName);
-    if (!newName || newName.trim() === oldName) return;
-    const trimmedName = newName.trim();
-    if (familiesList.some(f => f.name === trimmedName && f.key !== key)) {
-      showToast("⚠️ هذه العائلة موجودة بالفعل");
-      return;
-    }
-    try {
-      await set(ref(db, `families/${key}`), trimmedName);
-      const updates = {};
-      Object.entries(allProducts).forEach(([productId, product]) => {
-        if (product.family === oldName) {
-          updates[`products/${productId}/family`] = trimmedName;
-        }
-      });
-      if (Object.keys(updates).length > 0) {
-        await update(ref(db), updates);
-      }
-      showToast(`✅ تم تغيير اسم العائلة إلى "${trimmedName}"`);
-    } catch (error) {
-      console.error("خطأ في التعديل:", error);
-      showToast("❌ حدث خطأ أثناء التعديل");
-    }
-  }
-
-  async function deleteFamily(key, familyName) {
-    if (!confirm(`⚠️ هل أنت متأكد من حذف عائلة "${familyName}" نهائياً؟\n\nملاحظة: المنتجات التي تنتمي لهذه العائلة ستصبح "غير مصنف"`)) {
-      return;
-    }
-    try {
-      const updates = {};
-      Object.entries(allProducts).forEach(([productId, product]) => {
-        if (product.family === familyName) {
-          updates[`products/${productId}/family`] = "";
-        }
-      });
-      if (Object.keys(updates).length > 0) {
-        await update(ref(db), updates);
-      }
-      await remove(ref(db, `families/${key}`));
-      showToast(`✅ تم حذف عائلة "${familyName}"`);
-    } catch (error) {
-      console.error("خطأ في الحذف:", error);
-      showToast("❌ حدث خطأ أثناء الحذف");
-    }
-  }
-
-  function updateFamilyCounts() {
-    const totalProducts = Object.values(allProducts).filter(p => !p.hidden).length;
-    const countAll = document.getElementById("countAll");
-    if (countAll) countAll.textContent = totalProducts;
-    familiesList.forEach(({ name }) => {
-      const count = Object.values(allProducts).filter(p => !p.hidden && p.family === name).length;
-      const countEl = document.getElementById(`count_${escapeHtml(name)}`);
-      if (countEl) countEl.textContent = count;
-    });
-  }
-
-  window.filterByFamily = function(family) {
-    currentFamilyFilter = family;
-    updateActiveFilters();
-    applyFiltersAndRender();
-  };
-
-  window.clearFamilyFilter = function() {
-    currentFamilyFilter = 'الكل';
-    updateActiveFilters();
-    applyFiltersAndRender();
-  };
-
-  function updateActiveFilters() {
-    document.querySelectorAll('.filter-btn').forEach(btn => {
-      const family = btn.dataset.family;
-      btn.classList.toggle('active', family === currentFamilyFilter);
-    });
-    const clearBtn = document.getElementById("clearFilterBtn");
-    if (clearBtn) {
-      if (currentFamilyFilter === 'الكل') {
-        clearBtn.classList.remove('show');
-      } else {
-        clearBtn.classList.add('show');
-        clearBtn.textContent = `✕ ${escapeHtml(currentFamilyFilter)}`;
-      }
-    }
-  }
-
-  function applyFiltersAndRender() {
-    const searchTerm = document.getElementById("searchInput").value.trim().toLowerCase();
-    let result = {...allProducts};
-    if (currentFamilyFilter !== 'الكل' && currentFamilyFilter) {
-      result = Object.fromEntries(
-        Object.entries(result).filter(([_, p]) => p.family === currentFamilyFilter)
-      );
-    }
-    if (searchTerm) {
-      result = Object.fromEntries(
-        Object.entries(result).filter(([_, p]) => 
-          (p.name || "").toLowerCase().includes(searchTerm) || 
-          (p.serial || "").toLowerCase().includes(searchTerm)
-        )
-      );
-    }
-    filtered = result;
-    currentPage = 1;
-    renderProducts(1);
-    updateFamilyCounts();
-  }
-
-  function applySearch() {
-    applyFiltersAndRender();
-  }
-
-  // ====== دوال المنتجات والطلبات (مع دعم الجملة) ======
-  async function getNextInvoiceNumber() {
-    const snapshot = await get(invoiceCounterRef);
-    let currentNumber = snapshot.exists() ? snapshot.val() : 0;
-    const nextNumber = currentNumber + 1;
-    await set(invoiceCounterRef, nextNumber);
-    return nextNumber;
-  }
-
-  function createOrder(customerName, phone, address, cart) {
-    const items = cart.map(item => ({
-        id: item.id,
-        name: item.name,
-        serial: item.serial || '---',
-        quantity: item.quantity,
-        price: item.price
-    }));
-    const totalPrice = items.reduce((sum, it) => sum + (it.price * it.quantity), 0);
-    const order = {
-        customerName: customerName,
-        phone: phone,
-        address: address,
-        items: items,
-        totalPrice: totalPrice,
-        timestamp: Date.now()
-    };
-    return push(ordersRef, order);
-  }
-
-  // ====== دوال الطباعة (بدون تغيير) ======
-  let printContext = { key: null, order: null, type: null };
-
-  async function confirmOrderOnly(key, order) {
-    const currentUserName = localStorage.getItem("user") || "Admin";
-    const invoiceNumber = await getNextInvoiceNumber();
-    order.invoiceNumber = invoiceNumber;
-    order.confirmedAt = Date.now();
-    order.confirmedBy = currentUserName;
-    await set(ref(db, `confirmedOrders/${key}`), order);
-    await remove(ref(db, `whatsappOrders/${key}`));
-    showToast("✅ تم تأكيد الطلب");
-    return order;
-  }
-
-  function showPrintOptions(key, order, type) {
-    printContext.key = key;
-    printContext.order = order;
-    printContext.type = type;
-    document.getElementById('printOptionModal').style.display = 'flex';
-  }
-
-  function printNormal() {
-    const { key, order, type } = printContext;
-    if (type === 'whatsapp') {
-      const sellerName = localStorage.getItem("user") || "Admin";
-      printInvoice(order, sellerName);
-    } else {
-      const sellerName = localStorage.getItem("user") || "Admin";
-      printConfirmedOrder(order, sellerName);
-    }
-    closeModal('printOptionModal');
-  }
-
-  function printThermal() {
-    window.open('print_invoice.html', '_blank');
-    closeModal('printOptionModal');
-  }
-
-  document.getElementById('thermalPrintBtn').addEventListener('click', printThermal);
-  document.getElementById('normalPrintBtn').addEventListener('click', printNormal);
-
-  function printInvoice(order, sellerName) {
-  let rows = "";
-  let totalQte = 0;
-  let itemIndex = 1;
-  let invoiceNumber = order.invoiceNumber ? order.invoiceNumber.toString().padStart(4, '0') : '----';
-  
-  if (order.items && Array.isArray(order.items)) {
-    order.items.forEach((it) => {
-      const qty = Number(it.quantity || 0);
-      const price = Number(it.price || 0);
-      const total = qty * price;
-      totalQte += qty;
-      rows += `
-        <tr>
-          <td style="text-align:center; border:1px solid #000; padding:2px 4px;">${itemIndex}</td>
-          <td style="border:1px solid #000; padding:2px 4px; text-align:center; direction:ltr;">${escapeHtml(it.serial || '---')}</td>
-          <td style="border:1px solid #000; padding:2px 4px; text-align:left; direction:ltr; font-weight:600;">${escapeHtml(it.name || '')}</td>
-          <td style="text-align:center; border:1px solid #000; padding:2px 4px;">${qty}</td>
-          <!-- عرض السعر الفردي بدون فواصل عشرية -->
-          <td style="text-align:right; border:1px solid #000; padding:2px 4px; direction:ltr;">
-            ${price.toLocaleString('fr-FR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} DA
-          </td>
-          <!-- عرض المجموع بدون فواصل عشرية -->
-          <td style="text-align:right; border:1px solid #000; padding:2px 4px; direction:ltr;">
-            ${total.toLocaleString('fr-FR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} DA
-          </td>
-        </tr>
-      `;
-      itemIndex++;
-    });
-  }
-  
-  const totalPrice = order.totalPrice || 0;
-  const nbreProduit = order.items ? order.items.length : 0;
-  
-  const win = window.open('', '_blank');
-  win.document.write(`
-    <!DOCTYPE html>
-    <html lang="fr" dir="ltr">
-    <head>
-      <meta charset="UTF-8">
-      <title>Bon de livraison</title>
-      <style>
-        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap');
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Cairo', Arial, sans-serif; font-size: 12px; background: white; padding: 10px; direction: ltr; }
-        .invoice { max-width: 1000px; margin: 0 auto; border: 2px solid #000; padding: 12px; }
-        .top-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 15px; }
-        .store-info { display: flex; align-items: center; gap: 10px; width: 55%; }
-        .store-logo img { width: 50px; height: 50px; object-fit: contain; }
-        .store-details h2 { font-size: 14px; font-weight: 900; margin-bottom: 3px; }
-        .store-details p { font-size: 10px; margin: 2px 0; }
-        .client-info { width: 40%; border: 1px solid #000; padding: 6px 10px; line-height: 1.4; font-size: 11px; direction: ltr; }
-        .client-info p { margin: 2px 0; text-align: left; }
-        .info-bar { display: flex; justify-content: space-between; margin-bottom: 15px; padding: 5px 0; font-size: 11px; font-weight: 600; direction: ltr; }
-        table { width: 100%; border-collapse: collapse; margin: 10px 0; direction: ltr; }
-        /* تقليل padding في الرأس والخلايا */
-        th, td { border: 1px solid #000; padding: 2px 4px; font-size: 11px; }
-        th { background: #f4f4f4; font-weight: 700; text-align: center; }
-        .summary-line { margin: 8px 0; text-align: right; font-weight: 600; font-size: 11px; direction: ltr; }
-        .bottom-section { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 15px; border-top: 2px solid #000; padding-top: 10px; direction: ltr; }
-        .invoice-number { text-align: right; font-size: 11px; font-weight: bold; }
-        .total-box { text-align: right; }
-        .total-box strong { font-size: 12px; }
-        .total-amount { font-size: 16px; font-weight: 900; }
-        .footer-text { text-align: center; margin-top: 12px; font-size: 10px; font-weight: 500; direction: ltr; }
-        @page { @bottom-center { content: "Page : " counter(page) "/" counter(pages); } }
-        @media print { body { padding: 0; } .invoice { border: 2px solid #000; } .no-print { display: none !important; } }
-        td:nth-child(3) { direction: ltr; text-align: left; font-weight: 600; }
-        td:nth-child(2) { direction: ltr; text-align: center; }
-        td:nth-child(5), td:nth-child(6) { direction: ltr; text-align: right; }
-      </style>
-    </head>
-    <body>
-      <div class="invoice">
-        <div class="top-header">
-          <div class="store-info">
-            <div class="store-logo"><img src="https://i.postimg.cc/3J7HQ20j/1000022206-removebg-preview.png" alt="Logo"></div>
-            <div class="store-details">
-              <h2>aksel & anais</h2>
-              <p>Télé : 0781 55 48 85</p>
-              <p>zéralda.</p>
-            </div>
-          </div>
-          <div class="client-info">
-            <p><strong>Client :</strong> ${escapeHtml(order.customerName || '')}</p>
-            <p><strong>Adresse :</strong> ${escapeHtml(order.address || '')}</p>
-            <p><strong>Télé :</strong> ${escapeHtml(order.phone || '')}</p>
-          </div>
-        </div>
-        <div class="info-bar">
-          <span>le ${new Date().toLocaleDateString('fr-FR')} - ${new Date().toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'})}</span>
-          <span>Préparé par : ${escapeHtml(sellerName || 'KARIM')}</span>
-        </div>
-        <div style="text-align:center; margin:10px 0; font-weight:bold; font-size:14px; direction:ltr;">Bon de livraison</div>
-        <table>
-          <thead><tr><th style="width:5%">N°</th><th style="width:10%">Réf</th><th style="width:50%">DESIGNATION</th><th style="width:8%">QTE</th><th style="width:13%">Prix u</th><th style="width:14%">Total</th></tr></thead>
-          <tbody>${rows}</tbody>
-        </table>
-        <div class="summary-line">Nbre Produit : ${nbreProduit} &nbsp;&nbsp;&nbsp; Tot Qté : ${totalQte}</div>
-        <div class="bottom-section">
-          <div class="invoice-number">bon de livraison N°: ${invoiceNumber}</div>
-          <div class="total-box">
-            <div><strong>net à payer</strong></div>
-            <!-- هنا نترك الصيغة العشرية بمنزلتين للمبلغ الإجمالي -->
-            <div class="total-amount">${Math.floor(totalPrice).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} DA</div>
-          </div>
-        </div>
-        <div class="footer-text">Merci pour votre confiance</div>
-      </div>
-      <div class="no-print" style="text-align:center; margin:20px 0;">
-        <button onclick="window.print()" style="padding:10px 25px; font-size:14px; margin:5px; background:#000; color:white; border:none; border-radius:5px; cursor:pointer;">🖨️ Imprimer</button>
-        <button onclick="window.close()" style="padding:10px 25px; font-size:14px; margin:5px;">✖️ Fermer</button>
-      </div>
-    </body>
-    </html>
-  `);
-  win.document.close();
-  setTimeout(() => { win.focus(); }, 500);
-}
-
-  function printConfirmedOrder(order, sellerName) {
-  let rows = "";
-  let totalQte = 0;
-  let itemIndex = 1;
-  let invoiceNumber = order.invoiceNumber ? order.invoiceNumber.toString().padStart(4, '0') : '----';
-  
-  if (order.items && Array.isArray(order.items)) {
-    order.items.forEach((it) => {
-      const qty = Number(it.quantity || 0);
-      const price = Number(it.price || 0);
-      const total = qty * price;
-      totalQte += qty;
-      rows += `
-        <tr>
-          <td style="text-align:center; border:1px solid #000; padding:2px 4px;">${itemIndex}</td>
-          <td style="border:1px solid #000; padding:2px 4px; text-align:center; direction:ltr;">${escapeHtml(it.serial || '---')}</td>
-          <td style="border:1px solid #000; padding:2px 4px; text-align:left; direction:ltr; font-weight:600;">${escapeHtml(it.name || '')}</td>
-          <td style="text-align:center; border:1px solid #000; padding:2px 4px;">${qty}</td>
-          <!-- عرض السعر الفردي بدون فواصل عشرية -->
-          <td style="text-align:right; border:1px solid #000; padding:2px 4px; direction:ltr;">
-            ${price.toLocaleString('fr-FR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} DA
-          </td>
-          <!-- عرض المجموع بدون فواصل عشرية -->
-          <td style="text-align:right; border:1px solid #000; padding:2px 4px; direction:ltr;">
-            ${total.toLocaleString('fr-FR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} DA
-          </td>
-        </tr>
-      `;
-      itemIndex++;
-    });
-  }
-  
-  const totalPrice = order.totalPrice || 0;
-  const nbreProduit = order.items ? order.items.length : 0;
-  
-  const win = window.open('', '_blank');
-  win.document.write(`
-    <!DOCTYPE html>
-    <html lang="fr" dir="ltr">
-    <head>
-      <meta charset="UTF-8">
-      <title>Bon de livraison confirmé</title>
-      <style>
-        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap');
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Cairo', Arial, sans-serif; font-size: 12px; background: white; padding: 10px; direction: ltr; }
-        .invoice { max-width: 1000px; margin: 0 auto; border: 2px solid #000; padding: 12px; }
-        .top-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 15px; }
-        .store-info { display: flex; align-items: center; gap: 10px; width: 55%; }
-        .store-logo img { width: 50px; height: 50px; object-fit: contain; }
-        .store-details h2 { font-size: 14px; font-weight: 900; margin-bottom: 3px; }
-        .store-details p { font-size: 10px; margin: 2px 0; }
-        .client-info { width: 40%; border: 1px solid #000; padding: 6px 10px; line-height: 1.4; font-size: 11px; direction: ltr; }
-        .client-info p { margin: 2px 0; text-align: left; }
-        .info-bar { display: flex; justify-content: space-between; margin-bottom: 15px; padding: 5px 0; font-size: 11px; font-weight: 600; direction: ltr; }
-        table { width: 100%; border-collapse: collapse; margin: 10px 0; direction: ltr; }
-        th, td { border: 1px solid #000; padding: 2px 4px; font-size: 11px; }
-        th { background: #f4f4f4; font-weight: 700; text-align: center; }
-        .summary-line { margin: 8px 0; text-align: right; font-weight: 600; font-size: 11px; direction: ltr; }
-        .bottom-section { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 15px; border-top: 2px solid #000; padding-top: 10px; direction: ltr; }
-        .invoice-number { text-align: right; font-size: 11px; font-weight: bold; }
-        .total-box { text-align: right; }
-        .total-box strong { font-size: 12px; }
-        .total-amount { font-size: 16px; font-weight: 900; }
-        .footer-text { text-align: center; margin-top: 12px; font-size: 10px; font-weight: 500; direction: ltr; }
-        @page { @bottom-center { content: "Page : " counter(page) "/" counter(pages); } }
-        @media print { body { padding: 0; } .invoice { border: 2px solid #000; } .no-print { display: none !important; } }
-        td:nth-child(3) { direction: ltr; text-align: left; font-weight: 600; }
-        td:nth-child(2) { direction: ltr; text-align: center; }
-        td:nth-child(5), td:nth-child(6) { direction: ltr; text-align: right; }
-      </style>
-    </head>
-    <body>
-      <div class="invoice">
-        <div class="top-header">
-          <div class="store-info">
-            <div class="store-logo"><img src="https://i.postimg.cc/3J7HQ20j/1000022206-removebg-preview.png" alt="Logo"></div>
-            <div class="store-details">
-              <h2>aksel & anais</h2>
-              <p>Télé : 0781554885</p>
-              <p>zéralda.</p>
-            </div>
-          </div>
-          <div class="client-info">
-            <p><strong>Client :</strong> ${escapeHtml(order.customerName || '')}</p>
-            <p><strong>Adresse :</strong> ${escapeHtml(order.address || '')}</p>
-            <p><strong>Télé :</strong> ${escapeHtml(order.phone || '')}</p>
-          </div>
-        </div>
-        <div class="info-bar">
-          <span>le ${new Date().toLocaleDateString('fr-FR')} - ${new Date().toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'})}</span>
-          <span>Préparé par : ${escapeHtml(sellerName || 'KARIM')}</span>
-        </div>
-        <div style="text-align:center; margin:10px 0; font-weight:bold; font-size:14px; direction:ltr;">Bon de livraison</div>
-        <table>
-          <thead><tr><th style="width:5%">N°</th><th style="width:10%">Réf</th><th style="width:50%">DESIGNATION</th><th style="width:8%">QTE</th><th style="width:13%">Prix u</th><th style="width:14%">Total</th></tr></thead>
-          <tbody>${rows}</tbody>
-        </table>
-        <div class="summary-line">Nbre Produit : ${nbreProduit} &nbsp;&nbsp;&nbsp; Tot Qté : ${totalQte}</div>
-        <div class="bottom-section">
-          <div class="invoice-number">bon de livraison N°: ${invoiceNumber}</div>
-          <div class="total-box">
-            <div><strong>net à payer</strong></div>
-            <!-- المبلغ الإجمالي مع منزلتين عشريتين -->
-            <div class="total-amount">${Math.floor(totalPrice).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} DA</div>
-          </div>
-        </div>
-        <div class="footer-text">Merci pour votre confiance</div>
-      </div>
-      <div class="no-print" style="text-align:center; margin:20px 0;">
-        <button onclick="window.print()" style="padding:10px 25px; font-size:14px; margin:5px; background:#000; color:white; border:none; border-radius:5px; cursor:pointer;">🖨️ Imprimer</button>
-        <button onclick="window.close()" style="padding:10px 25px; font-size:14px; margin:5px;">✖️ Fermer</button>
-      </div>
-    </body>
-    </html>
-  `);
-  win.document.close();
-  setTimeout(() => { win.focus(); }, 500);
-}
-
-  // ====== عرض المنتجات (مع إظهار سعر الجملة في البطاقة) ======
-  function renderProducts(page) {
-    const container = document.getElementById("productsContainer");
-    if (!container) return;
-    container.innerHTML = "";
-    const arr = Object.entries(filtered).filter(([_,p]) => !p.hidden);
-    const total = Math.ceil(arr.length / PER_PAGE);
-    if (page > total) page = 1;
-    const start = (page-1)*PER_PAGE;
-    const items = arr.slice(start, start+PER_PAGE);
-    if(!items.length) { 
-      container.innerHTML = `
-        <div class="no-data" style="grid-column: 1 / -1;">
-          <i class="fas fa-box-open"></i>
-          لا توجد منتجات ${currentFamilyFilter !== 'الكل' ? `في عائلة "${currentFamilyFilter}"` : ''}
-        </div>
-      `; 
-      renderPagination(0); 
-      return; 
-    }
-    
-    const canEdit = (isOwner() || isAdmin());
-    
-    items.forEach(([id, prod]) => {
-      const card = document.createElement("div");
-      card.className = "product-card";
-      if(prod.hidden) card.classList.add("hidden-product");
-      
-      const discount = allDiscounts[id];
-      const isOnSale = discount && discount.isActive && 
-        (discount.unlimited || (discount.endDate && new Date(discount.endDate).getTime() > Date.now()));
-      
-      if (isOnSale) {
-        card.classList.add("on-sale");
-        const badge = document.createElement("div");
-        badge.className = "sale-badge";
-        badge.innerHTML = `<i class="fas fa-tags"></i> ${discount.unlimited ? 'تخفيض دائم' : 'تخفيض'}`;
-        card.appendChild(badge);
-      }
-      
-      let priceHtml = `<div class="product-price">${Number(prod.price).toLocaleString()} دج</div>`;
-      if (isOnSale) {
-        priceHtml = `
-          <div class="product-price">
-            <span class="old-price">${Number(prod.price).toLocaleString()} دج</span>
-            ${Number(discount.newPrice).toLocaleString()} دج
-          </div>
-        `;
-      }
-      
-      // عرض سعر الجملة إذا وجد
-      let wholesaleHtml = '';
-      if (prod.wholesalePrice && !isNaN(prod.wholesalePrice)) {
-        wholesaleHtml = `<div class="product-wholesale-price">🏷️ جملة: ${Number(prod.wholesalePrice).toLocaleString()} دج</div>`;
-      }
-      
-      card.innerHTML = `
-        <img src="${prod.imageUrl || 'https://via.placeholder.com/150'}" onerror="this.src='https://via.placeholder.com/150'">
-        <div class="product-info">
-          <div class="product-name">${escapeHtml(prod.name)}</div>
-          ${priceHtml}
-          ${wholesaleHtml}
-          <div class="product-family">🏷️ ${prod.family || 'غير مصنف'}</div>
-          ${isOnSale && !discount.unlimited && discount.endDate ? `<div class="discount-timer" id="timer_${id}" data-end="${discount.endDate}" data-productid="${id}"><i class="far fa-clock"></i> <span class="time-left">جاري...</span></div>` : ''}
-          <div class="product-actions">
-            ${canEdit ? `<button class="btn-icon btn-edit" data-id="${id}"><i class="fas fa-edit"></i> تعديل</button>` : ''}
-            ${canEdit ? `<button class="btn-icon btn-delete" data-id="${id}"><i class="fas fa-trash"></i> حذف</button>` : ''}
-            ${canEdit ? `<button class="btn-icon btn-discount ${isOnSale ? 'active-discount' : ''}" data-id="${id}"><i class="fas fa-tags"></i> ${isOnSale ? 'تعديل التخفيض' : 'تخفيض'}</button>` : ''}
-          </div>
-        </div>
-      `;
-      container.appendChild(card);
-      
-      if (isOnSale && !discount.unlimited && discount.endDate) {
-        const timerEl = document.getElementById(`timer_${id}`);
-        if (timerEl) {
-          timerEl.dataset.end = discount.endDate;
-          timerEl.dataset.productid = id;
-          updateTimer(timerEl);
-        }
-      }
-    });
-    
-    document.querySelectorAll(".btn-edit").forEach(btn => {
-      btn.addEventListener("click", (e) => { e.stopPropagation(); editProduct(btn.dataset.id); });
-    });
-    document.querySelectorAll(".btn-delete").forEach(btn => {
-      btn.addEventListener("click", (e) => { e.stopPropagation(); deleteProduct(btn.dataset.id); });
-    });
-    document.querySelectorAll(".btn-discount").forEach(btn => {
-      btn.addEventListener("click", (e) => { e.stopPropagation(); openDiscountModal(btn.dataset.id); });
-    });
-    renderPagination(total);
-  }
-
-  // ====== زر تغيير الرقم السري للجملة (مستقل) ======
-  // ملاحظة: هذا الزر يظهر فقط للمالك (تم التحكم به في updateMenuPermissions)
-  document.getElementById("btnWholesaleCode")?.addEventListener("click", () => {
-    if (!isOwner()) {
-      showToast("غير مسموح");
-      return;
-    }
-    openModal("wholesaleCodeModal");
-    get(wholesaleCodeRef).then(snap => {
-      if (snap.exists() && snap.val().code) {
-        document.getElementById("wholesaleCodeInput").value = snap.val().code;
-      } else {
-        document.getElementById("wholesaleCodeInput").value = '';
-      }
-    });
+  // ============================================================
+  // إضافة طابعة (نسخة محسنة)
+  // ============================================================
+  addPrinterBtn.addEventListener('click', () => {
+    console.log('🟢 تم الضغط على زر إضافة طابعة');
+    addModal.style.display = 'flex';
   });
 
-  document.getElementById("saveWholesaleCodeBtn")?.addEventListener("click", async () => {
-    const code = document.getElementById("wholesaleCodeInput").value.trim();
-    if (!code) {
-      showToast("⚠️ الرجاء إدخال الرقم السري");
-      return;
-    }
-    try {
-      await set(wholesaleCodeRef, { code: code });
-      showToast("✅ تم حفظ الرقم السري للجملة بنجاح");
-      closeModal("wholesaleCodeModal");
-    } catch (error) {
-      console.error(error);
-      showToast("❌ حدث خطأ أثناء الحفظ");
-    }
+  cancelAddBtn.addEventListener('click', () => {
+    console.log('🔴 تم الضغط على زر إلغاء');
+    addModal.style.display = 'none';
   });
 
-  // ====== دوال التخفيضات (بدون تغيير) ======
-  function loadDiscounts() {
-    onValue(discountsRef, (snap) => {
-      const data = snap.val() || {};
-      allDiscounts = data;
-      const now = Date.now();
-      let updated = false;
-      Object.entries(allDiscounts).forEach(([productId, discount]) => {
-        if (discount.isActive && !discount.unlimited && discount.endDate) {
-          if (new Date(discount.endDate).getTime() < now) {
-            const refPath = ref(db, `discounts/${productId}`);
-            update(refPath, { isActive: false }).catch(console.error);
-            updated = true;
+  confirmAddBtn.addEventListener('click', async () => {
+    console.log('🟢 تم الضغط على زر بحث');
+    const paperWidth = parseInt(paperSizeSelect.value) || 80;
+    addModal.style.display = 'none';
+    
+    try {
+      showStatus('⏳ Vérification du Bluetooth...', 'info');
+      if (!navigator.bluetooth) throw new Error('Web Bluetooth non supporté. Utilisez Chrome sur Android ou Edge.');
+
+      showStatus('⏳ Recherche d\'une imprimante...', 'info');
+      let device;
+      const serviceUUID1 = '000018f0-0000-1000-8000-00805f9b34fb';
+      const serviceUUID2 = '00001101-0000-1000-8000-00805f9b34fb';
+      
+      try {
+        device = await navigator.bluetooth.requestDevice({
+          acceptAllDevices: true,
+          optionalServices: [serviceUUID1, serviceUUID2]
+        });
+      } catch (e1) {
+        console.warn('acceptAllDevices فشل:', e1);
+        try {
+          device = await navigator.bluetooth.requestDevice({
+            filters: [{ services: [serviceUUID1] }, { services: [serviceUUID2] }],
+            optionalServices: [serviceUUID1, serviceUUID2]
+          });
+        } catch (e2) {
+          console.warn('البحث بالخدمات فشل:', e2);
+          try {
+            device = await navigator.bluetooth.requestDevice({
+              filters: [
+                { namePrefix: 'XP-' }, { namePrefix: 'printer' }, { namePrefix: 'thermal' },
+                { namePrefix: 'Xprinter' }, { namePrefix: 'BT' }, { namePrefix: 'Mi' },
+                { namePrefix: 'Xiaomi' }, { namePrefix: 'P801' }, { namePrefix: 'MTP' },
+                { namePrefix: 'GoojPRT' }
+              ],
+              optionalServices: [serviceUUID1, serviceUUID2]
+            });
+          } catch (e3) {
+            console.warn('البحث بالأسماء فشل:', e3);
+            throw new Error('❌ لم يتم العثور على طابعة. تأكد من تفعيل البلوتوث ووضع الاقتران.');
           }
         }
-      });
-      renderProducts(currentPage);
-      renderDiscountsList();
-    });
-  }
+      }
 
-  function renderDiscountsList() {
-    const container = document.getElementById("discountsContainer");
-    if (!container) return;
-    container.innerHTML = "";
-    
-    const activeDiscounts = Object.entries(allDiscounts).filter(([_, d]) => d.isActive);
-    if (activeDiscounts.length === 0) {
-      container.innerHTML = `<div class="no-data" style="grid-column: 1 / -1;"><i class="fas fa-tag"></i> لا توجد تخفيضات نشطة حالياً</div>`;
-      return;
-    }
-    
-    container.className = "products-grid";
-    
-    activeDiscounts.forEach(([productId, discount]) => {
-      const product = allProducts[productId];
-      if (!product) return;
+      if (!device) throw new Error('لم يتم العثور على طابعة.');
       
-      const card = document.createElement("div");
-      card.className = "product-card on-sale";
-      
-      let timerText = '';
-      if (discount.unlimited) {
-        timerText = '<span style="color:#2563eb; font-weight:600;"><i class="fas fa-infinity"></i> دائم</span>';
-      } else if (discount.endDate) {
-        const end = new Date(discount.endDate);
-        const now = new Date();
-        const diff = end.getTime() - now.getTime();
-        if (diff > 0) {
-          const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-          const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-          const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-          const secs = Math.floor((diff % (1000 * 60)) / 1000);
-          timerText = `⏳ ${days}يوم ${hours}س ${mins}د ${secs}ث`;
-        } else {
-          timerText = '⛔ منتهي';
+      showStatus(`✅ Appareil sélectionné : ${device.name || 'Inconnu'}`, 'success');
+      showStatus(`⏳ Connexion à ${device.name}...`, 'info');
+
+      let server;
+      try {
+        server = await device.gatt.connect();
+      } catch (e) {
+        throw new Error(`Impossible de se connecter à ${device.name}. Vérifiez qu'elle est allumée.`);
+      }
+
+      let characteristic = null;
+      const services = await server.getPrimaryServices();
+      for (const service of services) {
+        const chars = await service.getCharacteristics();
+        for (const c of chars) {
+          if (c.properties.write || c.properties.writeWithoutResponse) {
+            characteristic = c;
+            break;
+          }
         }
+        if (characteristic) break;
       }
-      
-      const startDate = discount.startDate ? new Date(discount.startDate).toLocaleString('ar-DZ') : '---';
-      const endDate = discount.endDate ? new Date(discount.endDate).toLocaleString('ar-DZ') : 'بدون انتهاء';
-      
-      card.innerHTML = `
-        <div style="position:relative;">
-          <img src="${product.imageUrl || 'https://via.placeholder.com/150'}" style="width:100%; height:180px; object-fit:cover; background:#f0f0f0;">
-          <div class="sale-badge" style="position:absolute; top:8px; right:8px; background:#dc2626; color:#ffdd00; padding:4px 12px; border-radius:30px; font-weight:700; font-size:11px; box-shadow:0 2px 8px rgba(220,38,38,0.3); z-index:5; display:flex; align-items:center; gap:4px;">
-            <i class="fas fa-tags"></i> ${discount.unlimited ? 'دائم' : 'تخفيض'}
-          </div>
-        </div>
-        <div class="product-info">
-          <div class="product-name" style="font-weight:700; font-size:14px; margin-bottom:6px;">${escapeHtml(product.name)}</div>
-          <div class="product-price" style="color:#dc2626; font-weight:800; font-size:1.2rem; margin-bottom:4px;">
-            <span class="old-price" style="text-decoration:line-through; color:#999; font-size:0.8rem; margin-left:6px;">${Number(product.price).toLocaleString()} دج</span>
-            ${Number(discount.newPrice).toLocaleString()} دج
-          </div>
-          <div class="product-family" style="font-size:11px; color:#6b7280; margin-bottom:8px; background:#f3f4f6; padding:2px 10px; border-radius:20px; display:inline-block;">
-            🏷️ ${product.family || 'غير مصنف'}
-          </div>
-          <div style="font-size:12px; color:#6b7280; margin-bottom:6px;">
-            <i class="far fa-calendar-alt"></i> من ${startDate} إلى ${endDate}
-          </div>
-          <div style="font-size:12px; font-weight:600; color:#dc2626; background:#fee2e2; padding:2px 10px; border-radius:20px; display:inline-block; margin-bottom:8px;">
-            ${timerText}
-          </div>
-          <div class="product-actions" style="display:flex; gap:8px; flex-wrap:wrap;">
-            <button class="btn-icon btn-remove-discount" data-id="${productId}" style="background:#fee2e2; color:#dc2626; flex:1;">
-              <i class="fas fa-trash"></i> إزالة
-            </button>
-            <button class="btn-icon btn-reactivate" data-id="${productId}" style="background:#dbeafe; color:#2563eb; flex:1;">
-              <i class="fas fa-undo"></i> إعادة تفعيل
-            </button>
-          </div>
-        </div>
-      `;
-      
-      container.appendChild(card);
-      
-      card.querySelector('.btn-remove-discount').addEventListener('click', (e) => {
-        e.stopPropagation();
-        removeDiscount(productId);
-      });
-      card.querySelector('.btn-reactivate').addEventListener('click', (e) => {
-        e.stopPropagation();
-        reactivateDiscount(productId);
-      });
-    });
-  }
 
-  function openDiscountModal(productId) {
-    const modal = document.getElementById("discountModal");
-    const product = allProducts[productId];
-    if (!product) return;
-    
-    document.getElementById("discountProductId").value = productId;
-    document.getElementById("discountProductName").textContent = product.name;
-    
-    const existing = allDiscounts[productId];
-    if (existing && existing.isActive) {
-      document.getElementById("discountNewPrice").value = existing.newPrice || '';
-      document.getElementById("discountUnlimited").checked = existing.unlimited || false;
-      if (existing.startDate) {
-        document.getElementById("discountStartDate").value = existing.startDate.slice(0, 16);
-      } else {
-        document.getElementById("discountStartDate").value = '';
+      if (!characteristic) {
+        throw new Error('Cet appareil ne semble pas être une imprimante (pas de caractéristique d\'écriture).');
       }
-      if (existing.endDate) {
-        document.getElementById("discountEndDate").value = existing.endDate.slice(0, 16);
-      } else {
-        document.getElementById("discountEndDate").value = '';
-      }
-      document.getElementById("removeDiscountBtn").style.display = "inline-block";
-      document.getElementById("saveDiscountBtn").textContent = "💾 تحديث التخفيض";
-    } else {
-      document.getElementById("discountNewPrice").value = '';
-      document.getElementById("discountUnlimited").checked = false;
-      document.getElementById("discountStartDate").value = '';
-      document.getElementById("discountEndDate").value = '';
-      document.getElementById("removeDiscountBtn").style.display = "none";
-      document.getElementById("saveDiscountBtn").textContent = "💾 إضافة تخفيض";
-    }
-    
-    modal.style.display = "flex";
-  }
 
-  async function saveDiscount() {
-    const productId = document.getElementById("discountProductId").value;
-    const newPrice = parseFloat(document.getElementById("discountNewPrice").value);
-    const unlimited = document.getElementById("discountUnlimited").checked;
-    let startDate = document.getElementById("discountStartDate").value;
-    let endDate = document.getElementById("discountEndDate").value;
-    
-    if (!productId || isNaN(newPrice) || newPrice <= 0) {
-      showToast("⚠️ الرجاء إدخال سعر صحيح");
-      return;
-    }
-    
-    const product = allProducts[productId];
-    if (!product) {
-      showToast("⚠️ المنتج غير موجود");
-      return;
-    }
-    
-    if (newPrice >= product.price) {
-      showToast("⚠️ السعر الجديد يجب أن يكون أقل من السعر الأصلي");
-      return;
-    }
-    
-    if (!unlimited) {
-      if (!startDate || !endDate) {
-        showToast("⚠️ الرجاء تحديد تاريخ البداية والنهاية أو اختيار 'بدون وقت محدد'");
-        return;
-      }
-      if (new Date(startDate).getTime() >= new Date(endDate).getTime()) {
-        showToast("⚠️ تاريخ البداية يجب أن يكون قبل تاريخ النهاية");
-        return;
-      }
-      const start = new Date(startDate);
-      const end = new Date(endDate);
-      startDate = start.toISOString();
-      endDate = end.toISOString();
-    } else {
-      startDate = null;
-      endDate = null;
-    }
-    
-    try {
-      const discountData = {
-        productId: productId,
-        newPrice: newPrice,
-        unlimited: unlimited,
-        startDate: startDate,
-        endDate: endDate,
-        isActive: true,
-        createdAt: Date.now()
+      showStatus('⏳ Détection du protocole...', 'info');
+      const protocol = await detectProtocol(characteristic);
+
+      const newPrinterRef = push(printersRef);
+      const printerData = {
+        name: device.name || 'Imprimante inconnue',
+        protocol: protocol,
+        paperWidth: paperWidth,
+        deviceId: device.id,
+        lastUsed: Date.now(),
+        createdAt: Date.now(),
+        detectedAt: Date.now()
       };
-      
-      await set(ref(db, `discounts/${productId}`), discountData);
-      showToast("✅ تم حفظ التخفيض بنجاح");
-      closeModal("discountModal");
-    } catch (error) {
-      console.error(error);
-      showToast("❌ حدث خطأ أثناء الحفظ");
-    }
-  }
+      await set(newPrinterRef, printerData);
+      selectedPrinterId = newPrinterRef.key;
+      renderPrinterList();
+      showStatus(`✅ Imprimante "${printerData.name}" ajoutée (${protocol.toUpperCase()}, ${paperWidth}mm)`, 'success');
 
-  async function removeDiscount(productId) {
-    if (!confirm(`⚠️ هل تريد إزالة التخفيض عن هذا المنتج؟`)) return;
-    try {
-      await remove(ref(db, `discounts/${productId}`));
-      showToast("✅ تم إزالة التخفيض");
-    } catch (error) {
-      console.error(error);
-      showToast("❌ حدث خطأ");
-    }
-  }
-
-  async function reactivateDiscount(productId) {
-    try {
-      const snapshot = await get(ref(db, `discounts/${productId}`));
-      if (snapshot.exists()) {
-        const data = snapshot.val();
-        data.isActive = true;
-        await set(ref(db, `discounts/${productId}`), data);
-        showToast("✅ تم إعادة تفعيل التخفيض");
-      } else {
-        showToast("⚠️ لا يوجد تخفيض لهذا المنتج");
+    } catch (e) {
+      console.error(e);
+      let errorMsg = e.message || 'Erreur inconnue';
+      if (errorMsg.includes('user cancelled')) {
+        errorMsg = '❌ Recherche annulée par l\'utilisateur.';
+      } else if (errorMsg.includes('No devices')) {
+        errorMsg = '❌ Aucune imprimante trouvée. Vérifiez le Bluetooth et le mode appairage.';
       }
-    } catch (error) {
-      console.error(error);
-      showToast("❌ حدث خطأ");
-    }
-  }
-
-  function updateTimer(timerEl) {
-    const endDate = new Date(timerEl.dataset.end);
-    const now = new Date();
-    const diff = endDate.getTime() - now.getTime();
-    const timeSpan = timerEl.querySelector('.time-left');
-    if (!timeSpan) return;
-    
-    if (diff <= 0) {
-      timeSpan.textContent = "انتهى!";
-      timerEl.style.background = "#e5e7eb";
-      timerEl.style.color = "#6b7280";
-      const productId = timerEl.dataset.productid;
-      if (productId && allDiscounts[productId] && allDiscounts[productId].isActive) {
-        const refPath = ref(db, `discounts/${productId}`);
-        update(refPath, { isActive: false }).catch(console.error);
+      showStatus(errorMsg, 'error');
+      if (confirm('❌ Échec de la recherche. Voulez-vous réessayer avec des instructions supplémentaires ?')) {
+        addModal.style.display = 'flex';
+        showStatus('💡 Assurez-vous que l\'imprimante est allumée et en mode appairage (voyant clignotant).', 'warning');
       }
-      return;
     }
-    
-    const days = Math.floor(diff / (1000*60*60*24));
-    const hours = Math.floor((diff % (1000*60*60*24)) / (1000*60*60));
-    const mins = Math.floor((diff % (1000*60*60)) / (1000*60));
-    const secs = Math.floor((diff % (1000*60)) / 1000);
-    let str = '';
-    if (days > 0) str += `${days}يوم `;
-    str += `${String(hours).padStart(2,'0')}:${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
-    timeSpan.textContent = str;
-  }
+  });
 
-  function startCountdownTimers() {
-    setInterval(() => {
-      document.querySelectorAll('.discount-timer[data-end]').forEach(el => {
-        updateTimer(el);
-      });
-    }, 1000);
-  }
-
-  // ====== عرض المنتجات المخفية ======
-  function renderHidden() {
-    const container = document.getElementById("hiddenProductsContainer");
-    if (!container) return;
-    container.innerHTML = "";
-    if (getRole() === "seller") {
-      container.innerHTML = "<div class='no-data'>🔒 غير مصرح لك برؤية المنتجات المخفية</div>";
-      return;
-    }
-    const hidden = Object.entries(allProducts).filter(([_,p]) => p.hidden);
-    if(!hidden.length) { container.innerHTML = "<div class='no-data'>لا توجد منتجات مخفية</div>"; return; }
-    hidden.forEach(([id, prod]) => {
-      const card = document.createElement("div");
-      card.className = "product-card";
-      card.innerHTML = `
-        <img src="${prod.imageUrl || 'https://via.placeholder.com/150'}">
-        <div class="product-info">
-          <div class="product-name">${escapeHtml(prod.name)}</div>
-          <div class="product-price">${prod.price} دج</div>
-          <div class="product-family">🏷️ ${prod.family || 'غير مصنف'}</div>
-          <div class="product-actions">
-            <button class="btn-icon btn-edit" data-id="${id}"><i class="fas fa-edit"></i> تعديل</button>
-          </div>
-        </div>
-      `;
-      container.appendChild(card);
-    });
-    document.querySelectorAll("#hiddenProductsContainer .btn-edit").forEach(btn => {
-      btn.addEventListener("click", () => editProduct(btn.dataset.id));
-    });
-  }
-
-  // ====== الترقيم ======
-  function renderPagination(total) {
-    const pagination = document.getElementById("pagination");
-    if (!pagination) return;
-    pagination.innerHTML = "";
-    if (total <= 1) return;
-
-    function createBtn(text, targetPage, active = false, disabled = false) {
-      const btn = document.createElement("button");
-      btn.textContent = text;
-      btn.style.cssText = `
-        min-width: 38px;
-        height: 38px;
-        border: none;
-        border-radius: 10px;
-        margin: 4px;
-        background: ${active ? "#10b981" : "#ffffff"};
-        color: ${active ? "#ffffff" : "#333"};
-        font-weight: 600;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-        cursor: ${disabled ? "default" : "pointer"};
-        opacity: ${disabled ? "0.5" : "1"};
-      `;
-      if (!disabled) btn.onclick = () => { currentPage = targetPage; renderProducts(targetPage); };
-      pagination.appendChild(btn);
-    }
-
-    createBtn("‹", currentPage - 1, false, currentPage === 1);
-    createBtn("1", 1, currentPage === 1);
-    if (currentPage > 3) {
-      const dots = document.createElement("span");
-      dots.textContent = "...";
-      dots.style.margin = "0 5px";
-      pagination.appendChild(dots);
-    }
-    for (let i = Math.max(2, currentPage - 2); i <= Math.min(total - 1, currentPage + 2); i++) {
-      createBtn(i, i, currentPage === i);
-    }
-    if (currentPage < total - 2) {
-      const dots = document.createElement("span");
-      dots.textContent = "...";
-      dots.style.margin = "0 5px";
-      pagination.appendChild(dots);
-    }
-    if (total > 1) createBtn(total, total, currentPage === total);
-    createBtn("›", currentPage + 1, false, currentPage === total);
-  }
-
-  // ====== تعديل المنتج (مع تعبئة سعر الجملة) ======
-  window.editProduct = (id) => {
-    const p = allProducts[id];
-    if(!p) return;
-    editingProductId = id;
-    document.getElementById("editId").value = id;
-    document.getElementById("serial").value = p.serial || "";
-    document.getElementById("name").value = p.name || "";
-    document.getElementById("price").value = p.price || "";
-    document.getElementById("wholesalePrice").value = p.wholesalePrice || "";
-    setFamilyInForm(p.family || "");
-    document.getElementById("formTitle").innerText = "✏️ تعديل المنتج";
-    const toggleBtn = document.getElementById("toggleVisibilityBtn");
-    toggleBtn.style.display = "inline-block";
-    toggleBtn.onclick = () => toggleVisibility(id);
-    document.getElementById("productModal").style.display = "flex";
-  };
-
-  window.deleteProduct = async (id) => {
-    if(!confirm("حذف المنتج نهائياً؟")) return;
-    const product = allProducts[id];
-    if(product?.deleteUrl) {
-      try { await fetch(product.deleteUrl, { mode: 'no-cors' }); } catch(e) {}
-    }
-    await remove(ref(db, "discounts/"+id));
-    await remove(ref(db, "products/"+id));
-    showToast("✅ تم الحذف");
-  };
-
-  async function uploadImage(file) {
-    const fd = new FormData(); fd.append("image", file);
-    const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, {method:"POST", body:fd});
-    const data = await res.json();
-    if(data.success) return {url: data.data.url, deleteUrl: data.data.delete_url};
-    throw new Error("فشل الرفع");
-  }
-
-  // ====== حفظ المنتج (مع إضافة سعر الجملة) ======
-  document.getElementById("productForm").onsubmit = async (e) => {
-    e.preventDefault();
-    const id = document.getElementById("editId").value;
-    const serial = document.getElementById("serial").value.trim();
-    const name = document.getElementById("name").value.trim();
-    const price = parseFloat(document.getElementById("price").value)||0;
-    const wholesalePrice = parseFloat(document.getElementById("wholesalePrice").value)||0;
-    const familySelect = document.getElementById("familySelect");
-    const selectedFamily = familySelect.value;
-    const fileInput = document.getElementById("imageFile");
-    const cameraInput = document.getElementById("cameraInput");
-    let selectedFile = fileInput.files[0] || cameraInput.files[0];
-    const existing = allProducts[id];
-    let newImg = existing?.imageUrl || "";
-    let newDel = existing?.deleteUrl || "";
-    closeModal("productModal");
-    showToast("⏳ جاري المعالجة...");
+  // ============================================================
+  // حذف الكل
+  // ============================================================
+  clearAllBtn.addEventListener('click', async () => {
+    if (!confirm('⚠️ Supprimer toutes les imprimantes enregistrées définitivement ?')) return;
     try {
-      if(selectedFile) {
-        if(existing?.deleteUrl) await fetch(existing.deleteUrl, {mode:'no-cors'});
-        const upload = await uploadImage(selectedFile);
-        newImg = upload.url; newDel = upload.deleteUrl;
-      }
-      const data = { 
-        serial, 
-        name, 
-        price, 
-        wholesalePrice: wholesalePrice > 0 ? wholesalePrice : null,
-        family: selectedFamily || "",
-        imageUrl: newImg, 
-        deleteUrl: newDel, 
-        hidden: existing?.hidden || false 
-      };
-      if(id) await update(ref(db, "products/"+id), data);
-      else await push(productsRef, data);
-      showToast("✅ تم الحفظ");
-      document.getElementById("productForm").reset();
-      document.getElementById("editId").value = "";
-      editingProductId = null;
-      document.getElementById("familySelect").value = "";
-      document.getElementById("wholesalePrice").value = "";
-    } catch(err) { alert("خطأ: "+err.message); }
-  };
-
-  async function toggleVisibility(id) {
-    const curr = allProducts[id];
-    if(!curr) return;
-    await update(ref(db, "products/"+id), { hidden: !curr.hidden });
-    showToast(curr.hidden ? "تم الإظهار" : "تم الإخفاء");
-    closeModal("productModal");
-  }
-
-  // ====== عرض الطلبات (بدون تغيير) ======
-  function renderWhatsappOrders(ordersData) {
-    const container = document.getElementById("whatsappOrdersContainer");
-    if (!container) return;
-    container.innerHTML = "";
-    const orders = ordersData || {};
-    const ordersArray = Object.entries(orders);
-    currentOrderCount = ordersArray.length;
-    if (currentOrderCount > lastSeenCount) {
-      newOrdersCount = currentOrderCount - lastSeenCount;
-    } else {
-      newOrdersCount = 0;
+      await remove(printersRef);
+      selectedPrinterId = null;
+      showStatus('✅ Toutes les imprimantes ont été supprimées', 'success');
+    } catch (e) {
+      showStatus('❌ Échec de la suppression', 'error');
     }
-    updateNotificationBadge();
-    if (ordersArray.length === 0) {
-      container.innerHTML = "<div class='no-data'>💬 لا توجد طلبات واتساب حتى الآن</div>";
-      return;
-    }
-    ordersArray.reverse().forEach(([key, order]) => {
-      const card = document.createElement("div");
-      card.className = "order-card whatsapp-orders";
-      card.style.cursor = "pointer";
-      card.style.transition = "all 0.2s";
-      card.style.borderRight = "4px solid #25D366";
-      const shortAddress = order.address && order.address.length > 30 
-        ? order.address.substring(0, 27) + "..." 
-        : order.address || "غير محدد";
-      card.innerHTML = `
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-          <div>
-            <span style="font-weight: 700; font-size: 16px;">${escapeHtml(order.customerName || 'عميل')}</span>
-            <span class="whatsapp-badge" style="margin-right: 8px;">WhatsApp</span>
-          </div>
-          <span style="color: #10b981; font-weight: 800;">${order.totalPrice.toLocaleString()} دج</span>
-        </div>
-        <div style="display: flex; gap: 12px; font-size: 13px; color: #6b7280; margin-top: 6px;">
-          <span><i class="fas fa-phone"></i> ${escapeHtml(order.phone || '')}</span>
-          <span><i class="fas fa-map-marker-alt"></i> ${escapeHtml(shortAddress)}</span>
-        </div>
-        <div style="font-size: 11px; color: #9ca3af; margin-top: 4px;">
-          <i class="far fa-clock"></i> ${new Date(order.timestamp).toLocaleString('ar-DZ')}
-        </div>
-        <div style="margin-top: 6px; font-size: 12px; color: #10b981;">
-          <i class="fas fa-chevron-left"></i> اضغط لعرض التفاصيل
-        </div>
-      `;
-      card.addEventListener("click", () => {
-        openOrderDetailModal(order, 'whatsapp', key);
-      });
-      container.appendChild(card);
-    });
-  }
+  });
 
-  function renderConfirmedOrders(confirmedData) {
-    const container = document.getElementById("confirmedOrdersContainer");
-    if (!container) return;
-    container.innerHTML = "";
+  // ============================================================
+  // عرض قائمة الفواتير
+  // ============================================================
+  function renderInvoicesList(confirmedData) {
+    const container = document.getElementById('app');
     const confirmed = confirmedData || {};
-    const confirmedArray = Object.entries(confirmed);
-    const count = confirmedArray.length;
-    updateConfirmedBadge(count);
-    if (confirmedArray.length === 0) {
-      container.innerHTML = "<div class='no-data'>✅ لا توجد طلبات مؤكدة حتى الآن</div>";
+    const entries = Object.entries(confirmed);
+    if (entries.length === 0) {
+      container.innerHTML = `<div class="no-data"><i class="fas fa-file-invoice"></i> Aucune facture confirmée</div>`;
       return;
     }
-    confirmedArray.reverse().forEach(([key, order]) => {
-      const card = document.createElement("div");
-      card.className = "order-card confirmed-card";
-      card.style.cursor = "pointer";
-      card.style.transition = "all 0.2s";
-      card.style.borderRight = "4px solid #f39c12";
-      const shortAddress = order.address && order.address.length > 30 
-        ? order.address.substring(0, 27) + "..." 
-        : order.address || "غير محدد";
-      const confirmedDate = order.confirmedAt ? new Date(order.confirmedAt).toLocaleString('ar-DZ') : '---';
-      card.innerHTML = `
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-          <div>
-            <span style="font-weight: 700; font-size: 16px;">${escapeHtml(order.customerName || 'عميل')}</span>
-            <span class="confirmed-badge" style="margin-right: 8px;">مؤكد</span>
+    const sorted = entries.reverse().slice(0, 50);
+    let html = `<div class="invoice-list">`;
+    sorted.forEach(([key, order]) => {
+      const date = order.confirmedAt ? new Date(order.confirmedAt).toLocaleString('fr-FR') : '---';
+      const total = order.totalPrice || 0;
+      html += `
+        <div class="invoice-card">
+          <div class="info">
+            <div><strong>#${order.invoiceNumber || '---'}</strong></div>
+            <div><i class="fas fa-user"></i> ${escapeHtml(order.customerName || 'Client')}</div>
+            <div><i class="fas fa-phone"></i> ${escapeHtml(order.phone || '')}</div>
+            <div><i class="fas fa-calendar"></i> ${date}</div>
           </div>
-          <span style="color: #f39c12; font-weight: 800;">${order.totalPrice.toLocaleString()} دج</span>
-        </div>
-        <div style="display: flex; gap: 12px; font-size: 13px; color: #6b7280; margin-top: 6px;">
-          <span><i class="fas fa-phone"></i> ${escapeHtml(order.phone || '')}</span>
-          <span><i class="fas fa-map-marker-alt"></i> ${escapeHtml(shortAddress)}</span>
-        </div>
-        <div style="font-size: 11px; color: #9ca3af; margin-top: 4px;">
-          <i class="fas fa-check-circle"></i> بواسطة ${escapeHtml(order.confirmedBy || 'Admin')} | ${confirmedDate}
-        </div>
-        <div style="margin-top: 6px; font-size: 12px; color: #f39c12;">
-          <i class="fas fa-chevron-left"></i> اضغط لعرض التفاصيل
+          <div class="total">${total.toLocaleString()} DA</div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button class="btn btn-print" onclick="printInvoice('${key}')"><i class="fas fa-print"></i> Imprimer</button>
+            <button class="btn btn-print" style="background:#6b7280;" onclick="previewInvoice('${key}')"><i class="fas fa-eye"></i> Aperçu</button>
+          </div>
         </div>
       `;
-      card.addEventListener("click", () => {
-        openOrderDetailModal(order, 'confirmed', key);
-      });
-      container.appendChild(card);
     });
+    html += `</div>`;
+    container.innerHTML = html;
   }
 
-  // ====== مودال تفاصيل الطلب (بدون تغيير) ======
-  function openOrderDetailModal(order, type, key) {
-    const modal = document.getElementById("orderDetailModal");
-    const content = document.getElementById("orderDetailContent");
-    let itemsHtml = "";
-    let totalQte = 0;
-    if (order.items && Array.isArray(order.items)) {
-      order.items.forEach((it, idx) => {
-        const qty = Number(it.quantity || 0);
-        const price = Number(it.price || 0);
-        const total = qty * price;
-        totalQte += qty;
-        itemsHtml += `
-          <tr>
-            <td style="text-align:center; padding: 6px;">${idx+1}</td>
-            <td style="text-align:center;">${escapeHtml(it.serial || '---')}</td>
-            <td>${escapeHtml(it.name)}</td>
-            <td style="text-align:center;">${qty}</td>
-            <td style="text-align:right;">${price.toLocaleString()} دج</td>
-            <td style="text-align:right;">${total.toLocaleString()} دج</td>
-          </tr>
-        `;
-      });
+  // ============================================================
+  // دوال الطباعة (مع تعديل المعاينة)
+  // ============================================================
+  window.printInvoice = async (key) => {
+    try {
+      const snapshot = await get(ref(db, `confirmedOrders/${key}`));
+      if (!snapshot.exists()) { showStatus('❌ Facture introuvable', 'error'); return; }
+      await smartPrint(snapshot.val());
+    } catch (e) {
+      showStatus('❌ Erreur : ' + e.message, 'error');
     }
-    const isWhatsapp = type === 'whatsapp';
-    const statusLabel = isWhatsapp ? 'طلب واتساب' : 'طلب مؤكد';
-    const statusColor = isWhatsapp ? '#25D366' : '#f39c12';
-    let actionButtons = '';
-    if (isWhatsapp) {
-      actionButtons = `
-        <button class="confirm-order-detail" data-key="${key}" style="background:#2ecc71; color:white; border:none; padding:10px 20px; border-radius:30px; cursor:pointer; font-weight:600;">
-          <i class="fas fa-check"></i> تأكيد وطباعة
-        </button>
-        <button class="delete-whatsapp-detail" data-key="${key}" style="background:#e74c3c; color:white; border:none; padding:10px 20px; border-radius:30px; cursor:pointer; font-weight:600;">
-          <i class="fas fa-trash"></i> حذف
-        </button>
-      `;
-    } else {
-      actionButtons = `
-        <button class="print-confirmed-detail" data-key="${key}" style="background:#f39c12; color:white; border:none; padding:10px 20px; border-radius:30px; cursor:pointer; font-weight:600;">
-          <i class="fas fa-print"></i> طباعة
-        </button>
-        <button class="delete-confirmed-detail" data-key="${key}" style="background:#e74c3c; color:white; border:none; padding:10px 20px; border-radius:30px; cursor:pointer; font-weight:600;">
-          <i class="fas fa-trash"></i> حذف
-        </button>
-      `;
-    }
-    const confirmedDate = order.confirmedAt ? new Date(order.confirmedAt).toLocaleString('ar-DZ') : '---';
-    content.innerHTML = `
-      <div style="margin-bottom: 20px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
-          <h3 style="color: ${statusColor}; margin:0;">${statusLabel}</h3>
-          <span style="background: ${statusColor}; color:white; padding:4px 16px; border-radius:30px; font-weight:600;">${order.totalPrice.toLocaleString()} دج</span>
-        </div>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; background: #f8fafc; padding: 12px; border-radius: 16px;">
-          <div><strong>العميل:</strong> ${escapeHtml(order.customerName || '')}</div>
-          <div><strong>الهاتف:</strong> ${escapeHtml(order.phone || '')}</div>
-          <div style="grid-column: 1 / -1;"><strong>العنوان:</strong> ${escapeHtml(order.address || '')}</div>
-          ${!isWhatsapp ? `<div style="grid-column: 1 / -1; font-size:12px; color:#6b7280;"><i class="fas fa-check-circle"></i> تم التأكيد بواسطة: ${escapeHtml(order.confirmedBy || 'Admin')} | ${confirmedDate}</div>` : ''}
-        </div>
-        <div style="margin: 16px 0; overflow-x: auto;">
-          <table style="width:100%; border-collapse:collapse; font-size:13px;">
-            <thead>
-              <tr style="background:#f1f5f9;">
-                <th style="padding:8px; text-align:center;">#</th>
-                <th style="padding:8px; text-align:center;">الرقم التسلسلي</th>
-                <th style="padding:8px; text-align:right;">المنتج</th>
-                <th style="padding:8px; text-align:center;">الكمية</th>
-                <th style="padding:8px; text-align:right;">السعر</th>
-                <th style="padding:8px; text-align:right;">المجموع</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${itemsHtml || '<tr><td colspan="6" style="text-align:center; padding:12px;">لا توجد منتجات</td></tr>'}
-            </tbody>
-            <tfoot>
-  <tr style="font-weight:700; background:#f8fafc;">
-    <td colspan="6" style="text-align:right; padding:8px; color:#10b981;">
-      المبلغ الإجمالي : ${order.totalPrice.toLocaleString()} دج
-    </td>
-  </tr>
-</tfoot>
-          </table>
-        </div>
-        <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; border-top: 1px solid #e5e7eb; padding-top: 16px;">
-          ${actionButtons}
-        </div>
-      </div>
-    `;
-    modal.style.display = "flex";
-    
-    const confirmBtn = content.querySelector('.confirm-order-detail');
-    if (confirmBtn) {
-      confirmBtn.addEventListener('click', async () => {
-        const confirmedOrder = await confirmOrderOnly(key, order);
-        showPrintOptions(key, confirmedOrder, 'confirmed');
-        closeModal('orderDetailModal');
-      });
-    }
-    
-    const deleteWhatsappBtn = content.querySelector('.delete-whatsapp-detail');
-    if (deleteWhatsappBtn) {
-      deleteWhatsappBtn.addEventListener('click', async () => {
-        if (confirm("حذف هذا الطلب نهائياً؟")) {
-          await remove(ref(db, `whatsappOrders/${key}`));
-          showToast("✅ تم حذف الطلب");
-          closeModal('orderDetailModal');
-        }
-      });
-    }
-    
-    const printConfirmedBtn = content.querySelector('.print-confirmed-detail');
-    if (printConfirmedBtn) {
-      printConfirmedBtn.addEventListener('click', () => {
-        showPrintOptions(key, order, 'confirmed');
-      });
-    }
-    
-    const deleteConfirmedBtn = content.querySelector('.delete-confirmed-detail');
-    if (deleteConfirmedBtn) {
-      deleteConfirmedBtn.addEventListener('click', async () => {
-        if (confirm("حذف هذا الطلب المؤكد نهائياً؟")) {
-          await remove(ref(db, `confirmedOrders/${key}`));
-          showToast("✅ تم حذف الطلب المؤكد");
-          closeModal('orderDetailModal');
-        }
-      });
-    }
-  }
-
-  // ====== أحداث المودالات ======
-  document.getElementById("addFamilyBtn").addEventListener("click", async function() {
-    const select = document.getElementById("familySelect");
-    const newFamilyInput = document.getElementById("newFamilyInput");
-    if (newFamilyInput.style.display === "none") {
-      newFamilyInput.style.display = "block";
-      newFamilyInput.focus();
-      this.innerHTML = '<i class="fas fa-check"></i> حفظ';
-      this.style.background = "#059669";
-      return;
-    }
-    const familyName = newFamilyInput.value.trim();
-    if (!familyName) {
-      showToast("⚠️ الرجاء إدخال اسم العائلة");
-      return;
-    }
-    const success = await addNewFamily(familyName);
-    if (success) {
-      newFamilyInput.value = "";
-      newFamilyInput.style.display = "none";
-      this.innerHTML = '<i class="fas fa-plus"></i> إضافة';
-      this.style.background = "#10b981";
-      const select = document.getElementById("familySelect");
-      if (familiesList.some(f => f.name === familyName)) {
-        select.value = familyName;
-      }
-    }
-  });
-
-  document.getElementById("newFamilyInput").addEventListener("blur", function() {
-    if (this.value.trim() === "") {
-      this.style.display = "none";
-      const btn = document.getElementById("addFamilyBtn");
-      btn.innerHTML = '<i class="fas fa-plus"></i> إضافة';
-      btn.style.background = "#10b981";
-    }
-  });
-  document.getElementById("newFamilyInput").addEventListener("keydown", function(e) {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      document.getElementById("addFamilyBtn").click();
-    }
-    if (e.key === "Escape") {
-      this.value = "";
-      this.style.display = "none";
-      const btn = document.getElementById("addFamilyBtn");
-      btn.innerHTML = '<i class="fas fa-plus"></i> إضافة';
-      btn.style.background = "#10b981";
-    }
-  });
-
-  document.getElementById("clearFilterBtn").addEventListener("click", clearFamilyFilter);
-  document.getElementById("filterAll").addEventListener("click", function() {
-    filterByFamily('الكل');
-  });
-
-  document.getElementById("saveDiscountBtn").addEventListener("click", saveDiscount);
-  document.getElementById("removeDiscountBtn").addEventListener("click", function() {
-    const productId = document.getElementById("discountProductId").value;
-    if (productId) {
-      removeDiscount(productId);
-      closeModal("discountModal");
-    }
-  });
-
-  document.getElementById("discountUnlimited").addEventListener("change", function() {
-    const dateGroup = document.getElementById("discountDateGroup");
-    if (this.checked) {
-      dateGroup.style.display = "none";
-      document.getElementById("discountStartDate").value = '';
-      document.getElementById("discountEndDate").value = '';
-    } else {
-      dateGroup.style.display = "block";
-    }
-  });
-
-  document.getElementById("btnCover")?.addEventListener("click", () => document.getElementById("coverFileInput").click());
-  const coverInput = document.createElement("input"); 
-  coverInput.type = "file"; 
-  coverInput.accept = "image/*"; 
-  coverInput.style.display = "none"; 
-  coverInput.id = "coverFileInput";
-  document.body.appendChild(coverInput);
-  coverInput.addEventListener("change", async (e) => {
-    const file = e.target.files[0];
-    if(!file) return;
-    const imgData = await uploadImage(file);
-    await set(ref(db, "store/cover"), { url: imgData.url, deleteUrl: imgData.deleteUrl });
-    showToast("تم تغيير الغلاف");
-  });
-  onValue(ref(db, "store/cover"), (snap) => { 
-    if(snap.exists()) { 
-      document.getElementById("coverBanner").style.display = "block"; 
-      document.getElementById("coverImage").src = snap.val().url; 
-    } 
-  });
-
-  document.getElementById("btnUsers")?.addEventListener("click", () => { if(isOwner()) openModal("usersModal"); else showToast("غير مسموح"); });
-  document.getElementById("addUserBtn")?.addEventListener("click", async () => {
-    const name = document.getElementById("newUserName").value.trim();
-    const pass = document.getElementById("newUserPass").value.trim();
-    const isAdminUser = document.getElementById("isAdminCheck").checked;
-    if(!name||!pass) return;
-    const path = isAdminUser ? "users/admins" : "users/sellers";
-    await set(ref(db, `${path}/${name}`), { password: pass, role: isAdminUser?"admin":"seller" });
-    showToast("تمت الإضافة");
-    loadUsersList();
-  });
-  
-  async function loadUsersList() {
-    const listDiv = document.getElementById("usersList");
-    if(!listDiv) return;
-    listDiv.innerHTML = "";
-    const ownerSnap = await get(ref(db, "users/owner"));
-    if(ownerSnap.exists()) {
-      Object.entries(ownerSnap.val()).forEach(([name, val]) => {
-        listDiv.innerHTML += `<div style="display:flex; justify-content:space-between; align-items:center; margin:8px 0; padding:8px; background:#f0fdf4; border-radius:12px;">
-          <span><strong>${escapeHtml(name)}</strong> <span style="color:#10b981;">(مالك)</span></span>
-          <button disabled style="background:#ccc; padding:4px 12px; border-radius:20px;">لا يمكن الحذف</button>
-        </div>`;
-      });
-    }
-    const adminsSnap = await get(ref(db, "users/admins"));
-    if(adminsSnap.exists()) {
-      Object.entries(adminsSnap.val()).forEach(([name, val]) => {
-        listDiv.innerHTML += `<div style="display:flex; justify-content:space-between; align-items:center; margin:8px 0; padding:8px; background:#fff; border-radius:12px;">
-          <span><strong>${escapeHtml(name)}</strong> <span style="color:#f39c12;">(مدير)</span></span>
-          <button onclick="deleteUser('${name}', 'admin')" style="background:#e74c3c; color:white; border:none; padding:4px 12px; border-radius:20px;">حذف</button>
-        </div>`;
-      });
-    }
-    const sellersSnap = await get(ref(db, "users/sellers"));
-    if(sellersSnap.exists()) {
-      Object.entries(sellersSnap.val()).forEach(([name, val]) => {
-        listDiv.innerHTML += `<div style="display:flex; justify-content:space-between; align-items:center; margin:8px 0; padding:8px; background:#fff; border-radius:12px;">
-          <span><strong>${escapeHtml(name)}</strong> <span style="color:#3498db;">(بائع)</span></span>
-          <button onclick="deleteUser('${name}', 'seller')" style="background:#e74c3c; color:white; border:none; padding:4px 12px; border-radius:20px;">حذف</button>
-        </div>`;
-      });
-    }
-    if(listDiv.innerHTML === "") {
-      listDiv.innerHTML = "<p style='text-align:center; color:#888;'>لا يوجد مستخدمين</p>";
-    }
-  }
-  
-  window.deleteUser = async (name, role) => {
-    if(!confirm(`حذف المستخدم ${name} نهائياً؟`)) return;
-    const path = role === "admin" ? `users/admins/${name}` : `users/sellers/${name}`;
-    await remove(ref(db, path));
-    showToast(`✅ تم حذف المستخدم ${name}`);
-    loadUsersList();
   };
 
-  // ====== إعدادات المالك ======
-  document.getElementById("btnOwnerSettings")?.addEventListener("click", () => { 
-    if(isOwner()) {
-      openModal("ownerModal");
-    } else {
-      showToast("غير مسموح");
-    }
-  });
-
-  // حفظ إعدادات المالك (بدون الرقم السري)
-  document.getElementById("saveOwnerBtn")?.addEventListener("click", async () => {
-    const newName = document.getElementById("newOwnerName").value.trim();
-    const newPass = document.getElementById("newOwnerPass").value.trim();
-    
-    if (!newName || !newPass) {
-      showToast("⚠️ الرجاء إدخال الاسم وكلمة المرور");
-      return;
-    }
-    
-    const current = localStorage.getItem("user");
-    await set(ref(db, `users/owner/${newName}`), { password: newPass, role: "owner" });
-    if (newName !== current) await remove(ref(db, `users/owner/${current}`));
-    localStorage.setItem("user", newName);
-    
-    showToast("✅ تم تحديث بيانات المالك");
-    closeModal("ownerModal");
-  });
-
-  document.getElementById("btnDeleteAllProducts")?.addEventListener("click", async () => {
-    if(confirm("حذف جميع المنتجات نهائياً؟")) { 
-      await remove(productsRef); 
-      await remove(discountsRef);
-      showToast("تم حذف الكل"); 
-    }
-  });
-
-  document.getElementById("btnLogout")?.addEventListener("click", () => { localStorage.clear(); location.reload(); });
-  
-  document.getElementById("deleteAllConfirmedBtn")?.addEventListener("click", async () => {
-    if(confirm("⚠️ حذف جميع الطلبات المؤكدة نهائياً؟")) {
-      await remove(confirmedRef);
-      showToast("✅ تم حذف جميع الطلبات المؤكدة");
-    }
-  });
-
-  function closeModal(id) { 
-    document.getElementById(id).style.display = "none"; 
-    if (id === "productModal") {
-      const newFamilyInput = document.getElementById("newFamilyInput");
-      newFamilyInput.style.display = "none";
-      newFamilyInput.value = "";
-      const btn = document.getElementById("addFamilyBtn");
-      btn.innerHTML = '<i class="fas fa-plus"></i> إضافة';
-      btn.style.background = "#10b981";
-    }
-  }
-  function openModal(id) { 
-    document.getElementById(id).style.display = "flex"; 
-  }
-  window.closeModal = closeModal;
-
-  window.checkPassword = async () => {
-    const user = document.getElementById("adminUser").value.trim();
-    const pass = document.getElementById("adminPassword").value.trim();
-    if(!user||!pass) return;
-    const roles = ["owner","admins","sellers"];
-    for(let role of roles) {
-      const snap = await get(ref(db, `users/${role}/${user}`));
-      if(snap.exists() && snap.val().password===pass) {
-        localStorage.setItem("auth","true"); localStorage.setItem("user",user);
-        localStorage.setItem("role", role==="owner"?"owner":(role==="admins"?"admin":"seller"));
-        initApp(); return;
+  window.previewInvoice = async (key) => {
+    try {
+      const snapshot = await get(ref(db, `confirmedOrders/${key}`));
+      if (!snapshot.exists()) { alert('Facture introuvable'); return; }
+      const order = snapshot.val();
+      let itemsRows = '', totalQte = 0;
+      if (order.items) {
+        order.items.forEach(it => {
+          const qty = Number(it.quantity || 0);
+          const price = Number(it.price || 0);
+          totalQte += qty;
+          itemsRows += `<tr><td>${escapeHtml(it.name)}</td><td>${qty}</td><td>${price.toFixed(2)}</td><td>${(qty*price).toFixed(2)}</td></tr>`;
+        });
       }
-    }
-    alert("بيانات الدخول غير صحيحة");
+      // إزالة رابط Google Maps من العنوان
+      let address = order.address || '';
+      if (address.includes('http')) {
+        address = address.split('http')[0].trim();
+      }
+      const win = window.open('', '_blank', 'width=400,height=600');
+      win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Facture #${order.invoiceNumber||'----'}</title>
+        <style>body{font-family:'Cairo',sans-serif;padding:20px;direction:ltr}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ddd;padding:6px;text-align:center}</style>
+      </head><body>
+        <h2 style="text-align:center;">${storeName}</h2>
+        <p><strong>N° Facture :</strong> ${order.invoiceNumber||'----'}</p>
+        <p><strong>Client :</strong> ${escapeHtml(order.customerName||'')}</p>
+        <p><strong>Tél :</strong> ${escapeHtml(order.phone||'')}</p>
+        <p><strong>Adresse :</strong> ${escapeHtml(address)}</p>
+        <p><strong>Date :</strong> ${new Date(order.confirmedAt||Date.now()).toLocaleString('fr-FR')}</p>
+        <table><tr><th>Produit</th><th>Qté</th><th>Prix</th><th>Total</th></tr>${itemsRows||'<tr><td colspan="4">Aucun produit</td></tr>'}</table>
+        <h3 style="text-align:left;">Total : ${(order.totalPrice||0).toLocaleString()} DA</h3>
+        <p style="text-align:center;">📞 ${storePhoneNumber}</p>
+        <p style="text-align:center; font-size:12px;">Merci pour votre confiance</p>
+        <button onclick="window.print()">🖨️ Imprimer</button>
+        <button onclick="window.close()">✖️ Fermer</button>
+      </body></html>`);
+      win.document.close();
+      setTimeout(()=>win.focus(),300);
+    } catch(e) { alert('Erreur : '+e.message); }
   };
 
-  function initApp() {
-    document.getElementById("loginModal").style.display = "none";
-    document.getElementById("userNameDisplay").innerHTML = `<i class="fas fa-user-circle"></i> ${localStorage.getItem("user")} (${getRole()})`;
-    document.getElementById("tabsContainer").style.display = "flex";
-    updateMenuPermissions();
-    loadUsersList();
-    loadFamilies();
-    loadDiscounts();
-    startCountdownTimers();
-    
-    if (getRole() === "seller") {
-      const hiddenTab = document.querySelector('.tab[data-tab="hidden"]');
-      if (hiddenTab) hiddenTab.style.display = "none";
-    }
-    
-    const whatsappTab = document.querySelector('.tab[data-tab="whatsapp"]');
-    if (whatsappTab) {
-      whatsappTab.addEventListener("click", () => {
-        isWhatsappTabOpen = true;
-        lastSeenCount = currentOrderCount;
-        localStorage.setItem('lastSeenOrderCount', lastSeenCount);
-        newOrdersCount = 0;
-        updateNotificationBadge();
-      });
-    }
-    
-    document.querySelectorAll(".tab").forEach(tab => {
-      tab.addEventListener("click", () => {
-        document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
-        tab.classList.add("active");
-        const tabName = tab.dataset.tab;
-        document.getElementById("productsSection").style.display = tabName==="products"?"block":"none";
-        document.getElementById("discountsSection").style.display = tabName==="discounts"?"block":"none";
-        document.getElementById("hiddenSection").style.display = tabName==="hidden"?"block":"none";
-        document.getElementById("whatsappSection").style.display = tabName==="whatsapp"?"block":"none";
-        document.getElementById("confirmedSection").style.display = tabName==="confirmed"?"block":"none";
-        if(tabName==="hidden") renderHidden();
-        if(tabName==="discounts") renderDiscountsList();
-        if (tabName !== "whatsapp") {
-          isWhatsappTabOpen = false;
-          if (currentOrderCount > lastSeenCount) {
-            newOrdersCount = currentOrderCount - lastSeenCount;
-          } else {
-            newOrdersCount = 0;
-          }
-          updateNotificationBadge();
-        }
-      });
-    });
-    
-    document.getElementById("searchInput").addEventListener("input", applySearch);
-    document.getElementById("addProductBtn").onclick = () => { 
-      document.getElementById("productForm").reset(); 
-      document.getElementById("editId").value=""; 
-      document.getElementById("formTitle").innerText="إضافة منتج"; 
-      document.getElementById("toggleVisibilityBtn").style.display="none"; 
-      document.getElementById("familySelect").value = "";
-      document.getElementById("newFamilyInput").style.display = "none";
-      document.getElementById("newFamilyInput").value = "";
-      document.getElementById("wholesalePrice").value = "";
-      const btn = document.getElementById("addFamilyBtn");
-      btn.innerHTML = '<i class="fas fa-plus"></i> إضافة';
-      btn.style.background = "#10b981";
-      editingProductId = null;
-      openModal("productModal"); 
-    };
-    
-    const menuBtn = document.getElementById("menuToggleBtn");
-    const dropdown = document.getElementById("dropdownMenu");
-    menuBtn.addEventListener("click", () => { dropdown.style.display = dropdown.style.display==="block"?"none":"block"; });
-    document.addEventListener("click", (e) => { if(!menuBtn.contains(e.target) && !dropdown.contains(e.target)) dropdown.style.display="none"; });
-    
-    onValue(ordersRef, (snap) => {
-      renderWhatsappOrders(snap.val());
-    });
-    onValue(confirmedRef, (snap) => {
-      renderConfirmedOrders(snap.val());
-    });
-  }
-
-  onValue(productsRef, (snap) => { 
-    allProducts = snap.val()||{}; 
-    applyFiltersAndRender(); 
-    renderHidden(); 
-  });
-
-  if(localStorage.getItem("auth")==="true") initApp();
+  // ============================================================
+  // بدء التشغيل
+  // ============================================================
+  loadStoreSettings();
+  loadPrintersFromFirebase();
+  onValue(ref(db, 'confirmedOrders'), (snap) => renderInvoicesList(snap.val()));
+  console.log('✅ Impression des factures - Version définitive avec toutes les corrections');
 </script>
 </body>
 </html>
