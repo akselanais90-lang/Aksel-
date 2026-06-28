@@ -505,7 +505,7 @@
   }
 
   // ============================================================
-  // دالة الطباعة الذكية (محفوظة بنفس منطق الكود القديم الناجح)
+  // دالة الطباعة الذكية (مع deviceId + البحث الأصل كحل احتياطي)
   // ============================================================
   async function smartPrint(order) {
     if (!selectedPrinterId) {
@@ -518,39 +518,58 @@
       return false;
     }
     try {
-      showStatus(`⏳ Recherche de l'imprimante...`, 'info');
+      showStatus('⏳ Connexion à l\'imprimante...', 'info');
       if (!navigator.bluetooth) throw new Error('Votre navigateur ne supporte pas Web Bluetooth');
 
       let device = null;
+      const deviceId = selectedPrinter.deviceId;
       const printerName = selectedPrinter.name || '';
 
-      // ===== الإستراتيجية 1: البحث بالاسم الكامل (نفس الكود القديم الذي كان ناجحاً) =====
-      try {
-        device = await navigator.bluetooth.requestDevice({
-          filters: [{ name: printerName }],
-          optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb', '00001101-0000-1000-8000-00805f9b34fb']
-        });
-      } catch (e1) {
-        console.warn('Échec recherche par nom exact:', e1);
-        // ===== الإستراتيجية 2: البحث ببادئة الاسم (أول 10 حروف) =====
+      // ===== المحاولة 1: الاتصال المباشر باستخدام deviceId =====
+      if (deviceId) {
         try {
-          const prefix = printerName.substring(0, 10);
-          device = await navigator.bluetooth.requestDevice({
-            filters: [{ namePrefix: prefix }],
-            optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb', '00001101-0000-1000-8000-00805f9b34fb']
-          });
-        } catch (e2) {
-          console.warn('Échec recherche par préfixe:', e2);
-          // ===== الإستراتيجية 3: البحث الشامل (لكن مع تحديد الخدمات الاختيارية) =====
-          device = await navigator.bluetooth.requestDevice({
-            acceptAllDevices: true,
-            optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb', '00001101-0000-1000-8000-00805f9b34fb']
-          });
+          device = await navigator.bluetooth.getDevice({ id: deviceId });
+          console.log('✅ تم استرجاع الجهاز باستخدام deviceId');
+        } catch (e) {
+          console.warn('⚠️ فشل استرجاع الجهاز باستخدام deviceId:', e);
+          device = null;
         }
       }
 
-      if (!device) throw new Error('Aucun appareil trouvé');
-      
+      // ===== المحاولة 2: البحث بالاسم (مثل الكود الأصلي) =====
+      if (!device) {
+        showStatus('⏳ Recherche de l\'imprimante par nom...', 'info');
+        try {
+          device = await navigator.bluetooth.requestDevice({
+            filters: [{ name: printerName }],
+            optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb', '00001101-0000-1000-8000-00805f9b34fb']
+          });
+        } catch (e1) {
+          console.warn('Échec recherche par nom:', e1);
+          try {
+            const prefix = printerName.substring(0, 10);
+            device = await navigator.bluetooth.requestDevice({
+              filters: [{ namePrefix: prefix }],
+              optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb', '00001101-0000-1000-8000-00805f9b34fb']
+            });
+          } catch (e2) {
+            console.warn('Échec recherche par préfixe:', e2);
+            device = await navigator.bluetooth.requestDevice({
+              acceptAllDevices: true,
+              optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb', '00001101-0000-1000-8000-00805f9b34fb']
+            });
+          }
+        }
+        if (!device) throw new Error('Aucun appareil trouvé');
+        // تحديث deviceId في قاعدة البيانات
+        await update(ref(db, `users/${currentUser}/printers/${selectedPrinterId}`), {
+          deviceId: device.id
+        });
+        selectedPrinter.deviceId = device.id;
+      }
+
+      if (!device) throw new Error('لم يتم العثور على الطابعة');
+
       showStatus(`✅ Appareil trouvé : ${device.name || 'Inconnu'}`, 'success');
       showStatus(`⏳ Connexion à ${device.name}...`, 'info');
       const server = await device.gatt.connect();
@@ -656,49 +675,78 @@
   }
 
   // ============================================================
-  // إضافة طابعة (بحث ذكي لجميع الأنواع)
+  // إضافة طابعة (بنفس ترتيب الكود الأصلي + تحسينات للتوافق)
   // ============================================================
   addPrinterBtn.addEventListener('click', () => {
+    console.log('🟢 تم الضغط على زر إضافة طابعة');
     addModal.style.display = 'flex';
   });
+
   cancelAddBtn.addEventListener('click', () => {
+    console.log('🔴 تم الضغط على زر إلغاء');
     addModal.style.display = 'none';
   });
 
   confirmAddBtn.addEventListener('click', async () => {
+    console.log('🟢 تم الضغط على زر بحث');
     const paperWidth = parseInt(paperSizeSelect.value) || 80;
     addModal.style.display = 'none';
     
     try {
       showStatus('⏳ Vérification du Bluetooth...', 'info');
-      if (!navigator.bluetooth) {
-        throw new Error('Web Bluetooth non supporté. Utilisez Chrome sur Android ou Edge.');
-      }
+      if (!navigator.bluetooth) throw new Error('Web Bluetooth non supporté. Utilisez Chrome sur Android ou Edge.');
 
       showStatus('⏳ Recherche d\'une imprimante...', 'info');
       let device;
+      const serviceUUID1 = '000018f0-0000-1000-8000-00805f9b34fb';
+      const serviceUUID2 = '00001101-0000-1000-8000-00805f9b34fb';
+      
+      // === المحاولة 1: البحث عن أي جهاز (كما في الكود الأصلي الذي يعمل) ===
       try {
-        // محاولة البحث بأسماء شائعة للطابعات
-        device = await navigator.bluetooth.requestDevice({
-          filters: [
-            { namePrefix: 'XP-' },
-            { namePrefix: 'printer' },
-            { namePrefix: 'thermal' },
-            { namePrefix: 'Xprinter' },
-            { namePrefix: 'BT' },
-            { namePrefix: 'Mi' }
-          ],
-          optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb', '00001101-0000-1000-8000-00805f9b34fb']
-        });
-      } catch (e) {
-        console.warn('البحث بالأسماء فشل، جرب acceptAllDevices', e);
+        showStatus('⏳ Recherche de tous les appareils Bluetooth...', 'info');
         device = await navigator.bluetooth.requestDevice({
           acceptAllDevices: true,
-          optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb', '00001101-0000-1000-8000-00805f9b34fb']
+          optionalServices: [serviceUUID1, serviceUUID2]
         });
+      } catch (e1) {
+        console.warn('acceptAllDevices فشل:', e1);
+        
+        // === المحاولة 2: البحث بالخدمات ===
+        try {
+          showStatus('⏳ Recherche par services...', 'info');
+          device = await navigator.bluetooth.requestDevice({
+            filters: [{ services: [serviceUUID1] }, { services: [serviceUUID2] }],
+            optionalServices: [serviceUUID1, serviceUUID2]
+          });
+        } catch (e2) {
+          console.warn('البحث بالخدمات فشل:', e2);
+          
+          // === المحاولة 3: البحث بأسماء شائعة (لطابعات أخرى) ===
+          try {
+            showStatus('⏳ Recherche par noms...', 'info');
+            device = await navigator.bluetooth.requestDevice({
+              filters: [
+                { namePrefix: 'XP-' },
+                { namePrefix: 'printer' },
+                { namePrefix: 'thermal' },
+                { namePrefix: 'Xprinter' },
+                { namePrefix: 'BT' },
+                { namePrefix: 'Mi' },
+                { namePrefix: 'Xiaomi' },
+                { namePrefix: 'P801' },
+                { namePrefix: 'MTP' },
+                { namePrefix: 'GoojPRT' }
+              ],
+              optionalServices: [serviceUUID1, serviceUUID2]
+            });
+          } catch (e3) {
+            console.warn('البحث بالأسماء فشل:', e3);
+            throw new Error('❌ لم يتم العثور على طابعة. تأكد من تفعيل البلوتوث ووضع الاقتران.');
+          }
+        }
       }
 
-      if (!device) throw new Error('Aucun appareil trouvé');
+      if (!device) throw new Error('لم يتم العثور على طابعة.');
       
       showStatus(`✅ Appareil sélectionné : ${device.name || 'Inconnu'}`, 'success');
       showStatus(`⏳ Connexion à ${device.name}...`, 'info');
@@ -710,6 +758,7 @@
         throw new Error(`Impossible de se connecter à ${device.name}. Vérifiez qu'elle est allumée.`);
       }
 
+      // البحث عن خاصية الكتابة ديناميكياً (لأي خدمة)
       let characteristic = null;
       const services = await server.getPrimaryServices();
       for (const service of services) {
@@ -735,7 +784,7 @@
         name: device.name || 'Imprimante inconnue',
         protocol: protocol,
         paperWidth: paperWidth,
-        deviceId: device.id || 'unknown',
+        deviceId: device.id,
         lastUsed: Date.now(),
         createdAt: Date.now(),
         detectedAt: Date.now()
@@ -762,7 +811,7 @@
   });
 
   // ============================================================
-  // Supprimer toutes les imprimantes
+  // حذف الكل
   // ============================================================
   clearAllBtn.addEventListener('click', async () => {
     if (!confirm('⚠️ Supprimer toutes les imprimantes enregistrées définitivement ?')) return;
@@ -812,7 +861,7 @@
   }
 
   // ============================================================
-  // دوال الطباعة ومعاينة الفاتورة
+  // دوال الطباعة
   // ============================================================
   window.printInvoice = async (key) => {
     try {
@@ -862,7 +911,7 @@
   // ============================================================
   loadPrintersFromFirebase();
   onValue(ref(db, 'confirmedOrders'), (snap) => renderInvoicesList(snap.val()));
-  console.log('✅ Impression des factures - Version compatible avec Xprinter ET Xiaomi (sans modifier le fonctionnement original)');
+  console.log('✅ Impression des factures - Version universelle corrigée');
 </script>
 </body>
 </html>
