@@ -6,7 +6,6 @@
   <title>Impression des factures - aksel & anais</title>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/esc-pos-encoder@1.3.0/dist/esc-pos-encoder.umd.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -16,34 +15,10 @@
       padding: 16px;
       direction: rtl;
     }
-    .header {
-      background: white;
-      padding: 16px 20px;
-      border-radius: 20px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
+    .header { background: white; padding: 16px 20px; border-radius: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
     .header h1 { font-size: 1.2rem; color: #10b981; }
     .header .actions { display: flex; gap: 10px; flex-wrap: wrap; }
-    .btn {
-      padding: 8px 18px;
-      border: none;
-      border-radius: 30px;
-      font-weight: 600;
-      font-size: 13px;
-      cursor: pointer;
-      font-family: 'Cairo', sans-serif;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      transition: 0.2s;
-      text-decoration: none;
-    }
+    .btn { padding: 8px 18px; border: none; border-radius: 30px; font-weight: 600; font-size: 13px; cursor: pointer; font-family: 'Cairo', sans-serif; display: inline-flex; align-items: center; gap: 6px; transition: 0.2s; text-decoration: none; }
     .btn-primary { background: #10b981; color: white; }
     .btn-primary:hover { background: #059669; transform: scale(0.97); }
     .btn-print { background: #1e293b; color: white; }
@@ -60,154 +35,39 @@
     .btn-warning:hover { background: #d97706; }
     .btn-outline { background: transparent; border: 2px solid #e2e8f0; color: #1e293b; }
     .btn-outline:hover { background: #f1f5f9; }
-    .printer-panel {
-      background: white;
-      border-radius: 20px;
-      padding: 16px;
-      margin-bottom: 20px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    }
-    .printer-panel .section-title {
-      font-weight: 700;
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 15px;
-      color: #0f172a;
-    }
-    .printer-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-bottom: 12px;
-    }
-    .printer-chip {
-      background: #f1f5f9;
-      padding: 6px 16px;
-      border-radius: 30px;
-      font-size: 13px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      cursor: pointer;
-      border: 2px solid transparent;
-      transition: 0.2s;
-    }
+    .printer-panel { background: white; border-radius: 20px; padding: 16px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+    .printer-panel .section-title { font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; font-size: 15px; color: #0f172a; }
+    .printer-list { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
+    .printer-chip { background: #f1f5f9; padding: 6px 16px; border-radius: 30px; font-size: 13px; display: flex; align-items: center; gap: 8px; cursor: pointer; border: 2px solid transparent; transition: 0.2s; }
     .printer-chip:hover { background: #e2e8f0; }
-    .printer-chip.active {
-      border-color: #10b981;
-      background: #d1fae5;
-      font-weight: 700;
-    }
-    .printer-chip .delete-printer {
-      background: none;
-      border: none;
-      color: #ef4444;
-      cursor: pointer;
-      font-size: 14px;
-      padding: 0 4px;
-    }
+    .printer-chip.active { border-color: #10b981; background: #d1fae5; font-weight: 700; }
+    .printer-chip .delete-printer { background: none; border: none; color: #ef4444; cursor: pointer; font-size: 14px; padding: 0 4px; }
     .printer-chip .delete-printer:hover { color: #b91c1c; }
-    .printer-chip .protocol-badge {
-      font-size: 9px;
-      background: #64748b;
-      color: white;
-      padding: 0 6px;
-      border-radius: 20px;
-      text-transform: uppercase;
-    }
-    .printer-chip .paper-badge {
-      font-size: 9px;
-      background: #10b981;
-      color: white;
-      padding: 0 6px;
-      border-radius: 20px;
-    }
-    .empty-printers {
-      color: #94a3b8;
-      font-size: 13px;
-      padding: 4px 0;
-    }
-    .printer-actions {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      border-top: 1px solid #e2e8f0;
-      padding-top: 12px;
-      margin-top: 4px;
-    }
-    #statusMessage {
-      padding: 10px 16px;
-      border-radius: 12px;
-      margin-bottom: 16px;
-      display: none;
-      font-weight: 600;
-    }
+    .printer-chip .protocol-badge { font-size: 9px; background: #64748b; color: white; padding: 0 6px; border-radius: 20px; text-transform: uppercase; }
+    .printer-chip .paper-badge { font-size: 9px; background: #10b981; color: white; padding: 0 6px; border-radius: 20px; }
+    .empty-printers { color: #94a3b8; font-size: 13px; padding: 4px 0; }
+    .printer-actions { display: flex; gap: 10px; flex-wrap: wrap; border-top: 1px solid #e2e8f0; padding-top: 12px; margin-top: 4px; }
+    #statusMessage { padding: 10px 16px; border-radius: 12px; margin-bottom: 16px; display: none; font-weight: 600; }
     #statusMessage.success { background: #d1fae5; color: #065f46; display: block; }
     #statusMessage.error { background: #fee2e2; color: #991b1b; display: block; }
     #statusMessage.info { background: #dbeafe; color: #1e40af; display: block; }
     #statusMessage.warning { background: #fef3c7; color: #92400e; display: block; }
     .invoice-list { display: flex; flex-direction: column; gap: 16px; }
-    .invoice-card {
-      background: white;
-      border-radius: 20px;
-      padding: 16px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-      border-right: 4px solid #10b981;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
+    .invoice-card { background: white; border-radius: 20px; padding: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-right: 4px solid #10b981; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
     .invoice-card .info { display: flex; flex-wrap: wrap; gap: 16px; font-size: 14px; }
     .invoice-card .info strong { color: #0f172a; }
     .invoice-card .total { font-weight: 800; color: #10b981; font-size: 1.1rem; }
     .no-data { text-align: center; padding: 40px; color: #94a3b8; background: white; border-radius: 20px; }
     .no-data i { font-size: 40px; display: block; margin-bottom: 12px; }
-    .modal {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.5);
-      backdrop-filter: blur(6px);
-      z-index: 2000;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-    .modal-content {
-      background: white;
-      width: 100%;
-      max-width: 420px;
-      border-radius: 28px;
-      padding: 24px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-    }
+    .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(6px); z-index: 2000; align-items: center; justify-content: center; padding: 20px; }
+    .modal-content { background: white; width: 100%; max-width: 420px; border-radius: 28px; padding: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); }
     .modal-content h3 { text-align: center; margin-bottom: 16px; color: #0f172a; }
     .modal-content label { display: block; font-weight: 600; margin-bottom: 4px; font-size: 13px; }
-    .modal-content select, .modal-content input {
-      width: 100%;
-      padding: 10px;
-      border: 1px solid #e2e8f0;
-      border-radius: 12px;
-      font-family: inherit;
-      margin-bottom: 12px;
-    }
+    .modal-content select, .modal-content input { width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 12px; font-family: inherit; margin-bottom: 12px; }
     .modal-content .btn-group { display: flex; gap: 10px; }
     .modal-content .btn-group button { flex: 1; }
-    .modal-content .hint {
-      font-size: 12px;
-      color: #6b7280;
-      margin-top: -8px;
-      margin-bottom: 12px;
-    }
-    @media (max-width: 640px) {
-      .invoice-card { flex-direction: column; align-items: stretch; }
-      .invoice-card .info { gap: 8px; font-size: 13px; }
-      .printer-chip { font-size: 12px; padding: 4px 12px; }
-    }
+    .modal-content .hint { font-size: 12px; color: #6b7280; margin-top: -8px; margin-bottom: 12px; }
+    @media (max-width: 640px) { .invoice-card { flex-direction: column; align-items: stretch; } .invoice-card .info { gap: 8px; font-size: 13px; } .printer-chip { font-size: 12px; padding: 4px 12px; } }
   </style>
 </head>
 <body>
@@ -265,47 +125,25 @@
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   signInAnonymously(auth)
-    .then(() => console.log("✅ تم الدخول المجهول بنجاح (صفحة الطباعة)"))
-    .catch((error) => console.warn("⚠️ فشل الدخول المجهول، لكن الموقع سيستمر في العمل للقراءة فقط:", error));
-  window.auth = auth;
+    .then(() => console.log("✅ تم الدخول المجهول بنجاح"))
+    .catch((error) => console.warn("⚠️ فشل الدخول المجهول:", error));
 
   const db = getDatabase(app);
   const currentUser = localStorage.getItem("user") || "default_user";
   const printersRef = ref(db, `users/${currentUser}/printers`);
   let printersList = [];
   let selectedPrinterId = null;
-  let storePhoneNumber = "0781-554-885"; // قيمة افتراضية
+  
+  let storePhoneNumber = "0781-554-885";
   let storeName = "aksel & anais";
-
-  const printerListContainer = document.getElementById('printerListContainer');
-  const addPrinterBtn = document.getElementById('addPrinterBtn');
-  const clearAllBtn = document.getElementById('clearAllPrintersBtn');
-  const statusMsg = document.getElementById('statusMessage');
-  const addModal = document.getElementById('addPrinterModal');
-  const paperSizeSelect = document.getElementById('paperSizeSelect');
-  const confirmAddBtn = document.getElementById('confirmAddPrinter');
-  const cancelAddBtn = document.getElementById('cancelAddPrinter');
-
-  // ====== تحميل إعدادات المتجر من Firebase ======
-  function loadStoreSettings() {
-    const storeRef = ref(db, 'store');
-    onValue(storeRef, (snapshot) => {
-      const data = snapshot.val();
-      if (data) {
-        if (data.phone) storePhoneNumber = data.phone;
-        if (data.storeName) storeName = data.storeName;
-        console.log(`📱 رقم الهاتف المحمل: ${storePhoneNumber}`);
-        console.log(`🏷️ اسم المتجر: ${storeName}`);
-      }
-    });
-  }
 
   // ====== دوال مساعدة ======
   function showStatus(message, type = 'info') {
-    statusMsg.textContent = message;
-    statusMsg.className = type;
-    statusMsg.style.display = 'block';
-    setTimeout(() => { statusMsg.style.display = 'none'; }, 6000);
+    const el = document.getElementById('statusMessage');
+    el.textContent = message;
+    el.className = type;
+    el.style.display = 'block';
+    setTimeout(() => { el.style.display = 'none'; }, 6000);
   }
   function escapeHtml(str) {
     if (!str) return '';
@@ -315,6 +153,19 @@
       if (m === '>') return '&gt;';
       return m;
     });
+  }
+  function cleanInvoiceNumber(num) {
+    if (!num) return '----';
+    let s = String(num);
+    s = s.replace(/^[Nn]{3}\s*/, '');
+    return s;
+  }
+  function cleanPhone(phone) {
+    if (!phone) return '';
+    let s = String(phone);
+    s = s.replace(/^[Tt]1?[lL]1?\s*/, '');
+    s = s.replace(/^T[eé]l\s*/, '');
+    return s;
   }
 
   // ====== دوال الطابعات ======
@@ -337,8 +188,9 @@
     });
   }
   function renderPrinterList() {
+    const container = document.getElementById('printerListContainer');
     if (printersList.length === 0) {
-      printerListContainer.innerHTML = `<div class="empty-printers">📭 Aucune imprimante enregistrée.</div>`;
+      container.innerHTML = `<div class="empty-printers">📭 Aucune imprimante enregistrée.</div>`;
       return;
     }
     let html = '';
@@ -358,7 +210,7 @@
         </div>
       `;
     });
-    printerListContainer.innerHTML = html;
+    container.innerHTML = html;
   }
   window.selectPrinter = function(printerId) {
     selectedPrinterId = printerId;
@@ -384,7 +236,7 @@
   };
 
   // ============================================================
-  // أوامر ESC/POS الأساسية
+  // أوامر ESC/POS الأساسية (خام)
   // ============================================================
   const ESC = 0x1B;
   const GS = 0x1D;
@@ -396,212 +248,111 @@
   function escposCut() { return new Uint8Array([GS, 0x56, 0x00]); }
   function escposBoldOn() { return new Uint8Array([ESC, 0x45, 0x01]); }
   function escposBoldOff() { return new Uint8Array([ESC, 0x45, 0x00]); }
-  function escposFontSize(n) { return new Uint8Array([GS, 0x21, n]); }
-  function escposAlign(align) { return new Uint8Array([ESC, 0x61, align]); }
+  function escposAlign(align) { return new Uint8Array([ESC, 0x61, align]); } // 0=left, 1=center, 2=right
 
   // ============================================================
-  // بناء الفاتورة (ESC/POS) - معدل حسب الطلب
+  // بناء الفاتورة النهائي (بدون مكتبة)
   // ============================================================
-  function buildInvoice(order) {
-    const items = order.items || [];
-    const total = items.reduce((sum, it) => sum + (Number(it.price) * Number(it.quantity)), 0);
-    const invoiceNumber = order.invoiceNumber ? order.invoiceNumber.toString().padStart(4, '0') : '----';
-    const customer = order.customerName || 'Client';
-    const phone = order.phone || '';
-    // إزالة رابط Google Maps من العنوان
-    let address = order.address || '';
-    if (address.includes('http')) {
-      address = address.split('http')[0].trim();
-    }
-    const date = new Date(order.confirmedAt || Date.now()).toLocaleString('fr-FR');
+ function buildInvoice(order) {
+  const items = order.items || [];
+  const total = items.reduce((sum, it) => sum + (Number(it.price) * Number(it.quantity)), 0);
+  let invoiceNumber = order.invoiceNumber ? order.invoiceNumber.toString().padStart(4, '0') : '----';
+  invoiceNumber = cleanInvoiceNumber(invoiceNumber);
+  const customer = order.customerName || 'Client';
+  let phone = order.phone || '';
+  phone = cleanPhone(phone);
+  let address = order.address || '';
+  if (address.includes('http')) address = address.split('http')[0].trim();
+  const date = new Date(order.confirmedAt || Date.now()).toLocaleString('fr-FR');
+  
+  const chunks = [];
+  chunks.push(escposInit());
+  
+  const SIZE_2X = new Uint8Array([0x1D, 0x21, 0x11]);
+  
+  // 1. اسم المتجر
+  chunks.push(escposAlign(0));
+  chunks.push(SIZE_2X);
+  chunks.push(escposBoldOff());
+  chunks.push(escposLine(storeName));
+  chunks.push(escposLine(''));
+  
+  // 2. معلومات العميل
+  chunks.push(escposAlign(0));
+  chunks.push(SIZE_2X);
+  chunks.push(escposBoldOff());
+  chunks.push(escposLine(`Facture : ${invoiceNumber}`));
+  chunks.push(escposLine(`Date : ${date}`));
+  chunks.push(escposLine(`Client : ${customer}`));
+  if (phone) chunks.push(escposLine(`Tel : ${phone}`));
+  if (address) chunks.push(escposLine(`Adresse : ${address}`));
+  chunks.push(escposLine(''));
+  
+  // 3. رأس الجدول
+  chunks.push(escposAlign(0));
+  chunks.push(SIZE_2X);
+  chunks.push(escposBoldOff());
+  chunks.push(escposLine('Produit          Qte Prix Total'));
+  chunks.push(escposLine(''));
+  
+  // 4. صفوف المنتجات (بسيطة بدون تقسيم)
+  if (items.length === 0) {
+    chunks.push(escposAlign(0));
+    chunks.push(escposLine('(لا توجد منتجات)'));
+  } else {
+    chunks.push(escposAlign(0));
+    chunks.push(SIZE_2X);
+    chunks.push(escposBoldOff());
     
-    if (typeof EscPosEncoder === 'undefined') {
-      console.warn('Bibliothèque esc-pos-encoder non chargée, utilisation du fallback.');
-      return buildInvoiceFallback(order);
-    }
-    
-    const encoder = new EscPosEncoder();
-    encoder.initialize();
-    
-    // ====== 1. اسم المتجر (كبير جداً) ======
-    encoder
-      .align('center')
-      .bold(true)
-      .size(2, 2)
-      .text(storeName)
-      .size(1, 1)
-      .bold(false)
-      .newline();
-    
-    // ====== 2. خط فاصل ======
-    encoder
-      .align('center')
-      .text('='.repeat(48))
-      .newline();
-    
-    // ====== 3. معلومات العميل (حجم 2x1) ======
-    encoder.align('left');
-    encoder.size(2, 1);
-    encoder.text(`N° Facture : ${invoiceNumber}`);
-    encoder.text(`Date : ${date}`);
-    encoder.text(`Client : ${customer}`);
-    if (phone) encoder.text(`Tél : ${phone}`);
-    if (address) encoder.text(`Adresse : ${address}`);
-    encoder.newline();
-    encoder.size(1, 1);
-    
-    // ====== 4. خط فاصل ======
-    encoder
-      .align('center')
-      .text('-'.repeat(48))
-      .newline();
-    
-    // ====== 5. رأس الجدول ======
-    encoder
-      .align('center')
-      .bold(true)
-      .size(2, 1)
-      .text('Produit          Qté   Prix    Total')
-      .size(1, 1)
-      .bold(false)
-      .newline();
-    
-    // ====== 6. صفوف المنتجات (حجم عادي) ======
-    encoder.align('left');
-    encoder.size(1, 1);
-    const colName = 16;
-    const colQty = 5;
-    const colPrice = 7;
-    const colTotal = 8;
-    items.forEach(item => {
-      const name = (item.name || 'Produit').substring(0, colName);
+    items.forEach((item) => {
+      let name = item.name || 'Produit';
       const qty = Number(item.quantity) || 0;
       const price = Number(item.price) || 0;
       const totalItem = qty * price;
-      const namePadded = name.padEnd(colName);
-      const qtyPadded = String(qty).padStart(colQty);
-      const pricePadded = Number(price).toFixed(2).padStart(colPrice);
-      const totalPadded = Number(totalItem).toFixed(2).padStart(colTotal);
-      const row = `${namePadded}  ${qtyPadded}   ${pricePadded}   ${totalPadded}`;
-      encoder.text(row);
+      
+      // إزالة .00 من الأسعار الفردية
+      const priceStr = Number(price).toFixed(2).replace(/\.00$/, '');
+      const totalStr = Number(totalItem).toFixed(2).replace(/\.00$/, '');
+      
+      // قص الاسم إلى 14 حرفاً
+      const nameShort = name.substring(0, 14);
+      // بناء السطر يدوياً بدون padStart و padEnd لتفادي الرموز الغريبة
+      const line = nameShort.padEnd(14) + ' ' + String(qty).padStart(3) + ' ' + priceStr.padStart(6) + ' ' + totalStr.padStart(6);
+      chunks.push(escposLine(line));
     });
-    
-    // ====== 7. خط فاصل ======
-    encoder
-      .align('center')
-      .text('-'.repeat(48))
-      .newline();
-    
-    // ====== 8. المبلغ الإجمالي (Total في اليسار، المبلغ في اليمين) ======
-    encoder.align('left');
-    encoder.bold(true);
-    encoder.size(2, 1);
-    encoder.text('Total :');
-    encoder.align('right');
-    const totalFormatted = total.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
-    encoder.text(`${totalFormatted} DA`);
-    encoder.size(1, 1);
-    encoder.bold(false);
-    encoder.newline();
-    
-    // ====== 9. رقم هاتف المحل ======
-    encoder.align('center');
-    encoder.size(1, 1);
-    encoder.text(`📞 ${storePhoneNumber}`);
-    encoder.newline();
-    
-    // ====== 10. عبارة الشكر (بحجم أصغر) ======
-    encoder.align('center');
-    encoder.size(1, 1);
-    encoder.text('Merci pour votre confiance');
-    encoder.newline();
-    encoder.newline();
-    
-    // ====== 11. قص الورق ======
-    encoder.cut();
-    
-    return encoder.encode();
   }
-
-  // ============================================================
-  // Fallback (بدون مكتبة) - معدل حسب الطلب
-  // ============================================================
-  function buildInvoiceFallback(order) {
-    const items = order.items || [];
-    const total = items.reduce((sum, it) => sum + (Number(it.price) * Number(it.quantity)), 0);
-    const invoiceNumber = order.invoiceNumber ? order.invoiceNumber.toString().padStart(4, '0') : '----';
-    const customer = order.customerName || 'Client';
-    const phone = order.phone || '';
-    let address = order.address || '';
-    if (address.includes('http')) {
-      address = address.split('http')[0].trim();
-    }
-    const date = new Date(order.confirmedAt || Date.now()).toLocaleString('fr-FR');
-    const chunks = [];
-    chunks.push(escposInit());
-    chunks.push(escposAlign(1));
-    chunks.push(escposFontSize(0x22));
-    chunks.push(escposBoldOn());
-    chunks.push(escposLine(storeName));
-    chunks.push(escposBoldOff());
-    chunks.push(escposFontSize(0x00));
-    chunks.push(escposLine('='.repeat(48)));
-    // معلومات العميل بحجم 2x1
-    chunks.push(escposAlign(0));
-    chunks.push(escposFontSize(0x11));
-    chunks.push(escposLine(`N° Facture : ${invoiceNumber}`));
-    chunks.push(escposLine(`Date : ${date}`));
-    chunks.push(escposLine(`Client : ${customer}`));
-    if (phone) chunks.push(escposLine(`Tél : ${phone}`));
-    if (address) chunks.push(escposLine(`Adresse : ${address}`));
-    chunks.push(escposFontSize(0x00));
-    chunks.push(escposLine('-'.repeat(48)));
-    chunks.push(escposAlign(1));
-    chunks.push(escposBoldOn());
-    chunks.push(escposFontSize(0x11));
-    chunks.push(escposLine('  Produit   Qté  Prix  Total  '));
-    chunks.push(escposBoldOff());
-    chunks.push(escposFontSize(0x00));
-    chunks.push(escposAlign(0));
-    const colName = 16, colQty = 5, colPrice = 7, colTotal = 8;
-    function formatRow(name, qty, price, total) {
-      let nameStr = name.substring(0, colName).padEnd(colName);
-      const qtyStr = String(qty).padStart(colQty);
-      const priceStr = Number(price).toFixed(2).padStart(colPrice);
-      const totalStr = Number(total).toFixed(2).padStart(colTotal);
-      return nameStr + '  ' + qtyStr + '   ' + priceStr + '   ' + totalStr;
-    }
-    items.forEach(item => {
-      const name = item.name || 'Produit';
-      const qty = Number(item.quantity) || 0;
-      const price = Number(item.price) || 0;
-      const totalItem = qty * price;
-      chunks.push(escposLine(formatRow(name, qty, price, totalItem)));
-    });
-    chunks.push(escposLine('-'.repeat(48)));
-    // Total
-    chunks.push(escposAlign(0));
-    chunks.push(escposBoldOn());
-    chunks.push(escposFontSize(0x11));
-    chunks.push(escposLine(`Total : ${total.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ')} DA`));
-    chunks.push(escposBoldOff());
-    chunks.push(escposFontSize(0x00));
-    chunks.push(escposLine(''));
-    chunks.push(escposAlign(1));
-    chunks.push(escposLine(`📞 ${storePhoneNumber}`));
-    chunks.push(escposLine(''));
-    chunks.push(escposLine('Merci pour votre confiance'));
-    chunks.push(escposLine(''));
-    chunks.push(escposCut());
-    const totalLength = chunks.reduce((s, arr) => s + arr.length, 0);
-    const allData = new Uint8Array(totalLength);
-    let offset = 0;
-    for (const chunk of chunks) {
-      allData.set(chunk, offset);
-      offset += chunk.length;
-    }
-    return allData;
+  
+  chunks.push(escposLine(''));
+  
+  // 5. السعر الإجمالي
+  chunks.push(escposAlign(0));
+  chunks.push(SIZE_2X);
+  chunks.push(escposBoldOff());
+  const totalFormatted = total.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+  chunks.push(escposLine(`Total : ${totalFormatted} DA`));
+  chunks.push(escposLine(''));
+  
+  // 6. رسالة الشكر والهاتف
+  chunks.push(escposAlign(0));
+  chunks.push(SIZE_2X);
+  chunks.push(escposBoldOff());
+  chunks.push(escposLine(`Tel : ${storePhoneNumber}`));
+  chunks.push(escposLine('Merci pour votre confiance'));
+  chunks.push(escposLine(''));
+  chunks.push(escposLine(''));
+  
+  // 7. قص الورق
+  chunks.push(escposCut());
+  
+  const totalLength = chunks.reduce((s, arr) => s + arr.length, 0);
+  const allData = new Uint8Array(totalLength);
+  let offset = 0;
+  for (const chunk of chunks) {
+    allData.set(chunk, offset);
+    offset += chunk.length;
   }
+  return allData;
+}
 
   // ============================================================
   // إرسال البيانات على دفعات
@@ -629,15 +380,11 @@
       await characteristic.writeValue(new Uint8Array([...escposInit(), ...escposLine('Test'), ...escposCut()]));
       return 'escpos';
     } catch (e) { console.warn('ESC/POS test failed:', e); }
-    try {
-      await characteristic.writeValue(new TextEncoder().encode('SIZE 58 mm, 40 mm\nGAP 0 mm, 0 mm\nCLS\nTEXT 10,10,"0",1,1,1,"Test TSPL"\nPRINT 1\n'));
-      return 'tspl';
-    } catch (e) { console.warn('TSPL test failed:', e); }
     return 'raw';
   }
 
   // ============================================================
-  // دالة الطباعة الذكية (مع deviceId)
+  // الطباعة الذكية
   // ============================================================
   async function smartPrint(order) {
     if (!selectedPrinterId) {
@@ -657,7 +404,6 @@
       const deviceId = selectedPrinter.deviceId;
       const printerName = selectedPrinter.name || '';
 
-      // ===== المحاولة 1: الاتصال المباشر =====
       if (deviceId) {
         try {
           device = await navigator.bluetooth.getDevice({ id: deviceId });
@@ -668,7 +414,6 @@
         }
       }
 
-      // ===== المحاولة 2: البحث بالاسم =====
       if (!device) {
         showStatus('⏳ Recherche de l\'imprimante par nom...', 'info');
         try {
@@ -706,7 +451,6 @@
       const server = await device.gatt.connect();
       showStatus('✅ Connecté à l\'imprimante', 'success');
 
-      // ===== البحث الديناميكي عن خاصية الكتابة =====
       let characteristic = null;
       const services = await server.getPrimaryServices();
       for (const service of services) {
@@ -721,7 +465,6 @@
       }
       if (!characteristic) throw new Error('Caractéristique d\'écriture introuvable');
 
-      // ===== كشف أو استرجاع البروتوكول =====
       let protocol = selectedPrinter.protocol;
       if (!protocol || protocol === 'unknown') {
         showStatus('⏳ Détection du protocole...', 'info');
@@ -735,96 +478,8 @@
         showStatus(`✅ Protocole détecté : ${protocol.toUpperCase()}`, 'success');
       }
 
-      // ============================================================
-      // بناء البيانات حسب البروتوكول (مع التعديلات)
-      // ============================================================
-      let printData;
-
-      if (protocol === 'tspl') {
-        const items = order.items || [];
-        const total = items.reduce((sum, it) => sum + (Number(it.price) * Number(it.quantity)), 0);
-        const invoiceNumber = order.invoiceNumber ? order.invoiceNumber.toString().padStart(4, '0') : '----';
-        const customer = order.customerName || 'Client';
-        const phone = order.phone || '';
-        let address = order.address || '';
-        if (address.includes('http')) {
-          address = address.split('http')[0].trim();
-        }
-        const date = new Date(order.confirmedAt || Date.now()).toLocaleString('fr-FR');
-        const lines = [];
-        lines.push('SIZE 58 mm, 40 mm', 'GAP 0 mm, 0 mm', 'CLS');
-        let y = 10;
-        // اسم المتجر
-        lines.push(`TEXT 10,${y},"0",2,2,1,"${storeName}"`); y += 40;
-        // خط فاصل
-        lines.push(`TEXT 10,${y},"0",1,1,1,"========================"`); y += 25;
-        // معلومات العميل بحجم 2x1 (نفس المبلغ الإجمالي)
-        lines.push(`TEXT 10,${y},"0",2,1,1,"N° Facture : ${invoiceNumber}"`); y += 30;
-        lines.push(`TEXT 10,${y},"0",2,1,1,"Date : ${date}"`); y += 30;
-        lines.push(`TEXT 10,${y},"0",2,1,1,"Client : ${customer}"`); y += 30;
-        if (phone) lines.push(`TEXT 10,${y},"0",2,1,1,"Tél : ${phone}"`); y += 30;
-        if (address) lines.push(`TEXT 10,${y},"0",2,1,1,"Adr : ${address}"`); y += 30;
-        lines.push(`TEXT 10,${y},"0",1,1,1,"------------------------"`); y += 25;
-        // رأس الجدول
-        lines.push(`TEXT 10,${y},"0",2,1,1,"Produit       Qté Prix Total"`); y += 30;
-        // المنتجات بحجم عادي
-        items.forEach(item => {
-          const name = (item.name || 'Produit').substring(0, 12);
-          const qty = Number(item.quantity) || 0;
-          const price = Number(item.price) || 0;
-          const totalItem = qty * price;
-          const line = `${name.padEnd(12)} ${String(qty).padStart(3)} ${price.toFixed(0).padStart(5)} ${totalItem.toFixed(0).padStart(6)}`;
-          lines.push(`TEXT 10,${y},"0",1,1,1,"${line}"`); y += 25;
-        });
-        lines.push(`TEXT 10,${y},"0",1,1,1,"------------------------"`); y += 25;
-        // المبلغ الإجمالي (بحجم 2x1)
-        const totalFormatted = total.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
-        lines.push(`TEXT 10,${y},"0",2,1,1,"Total : ${totalFormatted} DA"`); y += 35;
-        // رقم الهاتف
-        lines.push(`TEXT 10,${y},"0",1,1,1,"📞 ${storePhoneNumber}"`); y += 25;
-        // عبارة الشكر
-        lines.push(`TEXT 10,${y},"0",1,1,1,"Merci pour votre confiance"`); y += 25;
-        lines.push('PRINT 1');
-        printData = new TextEncoder().encode(lines.join('\n') + '\n');
-      } 
-      else if (protocol === 'raw') {
-        const items = order.items || [];
-        const total = items.reduce((sum, it) => sum + (Number(it.price) * Number(it.quantity)), 0);
-        const invoiceNumber = order.invoiceNumber ? order.invoiceNumber.toString().padStart(4, '0') : '----';
-        const customer = order.customerName || 'Client';
-        const phone = order.phone || '';
-        let address = order.address || '';
-        if (address.includes('http')) {
-          address = address.split('http')[0].trim();
-        }
-        const date = new Date(order.confirmedAt || Date.now()).toLocaleString('fr-FR');
-        let text = `${storeName}\n`;
-        text += '='.repeat(48) + '\n';
-        text += `N° Facture : ${invoiceNumber}\n`;
-        text += `Date : ${date}\n`;
-        text += `Client : ${customer}\n`;
-        if (phone) text += `Tél : ${phone}\n`;
-        if (address) text += `Adresse : ${address}\n`;
-        text += '-'.repeat(48) + '\n';
-        text += 'Produit          Qté   Prix    Total\n';
-        items.forEach(item => {
-          const name = (item.name || 'Produit').padEnd(16);
-          const qty = String(Number(item.quantity) || 0).padStart(5);
-          const price = Number(item.price).toFixed(2).padStart(7);
-          const totalItem = (Number(item.quantity) * Number(item.price)).toFixed(2).padStart(8);
-          text += `${name}  ${qty}   ${price}   ${totalItem}\n`;
-        });
-        text += '-'.repeat(48) + '\n';
-        const totalFormatted = total.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
-        text += `Total : ${totalFormatted} DA\n\n`;
-        text += `📞 ${storePhoneNumber}\n`;
-        text += 'Merci pour votre confiance\n\n\n';
-        printData = new TextEncoder().encode(text);
-      } 
-      else {
-        // ESC/POS
-        printData = buildInvoice(order);
-      }
+      // استخدام دالة buildInvoice مباشرة (بدون مكتبة)
+      const printData = buildInvoice(order);
 
       showStatus(`⏳ Envoi des données (${printData.length} octets)...`, 'info');
       await sendChunked(characteristic, printData, 150);
@@ -841,22 +496,17 @@
   }
 
   // ============================================================
-  // إضافة طابعة (نسخة محسنة)
+  // إضافة طابعة
   // ============================================================
-  addPrinterBtn.addEventListener('click', () => {
-    console.log('🟢 تم الضغط على زر إضافة طابعة');
-    addModal.style.display = 'flex';
+  document.getElementById('addPrinterBtn').addEventListener('click', () => {
+    document.getElementById('addPrinterModal').style.display = 'flex';
   });
-
-  cancelAddBtn.addEventListener('click', () => {
-    console.log('🔴 تم الضغط على زر إلغاء');
-    addModal.style.display = 'none';
+  document.getElementById('cancelAddPrinter').addEventListener('click', () => {
+    document.getElementById('addPrinterModal').style.display = 'none';
   });
-
-  confirmAddBtn.addEventListener('click', async () => {
-    console.log('🟢 تم الضغط على زر بحث');
-    const paperWidth = parseInt(paperSizeSelect.value) || 80;
-    addModal.style.display = 'none';
+  document.getElementById('confirmAddPrinter').addEventListener('click', async () => {
+    const paperWidth = parseInt(document.getElementById('paperSizeSelect').value) || 80;
+    document.getElementById('addPrinterModal').style.display = 'none';
     
     try {
       showStatus('⏳ Vérification du Bluetooth...', 'info');
@@ -955,7 +605,7 @@
       }
       showStatus(errorMsg, 'error');
       if (confirm('❌ Échec de la recherche. Voulez-vous réessayer avec des instructions supplémentaires ?')) {
-        addModal.style.display = 'flex';
+        document.getElementById('addPrinterModal').style.display = 'flex';
         showStatus('💡 Assurez-vous que l\'imprimante est allumée et en mode appairage (voyant clignotant).', 'warning');
       }
     }
@@ -964,7 +614,7 @@
   // ============================================================
   // حذف الكل
   // ============================================================
-  clearAllBtn.addEventListener('click', async () => {
+  document.getElementById('clearAllPrintersBtn').addEventListener('click', async () => {
     if (!confirm('⚠️ Supprimer toutes les imprimantes enregistrées définitivement ?')) return;
     try {
       await remove(printersRef);
@@ -1012,7 +662,7 @@
   }
 
   // ============================================================
-  // دوال الطباعة (مع تعديل المعاينة)
+  // دوال الطباعة والمعاينة
   // ============================================================
   window.printInvoice = async (key) => {
     try {
@@ -1024,46 +674,204 @@
     }
   };
 
+  // ====== معاينة الفاتورة (شكل احترافي) ======
   window.previewInvoice = async (key) => {
     try {
       const snapshot = await get(ref(db, `confirmedOrders/${key}`));
       if (!snapshot.exists()) { alert('Facture introuvable'); return; }
       const order = snapshot.val();
-      let itemsRows = '', totalQte = 0;
-      if (order.items) {
-        order.items.forEach(it => {
-          const qty = Number(it.quantity || 0);
-          const price = Number(it.price || 0);
-          totalQte += qty;
-          itemsRows += `<tr><td>${escapeHtml(it.name)}</td><td>${qty}</td><td>${price.toFixed(2)}</td><td>${(qty*price).toFixed(2)}</td></tr>`;
+
+      let itemsHTML = '';
+      let total = 0;
+      if (order.items && order.items.length > 0) {
+        order.items.forEach((item, index) => {
+          const qty = Number(item.quantity) || 0;
+          const price = Number(item.price) || 0;
+          const lineTotal = qty * price;
+          total += lineTotal;
+          itemsHTML += `
+            <div class="item">
+              <div class="name">${index+1}. ${escapeHtml(item.name)}</div>
+              <div class="price">${price.toFixed(2).replace('.', ',')}</div>
+              <div class="values">
+                <div></div>
+                <div class="qty">${qty}</div>
+                <div class="total">${lineTotal.toFixed(2).replace('.', ',')}</div>
+              </div>
+            </div>
+          `;
         });
+      } else {
+        itemsHTML = '<p style="text-align:center;">لا توجد منتجات</p>';
       }
-      // إزالة رابط Google Maps من العنوان
-      let address = order.address || '';
-      if (address.includes('http')) {
-        address = address.split('http')[0].trim();
-      }
-      const win = window.open('', '_blank', 'width=400,height=600');
-      win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Facture #${order.invoiceNumber||'----'}</title>
-        <style>body{font-family:'Cairo',sans-serif;padding:20px;direction:ltr}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ddd;padding:6px;text-align:center}</style>
-      </head><body>
-        <h2 style="text-align:center;">${storeName}</h2>
-        <p><strong>N° Facture :</strong> ${order.invoiceNumber||'----'}</p>
-        <p><strong>Client :</strong> ${escapeHtml(order.customerName||'')}</p>
-        <p><strong>Tél :</strong> ${escapeHtml(order.phone||'')}</p>
-        <p><strong>Adresse :</strong> ${escapeHtml(address)}</p>
-        <p><strong>Date :</strong> ${new Date(order.confirmedAt||Date.now()).toLocaleString('fr-FR')}</p>
-        <table><tr><th>Produit</th><th>Qté</th><th>Prix</th><th>Total</th></tr>${itemsRows||'<tr><td colspan="4">Aucun produit</td></tr>'}</table>
-        <h3 style="text-align:left;">Total : ${(order.totalPrice||0).toLocaleString()} DA</h3>
-        <p style="text-align:center;">📞 ${storePhoneNumber}</p>
-        <p style="text-align:center; font-size:12px;">Merci pour votre confiance</p>
-        <button onclick="window.print()">🖨️ Imprimer</button>
-        <button onclick="window.close()">✖️ Fermer</button>
-      </body></html>`);
+
+      const totalFormatted = total.toFixed(2).replace('.', ',');
+      const store = storeName || 'aksel & anais';
+      const phoneStore = storePhoneNumber || '0781-554-885';
+      const date = new Date(order.confirmedAt || Date.now()).toLocaleString('fr-FR');
+      const customer = escapeHtml(order.customerName || 'Client');
+      const invoiceNum = cleanInvoiceNumber(order.invoiceNumber || '----');
+
+      const win = window.open('', '_blank', 'width=400,height=700,scrollbars=yes');
+      win.document.write(`
+        <!DOCTYPE html>
+        <html lang="fr">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Facture #${invoiceNum}</title>
+          <style>
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+            body { background: #ddd; font-family: Arial, Helvetica, sans-serif; }
+            .receipt {
+              width: 80mm;
+              background: #fff;
+              margin: 20px auto;
+              padding: 8px;
+              color: #000;
+            }
+            .center { text-align: center; }
+            .left { text-align: left; }
+            .right { text-align: right; }
+            .bold { font-weight: bold; }
+            .big { font-size: 30px; }
+            .small { font-size: 12px; }
+            .line {
+              border-top: 2px dotted #000;
+              margin: 8px 0;
+            }
+            .info {
+              line-height: 1.6;
+              font-size: 15px;
+            }
+            .headerRow {
+              display: grid;
+              grid-template-columns: 1fr 50px 80px;
+              font-weight: bold;
+              margin-top: 5px;
+              margin-bottom: 5px;
+            }
+            .item {
+              margin-top: 8px;
+            }
+            .name {
+              font-size: 16px;
+              font-weight: bold;
+            }
+            .price {
+              font-size: 15px;
+              margin-left: 18px;
+              margin-top: 2px;
+            }
+            .values {
+              display: grid;
+              grid-template-columns: 1fr 50px 80px;
+              align-items: center;
+              margin-top: -18px;
+            }
+            .qty { text-align: center; }
+            .total { text-align: right; }
+            .summary {
+              margin-top: 12px;
+            }
+            .summaryRow {
+              display: flex;
+              justify-content: space-between;
+              margin: 8px 0;
+              font-size: 18px;
+            }
+            .totalRow {
+              display: flex;
+              justify-content: space-between;
+              font-size: 20px;
+              font-weight: bold;
+              margin: 10px 0;
+            }
+            .footer {
+              text-align: center;
+              margin-top: 15px;
+              font-size: 18px;
+            }
+            .btn-group {
+              text-align: center;
+              margin-top: 15px;
+            }
+            .btn-group button {
+              margin: 5px;
+              padding: 8px 18px;
+              border: none;
+              border-radius: 30px;
+              font-weight: 600;
+              cursor: pointer;
+              font-size: 14px;
+            }
+            .btn-print { background: #1e293b; color: white; }
+            .btn-close { background: #e2e8f0; color: #1e293b; }
+            @media print {
+              body { background: white; }
+              .receipt { margin: 0; width: 80mm; box-shadow: none; }
+              .btn-group { display: none; }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="receipt">
+            <div class="center">
+              <h2>${store}</h2>
+              <div class="small">${escapeHtml(order.address || '')}<br>Télé : ${phoneStore}</div>
+            </div>
+            <div class="line"></div>
+            <div class="info">
+              <div>Reçu : ${invoiceNum}</div>
+              <div>La caissière : ${customer}</div>
+              <div>Date : ${date}</div>
+            </div>
+            <div class="line"></div>
+            <div class="headerRow">
+              <div>Prix de l'article</div>
+              <div style="text-align:center;">Qty</div>
+              <div style="text-align:right;">Total (DZD)</div>
+            </div>
+            <div class="line"></div>
+            <div id="items">${itemsHTML}</div>
+            <div class="line"></div>
+            <div class="summary">
+              <div class="summaryRow"><span>Sous total</span><span>${totalFormatted}</span></div>
+              <div class="line"></div>
+              <div class="totalRow"><span>Total</span><span>${totalFormatted}</span></div>
+              <div class="line"></div>
+              <div class="summaryRow"><span>Cash</span><span>${totalFormatted}</span></div>
+            </div>
+            <div class="line"></div>
+            <div class="footer">Télé : ${phoneStore}</div>
+          </div>
+          <div class="btn-group">
+            <button class="btn-print" onclick="window.print()">🖨️ طباعة</button>
+            <button class="btn-close" onclick="window.close()">✖️ إغلاق</button>
+          </div>
+        </body>
+        </html>
+      `);
       win.document.close();
-      setTimeout(()=>win.focus(),300);
-    } catch(e) { alert('Erreur : '+e.message); }
+      setTimeout(() => win.focus(), 300);
+    } catch (e) {
+      alert('خطأ في المعاينة: ' + e.message);
+    }
   };
+
+  // ============================================================
+  // تحميل إعدادات المتجر
+  // ============================================================
+  function loadStoreSettings() {
+    const storeRef = ref(db, 'store');
+    onValue(storeRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        if (data.phone) storePhoneNumber = data.phone;
+        if (data.storeName) storeName = data.storeName;
+      }
+    });
+  }
 
   // ============================================================
   // بدء التشغيل
@@ -1071,7 +879,7 @@
   loadStoreSettings();
   loadPrintersFromFirebase();
   onValue(ref(db, 'confirmedOrders'), (snap) => renderInvoicesList(snap.val()));
-  console.log('✅ Impression des factures - Version définitive avec toutes les corrections');
+  console.log('✅ Impression des factures - Version finale');
 </script>
 </body>
 </html>
