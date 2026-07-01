@@ -3,24 +3,62 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
-  <title>Impression des factures - aksel & anais</title>
+  <title>aksel & anais - Impression</title>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
+    /* ===== RESET & BASE ===== */
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: 'Cairo', 'Segoe UI', sans-serif;
-      background: #f3f4f6;
+      background: #f0f2f5;
       color: #1e293b;
-      padding: 16px;
+      padding: 20px;
       direction: rtl;
+      min-height: 100vh;
     }
-    .header { background: white; padding: 16px 20px; border-radius: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
-    .header h1 { font-size: 1.2rem; color: #10b981; }
-    .header .actions { display: flex; gap: 10px; flex-wrap: wrap; }
-    .btn { padding: 8px 18px; border: none; border-radius: 30px; font-weight: 600; font-size: 13px; cursor: pointer; font-family: 'Cairo', sans-serif; display: inline-flex; align-items: center; gap: 6px; transition: 0.2s; text-decoration: none; }
+
+    /* ===== HEADER ===== */
+    .app-header {
+      background: white;
+      padding: 18px 24px;
+      border-radius: 24px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .app-header .logo {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: #10b981;
+    }
+    .app-header .logo i { margin-left: 8px; }
+    .app-header .actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+    /* ===== BUTTONS ===== */
+    .btn {
+      padding: 10px 22px;
+      border: none;
+      border-radius: 40px;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      font-family: 'Cairo', sans-serif;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.25s ease;
+      text-decoration: none;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.10); }
+    .btn:active { transform: scale(0.97); }
     .btn-primary { background: #10b981; color: white; }
-    .btn-primary:hover { background: #059669; transform: scale(0.97); }
+    .btn-primary:hover { background: #059669; }
     .btn-print { background: #1e293b; color: white; }
     .btn-print:hover { background: #0f172a; }
     .btn-back { background: #e2e8f0; color: #1e293b; }
@@ -34,131 +72,401 @@
     .btn-warning { background: #f59e0b; color: white; }
     .btn-warning:hover { background: #d97706; }
     .btn-outline { background: transparent; border: 2px solid #e2e8f0; color: #1e293b; }
-    .btn-outline:hover { background: #f1f5f9; }
-    .btn-sm { padding: 4px 10px; font-size: 11px; }
-    .printer-panel { background: white; border-radius: 20px; padding: 16px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-    .printer-panel .section-title { font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; font-size: 15px; color: #0f172a; }
-    .printer-list { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
-    .printer-chip { background: #f1f5f9; padding: 6px 16px; border-radius: 30px; font-size: 13px; display: flex; align-items: center; gap: 8px; cursor: pointer; border: 2px solid transparent; transition: 0.2s; flex-wrap: wrap; }
-    .printer-chip:hover { background: #e2e8f0; }
-    .printer-chip.active { border-color: #10b981; background: #d1fae5; font-weight: 700; }
-    .printer-chip .delete-printer { background: none; border: none; color: #ef4444; cursor: pointer; font-size: 14px; padding: 0 4px; }
-    .printer-chip .delete-printer:hover { color: #b91c1c; }
-    .printer-chip .edit-printer { background: none; border: none; color: #2563eb; cursor: pointer; font-size: 14px; padding: 0 4px; }
-    .printer-chip .edit-printer:hover { color: #1d4ed8; }
-    .printer-chip .protocol-badge { font-size: 9px; background: #64748b; color: white; padding: 0 6px; border-radius: 20px; text-transform: uppercase; }
-    .printer-chip .paper-badge { font-size: 9px; background: #10b981; color: white; padding: 0 6px; border-radius: 20px; }
-    .printer-chip .size-badge { font-size: 9px; background: #8b5cf6; color: white; padding: 0 6px; border-radius: 20px; }
-    .empty-printers { color: #94a3b8; font-size: 13px; padding: 4px 0; }
-    .printer-actions { display: flex; gap: 10px; flex-wrap: wrap; border-top: 1px solid #e2e8f0; padding-top: 12px; margin-top: 4px; }
-    #statusMessage { padding: 10px 16px; border-radius: 12px; margin-bottom: 16px; display: none; font-weight: 600; }
+    .btn-outline:hover { background: #f1f5f9; border-color: #94a3b8; }
+    .btn-sm { padding: 6px 14px; font-size: 12px; border-radius: 30px; }
+    .btn-icon {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    }
+    .btn-icon:hover { transform: scale(1.08); }
+    .btn-icon-edit { background: #dbeafe; color: #2563eb; }
+    .btn-icon-edit:hover { background: #bfdbfe; }
+    .btn-icon-delete { background: #fee2e2; color: #dc2626; }
+    .btn-icon-delete:hover { background: #fecaca; }
+
+    /* ===== PRINTER PANEL ===== */
+    .panel {
+      background: white;
+      border-radius: 24px;
+      padding: 20px 24px 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+    }
+    .panel-title {
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: #0f172a;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .panel-title i { color: #2563eb; }
+
+    /* ===== PRINTER CARDS (GRID) ===== */
+    .printer-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    .printer-card {
+      background: #f8fafc;
+      border-radius: 20px;
+      padding: 16px 18px;
+      border: 2px solid transparent;
+      transition: all 0.25s ease;
+      cursor: pointer;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.02);
+    }
+    .printer-card:hover {
+      background: #f1f5f9;
+      border-color: #cbd5e1;
+    }
+    .printer-card.active {
+      border-color: #10b981;
+      background: #ecfdf5;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.12);
+    }
+    .printer-card .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .printer-card .card-name {
+      font-weight: 700;
+      font-size: 17px;
+      color: #0f172a;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .printer-card .card-name i { color: #64748b; font-size: 16px; }
+    .printer-card .card-actions {
+      display: flex;
+      gap: 6px;
+    }
+    .printer-card .card-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 4px;
+    }
+    .badge {
+      font-size: 11px;
+      padding: 3px 12px;
+      border-radius: 40px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: #e2e8f0;
+      color: #1e293b;
+    }
+    .badge-protocol { background: #64748b; color: white; }
+    .badge-paper { background: #10b981; color: white; }
+    .badge-size { background: #8b5cf6; color: white; }
+    .badge-selected {
+      background: #10b981;
+      color: white;
+      font-size: 10px;
+      padding: 2px 10px;
+      border-radius: 30px;
+      font-weight: 700;
+      margin-right: auto;
+    }
+    .empty-printers {
+      text-align: center;
+      padding: 30px 20px;
+      color: #94a3b8;
+    }
+    .empty-printers i { font-size: 40px; display: block; margin-bottom: 10px; }
+
+    /* ===== STATUS MESSAGE ===== */
+    #statusMessage {
+      padding: 12px 20px;
+      border-radius: 16px;
+      margin-bottom: 20px;
+      display: none;
+      font-weight: 600;
+      font-size: 14px;
+    }
     #statusMessage.success { background: #d1fae5; color: #065f46; display: block; }
     #statusMessage.error { background: #fee2e2; color: #991b1b; display: block; }
     #statusMessage.info { background: #dbeafe; color: #1e40af; display: block; }
     #statusMessage.warning { background: #fef3c7; color: #92400e; display: block; }
-    .invoice-list { display: flex; flex-direction: column; gap: 16px; }
-    .invoice-card { background: white; border-radius: 20px; padding: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-right: 4px solid #10b981; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
-    .invoice-card .info { display: flex; flex-wrap: wrap; gap: 16px; font-size: 14px; }
+
+    /* ===== INVOICE LIST ===== */
+    .invoice-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .invoice-card {
+      background: white;
+      border-radius: 20px;
+      padding: 16px 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      border-right: 5px solid #10b981;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      transition: 0.15s;
+    }
+    .invoice-card:hover { box-shadow: 0 4px 14px rgba(0,0,0,0.06); }
+    .invoice-card .info {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      font-size: 14px;
+      align-items: center;
+    }
     .invoice-card .info strong { color: #0f172a; }
-    .invoice-card .total { font-weight: 800; color: #10b981; font-size: 1.1rem; }
-    .no-data { text-align: center; padding: 40px; color: #94a3b8; background: white; border-radius: 20px; }
-    .no-data i { font-size: 40px; display: block; margin-bottom: 12px; }
-    .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(6px); z-index: 2000; align-items: center; justify-content: center; padding: 20px; }
-    .modal-content { background: white; width: 100%; max-width: 420px; border-radius: 28px; padding: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); }
-    .modal-content h3 { text-align: center; margin-bottom: 16px; color: #0f172a; }
-    .modal-content label { display: block; font-weight: 600; margin-bottom: 4px; font-size: 13px; }
-    .modal-content select, .modal-content input { width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 12px; font-family: inherit; margin-bottom: 12px; }
-    .modal-content .btn-group { display: flex; gap: 10px; }
+    .invoice-card .total {
+      font-weight: 800;
+      color: #10b981;
+      font-size: 1.15rem;
+    }
+    .invoice-card .actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .no-data {
+      text-align: center;
+      padding: 50px 20px;
+      color: #94a3b8;
+      background: white;
+      border-radius: 24px;
+    }
+    .no-data i { font-size: 48px; display: block; margin-bottom: 12px; }
+
+    /* ===== MODALS ===== */
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      backdrop-filter: blur(6px);
+      z-index: 3000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-content {
+      background: white;
+      width: 100%;
+      max-width: 440px;
+      border-radius: 32px;
+      padding: 28px 30px 32px;
+      box-shadow: 0 20px 48px rgba(0,0,0,0.18);
+      animation: modalFade 0.25s ease;
+    }
+    @keyframes modalFade {
+      from { opacity: 0; transform: scale(0.94) translateY(10px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .modal-content h3 {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 1.3rem;
+      color: #0f172a;
+    }
+    .modal-content h3 i { margin-left: 8px; color: #2563eb; }
+    .modal-content label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 6px;
+      font-size: 14px;
+      color: #1e293b;
+    }
+    .modal-content select,
+    .modal-content input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      font-family: inherit;
+      font-size: 14px;
+      margin-bottom: 14px;
+      background: #f8fafc;
+      transition: 0.15s;
+    }
+    .modal-content select:focus,
+    .modal-content input:focus {
+      outline: none;
+      border-color: #10b981;
+      box-shadow: 0 0 0 3px rgba(16,185,129,0.15);
+    }
+    .modal-content .hint {
+      font-size: 12px;
+      color: #6b7280;
+      margin-top: -8px;
+      margin-bottom: 14px;
+    }
+    .modal-content .btn-group {
+      display: flex;
+      gap: 10px;
+      margin-top: 6px;
+    }
     .modal-content .btn-group button { flex: 1; }
-    .modal-content .hint { font-size: 12px; color: #6b7280; margin-top: -8px; margin-bottom: 12px; }
-    .slider-group { margin: 16px 0; }
-    .slider-group label { display: flex; justify-content: space-between; align-items: center; }
-    .slider-group input[type="range"] { width: 100%; margin: 8px 0; }
-    .slider-value { font-size: 20px; font-weight: bold; color: #2563eb; min-width: 50px; text-align: center; }
-    @media (max-width: 640px) { .invoice-card { flex-direction: column; align-items: stretch; } .invoice-card .info { gap: 8px; font-size: 13px; } .printer-chip { font-size: 12px; padding: 4px 12px; } }
+
+    /* ===== SLIDERS ===== */
+    .slider-group {
+      margin: 18px 0 12px;
+    }
+    .slider-group label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 600;
+      font-size: 14px;
+    }
+    .slider-group label .slider-value {
+      font-size: 22px;
+      font-weight: 800;
+      color: #2563eb;
+      min-width: 50px;
+      text-align: center;
+    }
+    .slider-group input[type="range"] {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 6px;
+      border-radius: 10px;
+      background: #e2e8f0;
+      outline: none;
+      margin: 10px 0 4px;
+    }
+    .slider-group input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #2563eb;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(37,99,235,0.25);
+      transition: 0.1s;
+    }
+    .slider-group input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.1); }
+    .slider-group input[type="range"]::-moz-range-thumb {
+      width: 20px; height: 20px; border-radius: 50%; background: #2563eb; border: none; cursor: pointer;
+    }
+    .slider-range-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: #94a3b8;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 640px) {
+      body { padding: 12px; }
+      .app-header { padding: 14px 16px; flex-direction: column; align-items: stretch; }
+      .app-header .actions { justify-content: center; }
+      .printer-grid { grid-template-columns: 1fr; }
+      .invoice-card { flex-direction: column; align-items: stretch; }
+      .invoice-card .actions { justify-content: flex-start; }
+      .modal-content { padding: 20px; }
+    }
   </style>
 </head>
 <body>
-<div class="header no-print">
-  <h1><i class="fas fa-print"></i> Impression des factures</h1>
+
+<!-- ===== HEADER ===== -->
+<div class="app-header no-print">
+  <div class="logo"><i class="fas fa-print"></i> aksel & anais</div>
   <div class="actions">
-    <a href="admin.html" class="btn btn-back"><i class="fas fa-arrow-right"></i> Retour à l'admin</a>
+    <a href="admin.html" class="btn btn-back"><i class="fas fa-arrow-right"></i> Retour</a>
   </div>
 </div>
-<div class="printer-panel no-print" id="printerPanel">
-  <div class="section-title"><i class="fas fa-bluetooth"></i> Imprimantes enregistrées</div>
-  <div id="printerListContainer" class="printer-list"><div class="empty-printers">⏳ Chargement...</div></div>
-  <div class="printer-actions">
-    <button class="btn btn-bluetooth" id="addPrinterBtn"><i class="fas fa-plus"></i> Ajouter une imprimante</button>
-    <button class="btn btn-danger" id="clearAllPrintersBtn"><i class="fas fa-trash"></i> Tout supprimer</button>
+
+<!-- ===== PRINTER PANEL ===== -->
+<div class="panel no-print">
+  <div class="panel-title"><i class="fas fa-bluetooth-b"></i> Imprimantes enregistrées</div>
+  <div id="printerListContainer" class="printer-grid"><div class="empty-printers">⏳ Chargement...</div></div>
+  <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:8px; border-top:1px solid #e2e8f0; padding-top:16px;">
+    <button class="btn btn-bluetooth" id="addPrinterBtn"><i class="fas fa-plus-circle"></i> Ajouter</button>
+    <button class="btn btn-danger" id="clearAllPrintersBtn"><i class="fas fa-trash-alt"></i> Tout supprimer</button>
   </div>
-  <div style="font-size:11px; color:#94a3b8; margin-top:6px;">
-    <i class="fas fa-info-circle"></i> Sélectionnez une imprimante, puis appuyez sur "Imprimer" sur la facture.
+  <div style="font-size:12px; color:#94a3b8; margin-top:10px;">
+    <i class="fas fa-info-circle"></i> Sélectionnez une imprimante, puis "Imprimer" sur la facture.
   </div>
 </div>
+
+<!-- ===== STATUS ===== -->
 <div id="statusMessage"></div>
+
+<!-- ===== INVOICE LIST ===== -->
 <div id="app"></div>
 
-<!-- Modal d'ajout -->
+<!-- ===== MODAL AJOUT ===== -->
 <div id="addPrinterModal" class="modal">
   <div class="modal-content">
-    <h3><i class="fas fa-bluetooth"></i> Ajouter une imprimante</h3>
-    <label>Choisissez la taille du papier :</label>
+    <h3><i class="fas fa-plus-circle"></i> Ajouter une imprimante</h3>
+    <label>📄 Taille du papier</label>
     <select id="paperSizeSelect">
       <option value="80">80 mm (standard)</option>
       <option value="58">58 mm (petit)</option>
     </select>
-    <p class="hint">⚠️ Assurez-vous que le Bluetooth de votre appareil est activé et que l'imprimante est allumée et en mode appairage.</p>
+    <p class="hint">⚠️ Bluetooth activé, imprimante allumée et en mode appairage.</p>
     <div class="btn-group">
-      <button class="btn btn-success" id="confirmAddPrinter"><i class="fas fa-bluetooth"></i> Rechercher</button>
+      <button class="btn btn-success" id="confirmAddPrinter"><i class="fas fa-search"></i> Rechercher</button>
       <button class="btn btn-outline" id="cancelAddPrinter"><i class="fas fa-times"></i> Annuler</button>
     </div>
   </div>
 </div>
 
-<!-- Modal d'édition -->
+<!-- ===== MODAL ÉDITION ===== -->
 <div id="editPrinterModal" class="modal">
   <div class="modal-content">
-    <h3><i class="fas fa-edit"></i> ضبط حجم الخط</h3>
-    
+    <h3><i class="fas fa-sliders-h"></i> Ajuster la taille</h3>
     <div class="slider-group">
       <label>
-        <span><i class="fas fa-arrows-alt-h"></i> العرض</span>
+        <span><i class="fas fa-arrows-alt-h"></i> Largeur</span>
         <span class="slider-value" id="widthValue">2.0</span>
       </label>
       <input type="range" id="widthSlider" min="1.0" max="3.0" step="0.1" value="2.0">
-      <div style="display:flex; justify-content:space-between; font-size:12px; color:#94a3b8;">
-        <span>1.0</span>
-        <span>3.0</span>
-      </div>
+      <div class="slider-range-labels"><span>1.0</span><span>3.0</span></div>
     </div>
-
     <div class="slider-group">
       <label>
-        <span><i class="fas fa-arrows-alt-v"></i> الارتفاع</span>
+        <span><i class="fas fa-arrows-alt-v"></i> Hauteur</span>
         <span class="slider-value" id="heightValue">2.0</span>
       </label>
       <input type="range" id="heightSlider" min="1.0" max="3.0" step="0.1" value="2.0">
-      <div style="display:flex; justify-content:space-between; font-size:12px; color:#94a3b8;">
-        <span>1.0</span>
-        <span>3.0</span>
-      </div>
+      <div class="slider-range-labels"><span>1.0</span><span>3.0</span></div>
     </div>
-
-    <p class="hint">💡 اضبط العرض والارتفاع كما تريد. القيم من 1.0 إلى 3.0 بخطوة 0.1.</p>
+    <p class="hint">💡 Ajustez largeur et hauteur (1.0 → 3.0, pas de 0.1).</p>
     <div class="btn-group">
-      <button class="btn btn-success" id="confirmEditPrinter"><i class="fas fa-save"></i> حفظ</button>
-      <button class="btn btn-outline" id="cancelEditPrinter"><i class="fas fa-times"></i> إلغاء</button>
+      <button class="btn btn-success" id="confirmEditPrinter"><i class="fas fa-check"></i> Enregistrer</button>
+      <button class="btn btn-outline" id="cancelEditPrinter"><i class="fas fa-times"></i> Annuler</button>
     </div>
   </div>
 </div>
 
+<!-- ============================================================ -->
 <script type="module">
+  // ===== IMPORTS FIREBASE =====
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
   import { getDatabase, ref, onValue, set, remove, push, get, update } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
   import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 
-  // ====== إعدادات Firebase ======
+  // ===== CONFIG FIREBASE =====
   const firebaseConfig = {
     apiKey: "AIzaSyAr3Opxs_ikZZ4JZqArcnM8T_YEeyzS_mI",
     authDomain: "aksel-ff2ef.firebaseapp.com",
@@ -173,137 +481,114 @@
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   signInAnonymously(auth)
-    .then(() => console.log("✅ تم الدخول المجهول بنجاح"))
-    .catch((error) => console.warn("⚠️ فشل الدخول المجهول:", error));
+    .then(() => console.log("✅ Auth anonyme OK"))
+    .catch(() => console.warn("⚠️ Auth anonyme échoué"));
 
   const db = getDatabase(app);
   const currentUser = localStorage.getItem("user") || "default_user";
   const printersRef = ref(db, `users/${currentUser}/printers`);
+
   let printersList = [];
   let selectedPrinterId = null;
   let editingPrinterId = null;
-  
   let storePhoneNumber = "0781-554-885";
   let storeName = "aksel & anais";
 
-  // ====== دوال مساعدة ======
-  function showStatus(message, type = 'info') {
+  // ===== HELPERS =====
+  function showStatus(msg, type = 'info') {
     const el = document.getElementById('statusMessage');
-    el.textContent = message;
+    el.textContent = msg;
     el.className = type;
     el.style.display = 'block';
-    setTimeout(() => { el.style.display = 'none'; }, 6000);
+    setTimeout(() => el.style.display = 'none', 5500);
   }
   function escapeHtml(str) {
     if (!str) return '';
-    return String(str).replace(/[&<>]/g, function(m) {
-      if (m === '&') return '&amp;';
-      if (m === '<') return '&lt;';
-      if (m === '>') return '&gt;';
-      return m;
-    });
+    return String(str).replace(/[&<>]/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;' }[m] || m));
   }
   function cleanInvoiceNumber(num) {
     if (!num) return '----';
-    let s = String(num);
-    s = s.replace(/^[Nn]{3}\s*/, '');
-    return s;
+    return String(num).replace(/^[Nn]{3}\s*/, '');
   }
   function cleanPhone(phone) {
     if (!phone) return '';
-    let s = String(phone);
-    s = s.replace(/^[Tt]1?[lL]1?\s*/, '');
-    s = s.replace(/^T[eé]l\s*/, '');
-    return s;
+    return String(phone).replace(/^[Tt]1?[lL]1?\s*/, '').replace(/^T[eé]l\s*/, '');
   }
 
-  // ====== دوال الطابعات ======
-  function loadPrintersFromFirebase() {
-    onValue(printersRef, (snapshot) => {
-      const data = snapshot.val();
-      printersList = [];
-      if (data) {
-        printersList = Object.entries(data).map(([id, printer]) => ({ id, ...printer }));
-        printersList.sort((a, b) => (b.lastUsed || 0) - (a.lastUsed || 0));
-      }
-      renderPrinterList();
-      if (printersList.length > 0 && !selectedPrinterId) {
-        selectedPrinterId = printersList[0].id;
-      }
+  // ===== LOAD PRINTERS =====
+  function loadPrinters() {
+    onValue(printersRef, (snap) => {
+      const data = snap.val();
+      printersList = data ? Object.entries(data).map(([id, p]) => ({ id, ...p })) : [];
+      printersList.sort((a, b) => (b.lastUsed || 0) - (a.lastUsed || 0));
+      if (printersList.length && !selectedPrinterId) selectedPrinterId = printersList[0].id;
       if (selectedPrinterId && !printersList.find(p => p.id === selectedPrinterId)) {
-        selectedPrinterId = printersList.length > 0 ? printersList[0].id : null;
+        selectedPrinterId = printersList.length ? printersList[0].id : null;
       }
-      renderPrinterList();
+      renderPrinters();
     });
   }
-  
-  function renderPrinterList() {
+
+  function renderPrinters() {
     const container = document.getElementById('printerListContainer');
-    if (printersList.length === 0) {
-      container.innerHTML = `<div class="empty-printers">📭 Aucune imprimante enregistrée.</div>`;
+    if (!printersList.length) {
+      container.innerHTML = `<div class="empty-printers"><i class="fas fa-print"></i>Aucune imprimante</div>`;
       return;
     }
     let html = '';
-    printersList.forEach(printer => {
-      const isActive = (printer.id === selectedPrinterId);
-      const protocolLabel = printer.protocol || 'escpos';
-      const paperLabel = printer.paperWidth ? `${printer.paperWidth}mm` : '80mm';
-      const w = printer.widthScale !== undefined ? printer.widthScale : 2.0;
-      const h = printer.heightScale !== undefined ? printer.heightScale : 2.0;
-      const sizeLabel = `عرض ${w.toFixed(1)} × ارتفاع ${h.toFixed(1)}`;
-      
+    for (const p of printersList) {
+      const active = p.id === selectedPrinterId;
+      const w = p.widthScale ?? 2.0;
+      const h = p.heightScale ?? 2.0;
+      const sizeLabel = `${w.toFixed(1)}×${h.toFixed(1)}`;
       html += `
-        <div class="printer-chip ${isActive ? 'active' : ''}" data-id="${printer.id}" onclick="selectPrinter('${printer.id}')">
-          <i class="fas fa-print"></i>
-          <span>${escapeHtml(printer.name || 'Imprimante')}</span>
-          <span class="protocol-badge">${escapeHtml(protocolLabel)}</span>
-          <span class="paper-badge">${paperLabel}</span>
-          <span class="size-badge">${sizeLabel}</span>
-          <button class="edit-printer" onclick="event.stopPropagation(); openEditPrinter('${printer.id}')" title="Modifier la taille">
-            <i class="fas fa-cog"></i>
-          </button>
-          <button class="delete-printer" onclick="event.stopPropagation(); deletePrinter('${printer.id}')" title="Supprimer">
-            <i class="fas fa-times"></i>
-          </button>
+        <div class="printer-card ${active ? 'active' : ''}" onclick="selectPrinter('${p.id}')">
+          <div class="card-header">
+            <div class="card-name"><i class="fas fa-print"></i> ${escapeHtml(p.name || 'Imprimante')}</div>
+            <div class="card-actions">
+              ${active ? '<span class="badge-selected"><i class="fas fa-check-circle"></i> Actif</span>' : ''}
+              <button class="btn-icon btn-icon-edit" onclick="event.stopPropagation(); openEdit('${p.id}')" title="Modifier">
+                <i class="fas fa-sliders-h"></i>
+              </button>
+              <button class="btn-icon btn-icon-delete" onclick="event.stopPropagation(); deletePrinter('${p.id}')" title="Supprimer">
+                <i class="fas fa-trash-alt"></i>
+              </button>
+            </div>
+          </div>
+          <div class="card-badges">
+            <span class="badge badge-protocol"><i class="fas fa-code"></i> ${p.protocol || 'escpos'}</span>
+            <span class="badge badge-paper"><i class="fas fa-ruler"></i> ${p.paperWidth || 80}mm</span>
+            <span class="badge badge-size"><i class="fas fa-arrows-alt"></i> ${sizeLabel}</span>
+          </div>
         </div>
       `;
-    });
+    }
     container.innerHTML = html;
   }
-  
-  window.selectPrinter = function(printerId) {
-    selectedPrinterId = printerId;
-    const printer = printersList.find(p => p.id === printerId);
-    if (printer) {
-      update(ref(db, `users/${currentUser}/printers/${printerId}`), { lastUsed: Date.now() });
-    }
-    renderPrinterList();
-    showStatus(`✅ Imprimante sélectionnée : "${printer?.name || 'Imprimante'}"`, 'success');
+
+  window.selectPrinter = function(id) {
+    selectedPrinterId = id;
+    const p = printersList.find(x => x.id === id);
+    if (p) update(ref(db, `users/${currentUser}/printers/${id}`), { lastUsed: Date.now() });
+    renderPrinters();
+    showStatus(`✅ ${p?.name || 'Imprimante'} sélectionnée`, 'success');
   };
-  
-  window.deletePrinter = async function(printerId) {
-    if (!confirm('⚠️ Supprimer cette imprimante définitivement ?')) return;
+
+  window.deletePrinter = async function(id) {
+    if (!confirm('⚠️ Supprimer cette imprimante ?')) return;
     try {
-      await remove(ref(db, `users/${currentUser}/printers/${printerId}`));
-      showStatus('✅ Imprimante supprimée', 'success');
-      if (selectedPrinterId === printerId) {
-        selectedPrinterId = printersList.length > 1 ? printersList[0].id : null;
-      }
-    } catch (e) {
-      console.error(e);
-      showStatus('❌ Échec de la suppression', 'error');
-    }
+      await remove(ref(db, `users/${currentUser}/printers/${id}`));
+      showStatus('✅ Supprimée', 'success');
+      if (selectedPrinterId === id) selectedPrinterId = printersList.length > 1 ? printersList[0].id : null;
+    } catch { showStatus('❌ Échec', 'error'); }
   };
-  
-  window.openEditPrinter = function(printerId) {
-    editingPrinterId = printerId;
-    const printer = printersList.find(p => p.id === printerId);
-    if (!printer) {
-      showStatus('❌ Imprimante introuvable', 'error');
-      return;
-    }
-    const w = printer.widthScale !== undefined ? printer.widthScale : 2.0;
-    const h = printer.heightScale !== undefined ? printer.heightScale : 2.0;
+
+  window.openEdit = function(id) {
+    editingPrinterId = id;
+    const p = printersList.find(x => x.id === id);
+    if (!p) return;
+    const w = p.widthScale ?? 2.0;
+    const h = p.heightScale ?? 2.0;
     document.getElementById('widthSlider').value = w;
     document.getElementById('heightSlider').value = h;
     document.getElementById('widthValue').textContent = w.toFixed(1);
@@ -311,7 +596,7 @@
     document.getElementById('editPrinterModal').style.display = 'flex';
   };
 
-  // ربط الشرائح بتحديث القيم
+  // ===== SLIDERS LIVE =====
   document.getElementById('widthSlider').addEventListener('input', function() {
     document.getElementById('widthValue').textContent = parseFloat(this.value).toFixed(1);
   });
@@ -319,699 +604,359 @@
     document.getElementById('heightValue').textContent = parseFloat(this.value).toFixed(1);
   });
 
-  // ============================================================
-  // أوامر ESC/POS الأساسية (خام)
-  // ============================================================
-  const ESC = 0x1B;
-  const GS = 0x1D;
+  // ===== ESC/POS =====
+  const ESC = 0x1B, GS = 0x1D;
   function escposInit() { return new Uint8Array([ESC, 0x40]); }
-  function escposLine(text) {
-    const encoder = new TextEncoder();
-    return encoder.encode(text + '\n');
-  }
+  function escposLine(t) { return new TextEncoder().encode(t + '\n'); }
   function escposCut() { return new Uint8Array([GS, 0x56, 0x00]); }
-  function escposBoldOn() { return new Uint8Array([ESC, 0x45, 0x01]); }
   function escposBoldOff() { return new Uint8Array([ESC, 0x45, 0x00]); }
-  function escposAlign(align) { return new Uint8Array([ESC, 0x61, align]); }
+  function escposAlign(a) { return new Uint8Array([ESC, 0x61, a]); }
 
-  // ============================================================
-  // تحويل العرض والارتفاع إلى أمر GS ! n
-  // ============================================================
-  function buildFontSizeCommand(widthScale, heightScale) {
-    // تقريب القيم إلى أقرب عدد صحيح (1، 2، 3) لأن الأمر يدعم فقط أعداد صحيحة
-    let w = Math.round(widthScale);
-    let h = Math.round(heightScale);
-    // التأكد من أنها ضمن النطاق 1-3 (يمكن تمديدها إلى 8 لكننا نحافظ على البساطة)
-    w = Math.min(3, Math.max(1, w));
-    h = Math.min(3, Math.max(1, h));
-    // تحويل إلى بايت الأمر: (عرض-1)<<3 | (ارتفاع-1)
-    const n = ((w - 1) << 3) | (h - 1);
+  function buildFontSizeCmd(w, h) {
+    let w2 = Math.min(3, Math.max(1, Math.round(w)));
+    let h2 = Math.min(3, Math.max(1, Math.round(h)));
+    const n = ((w2 - 1) << 3) | (h2 - 1);
     return new Uint8Array([GS, 0x21, n]);
   }
 
-  // ============================================================
-  // بناء الفاتورة (مع حجم مخصص لكل طابعة)
-  // ============================================================
-  function buildInvoice(order, printer = null) {
+  // ===== BUILD INVOICE =====
+  function buildInvoice(order, printer) {
     const items = order.items || [];
-    const total = items.reduce((sum, it) => sum + (Number(it.price) * Number(it.quantity)), 0);
-    let invoiceNumber = order.invoiceNumber ? order.invoiceNumber.toString().padStart(4, '0') : '----';
-    invoiceNumber = cleanInvoiceNumber(invoiceNumber);
+    const total = items.reduce((s, it) => s + (Number(it.price) * Number(it.quantity)), 0);
+    let invNum = cleanInvoiceNumber(order.invoiceNumber || '----');
     const customer = order.customerName || 'Client';
-    let phone = order.phone || '';
-    phone = cleanPhone(phone);
-    let address = order.address || '';
-    if (address.includes('http')) address = address.split('http')[0].trim();
+    let phone = cleanPhone(order.phone || '');
+    let address = (order.address || '').split('http')[0].trim();
     const date = new Date(order.confirmedAt || Date.now()).toLocaleString('fr-FR');
-    
+
+    const w = (printer?.widthScale ?? 2.0);
+    const h = (printer?.heightScale ?? 2.0);
+    const fontCmd = buildFontSizeCmd(w, h);
+
     const chunks = [];
     chunks.push(escposInit());
-    
-    // تحديد حجم الخط من الطابعة
-    const widthScale = (printer && printer.widthScale !== undefined) ? printer.widthScale : 2.0;
-    const heightScale = (printer && printer.heightScale !== undefined) ? printer.heightScale : 2.0;
-    const fontSizeCmd = buildFontSizeCommand(widthScale, heightScale);
-    
-    // 1. اسم المتجر
-    chunks.push(escposAlign(0));
-    chunks.push(fontSizeCmd);
-    chunks.push(escposBoldOff());
-    chunks.push(escposLine(storeName));
-    chunks.push(escposLine(''));
-    
-    // 2. معلومات العميل
-    chunks.push(escposAlign(0));
-    chunks.push(fontSizeCmd);
-    chunks.push(escposBoldOff());
-    chunks.push(escposLine(`Facture : ${invoiceNumber}`));
-    chunks.push(escposLine(`Date : ${date}`));
-    chunks.push(escposLine(`Client : ${customer}`));
-    if (phone) chunks.push(escposLine(`Tel : ${phone}`));
-    if (address) chunks.push(escposLine(`Adresse : ${address}`));
-    chunks.push(escposLine(''));
-    
-    // 3. رأس الجدول
-    chunks.push(escposAlign(0));
-    chunks.push(fontSizeCmd);
-    chunks.push(escposBoldOff());
-    chunks.push(escposLine('Produit          Qte Prix Total'));
-    chunks.push(escposLine(''));
-    
-    // 4. صفوف المنتجات
-    if (items.length === 0) {
-      chunks.push(escposLine('(لا توجد منتجات)'));
-    } else {
-      items.forEach((item) => {
-        let name = item.name || 'Produit';
-        const qty = Number(item.quantity) || 0;
-        const price = Number(item.price) || 0;
+    const addLine = (txt) => chunks.push(escposLine(txt));
+    const addFont = () => chunks.push(fontCmd);
+
+    // Store name
+    chunks.push(escposAlign(0)); addFont(); chunks.push(escposBoldOff()); addLine(storeName); addLine('');
+    // Client info
+    chunks.push(escposAlign(0)); addFont(); chunks.push(escposBoldOff());
+    addLine(`Facture : ${invNum}`); addLine(`Date : ${date}`); addLine(`Client : ${customer}`);
+    if (phone) addLine(`Tel : ${phone}`);
+    if (address) addLine(`Adresse : ${address}`);
+    addLine('');
+    // Header
+    chunks.push(escposAlign(0)); addFont(); chunks.push(escposBoldOff());
+    addLine('Produit          Qte Prix Total'); addLine('');
+    // Items
+    if (items.length) {
+      items.forEach(it => {
+        const name = (it.name || 'Produit').substring(0, 14);
+        const qty = Number(it.quantity) || 0;
+        const price = Number(it.price) || 0;
         const totalItem = qty * price;
-        const priceStr = Number(price).toFixed(2).replace(/\.00$/, '');
-        const totalStr = Number(totalItem).toFixed(2).replace(/\.00$/, '');
-        const nameShort = name.substring(0, 14);
-        const line = nameShort.padEnd(14) + ' ' + String(qty).padStart(3) + ' ' + priceStr.padStart(6) + ' ' + totalStr.padStart(6);
-        chunks.push(escposLine(line));
+        const priceStr = price.toFixed(2).replace(/\.00$/, '');
+        const totalStr = totalItem.toFixed(2).replace(/\.00$/, '');
+        const line = name.padEnd(14) + ' ' + String(qty).padStart(3) + ' ' + priceStr.padStart(6) + ' ' + totalStr.padStart(6);
+        addLine(line);
       });
-    }
-    chunks.push(escposLine(''));
-    
-    // 5. الإجمالي
-    chunks.push(escposAlign(0));
-    chunks.push(fontSizeCmd);
-    chunks.push(escposBoldOff());
+    } else addLine('(aucun produit)');
+    addLine('');
+    // Total
+    chunks.push(escposAlign(0)); addFont(); chunks.push(escposBoldOff());
     const totalFormatted = total.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
-    chunks.push(escposLine(`Total : ${totalFormatted} DA`));
-    chunks.push(escposLine(''));
-    
-    // 6. رسالة الشكر
-    chunks.push(escposAlign(0));
-    chunks.push(fontSizeCmd);
-    chunks.push(escposBoldOff());
-    chunks.push(escposLine(`Tel : ${storePhoneNumber}`));
-    chunks.push(escposLine('Merci pour votre confiance'));
-    chunks.push(escposLine(''));
-    chunks.push(escposLine(''));
-    
+    addLine(`Total : ${totalFormatted} DA`); addLine('');
+    // Footer
+    chunks.push(escposAlign(0)); addFont(); chunks.push(escposBoldOff());
+    addLine(`Tel : ${storePhoneNumber}`); addLine('Merci pour votre confiance'); addLine(''); addLine('');
     chunks.push(escposCut());
-    
-    const totalLength = chunks.reduce((s, arr) => s + arr.length, 0);
-    const allData = new Uint8Array(totalLength);
+
+    const totalLen = chunks.reduce((s, arr) => s + arr.length, 0);
+    const all = new Uint8Array(totalLen);
     let offset = 0;
-    for (const chunk of chunks) {
-      allData.set(chunk, offset);
-      offset += chunk.length;
-    }
-    return allData;
+    for (const c of chunks) { all.set(c, offset); offset += c.length; }
+    return all;
   }
 
-  // ============================================================
-  // إرسال البيانات على دفعات
-  // ============================================================
-  async function sendChunked(characteristic, data, chunkSize = 150) {
-    const total = data.length;
+  // ===== SEND CHUNKED =====
+  async function sendChunked(char, data, chunkSize = 150) {
     let sent = 0;
-    while (sent < total) {
-      const end = Math.min(sent + chunkSize, total);
-      const chunk = data.slice(sent, end);
-      await characteristic.writeValue(chunk);
+    while (sent < data.length) {
+      const end = Math.min(sent + chunkSize, data.length);
+      await char.writeValue(data.slice(sent, end));
       sent = end;
       await new Promise(r => setTimeout(r, 30));
-      showStatus(`⏳ Envoi... ${Math.round((sent/total)*100)}%`, 'info');
     }
   }
 
-  // ============================================================
-  // كشف البروتوكول
-  // ============================================================
-  async function detectProtocol(characteristic) {
+  // ===== DETECT PROTOCOL =====
+  async function detectProtocol(char) {
     try {
-      await characteristic.writeValue(new Uint8Array([0x1B, 0x40, 0x1B, 0x64, 0x02, 0x1B, 0x4A, 0x0A]));
+      await char.writeValue(new Uint8Array([0x1B, 0x40, 0x1B, 0x64, 0x02, 0x1B, 0x4A, 0x0A]));
       await new Promise(r => setTimeout(r, 300));
-      await characteristic.writeValue(new Uint8Array([...escposInit(), ...escposLine('Test'), ...escposCut()]));
+      await char.writeValue(new Uint8Array([...escposInit(), ...escposLine('Test'), ...escposCut()]));
       return 'escpos';
-    } catch (e) { console.warn('ESC/POS test failed:', e); }
-    return 'raw';
+    } catch { return 'raw'; }
   }
 
-  // ============================================================
-  // الطباعة الذكية
-  // ============================================================
+  // ===== SMART PRINT =====
   async function smartPrint(order) {
-    if (!selectedPrinterId) {
-      showStatus('⚠️ Veuillez sélectionner une imprimante', 'warning');
-      return false;
-    }
-    const selectedPrinter = printersList.find(p => p.id === selectedPrinterId);
-    if (!selectedPrinter) {
-      showStatus('⚠️ Imprimante introuvable', 'error');
-      return false;
-    }
+    if (!selectedPrinterId) { showStatus('⚠️ Choisissez une imprimante', 'warning'); return false; }
+    const printer = printersList.find(p => p.id === selectedPrinterId);
+    if (!printer) { showStatus('⚠️ Imprimante introuvable', 'error'); return false; }
+
     try {
-      showStatus('⏳ Connexion à l\'imprimante...', 'info');
-      if (!navigator.bluetooth) throw new Error('Votre navigateur ne supporte pas Web Bluetooth');
-
+      if (!navigator.bluetooth) throw new Error('Web Bluetooth non supporté');
       let device = null;
-      const deviceId = selectedPrinter.deviceId;
-      const printerName = selectedPrinter.name || '';
-
-      if (deviceId) {
-        try {
-          device = await navigator.bluetooth.getDevice({ id: deviceId });
-          console.log('✅ تم استرجاع الجهاز باستخدام deviceId');
-        } catch (e) {
-          console.warn('⚠️ فشل استرجاع الجهاز باستخدام deviceId:', e);
-          device = null;
-        }
+      if (printer.deviceId) {
+        try { device = await navigator.bluetooth.getDevice({ id: printer.deviceId }); } catch {}
       }
-
       if (!device) {
-        showStatus('⏳ Recherche de l\'imprimante par nom...', 'info');
-        try {
-          device = await navigator.bluetooth.requestDevice({
-            filters: [{ name: printerName }],
-            optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb', '00001101-0000-1000-8000-00805f9b34fb']
-          });
-        } catch (e1) {
-          console.warn('Échec recherche par nom:', e1);
-          try {
-            const prefix = printerName.substring(0, 10);
-            device = await navigator.bluetooth.requestDevice({
-              filters: [{ namePrefix: prefix }],
-              optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb', '00001101-0000-1000-8000-00805f9b34fb']
-            });
-          } catch (e2) {
-            console.warn('Échec recherche par préfixe:', e2);
-            device = await navigator.bluetooth.requestDevice({
-              acceptAllDevices: true,
-              optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb', '00001101-0000-1000-8000-00805f9b34fb']
-            });
-          }
-        }
-        if (!device) throw new Error('Aucun appareil trouvé');
-        await update(ref(db, `users/${currentUser}/printers/${selectedPrinterId}`), {
-          deviceId: device.id
-        });
-        selectedPrinter.deviceId = device.id;
+        try { device = await navigator.bluetooth.requestDevice({ filters: [{ name: printer.name }], optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb', '00001101-0000-1000-8000-00805f9b34fb'] }); } catch {}
       }
+      if (!device) {
+        device = await navigator.bluetooth.requestDevice({ acceptAllDevices: true, optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb', '00001101-0000-1000-8000-00805f9b34fb'] });
+      }
+      if (!device) throw new Error('Aucun appareil');
 
-      if (!device) throw new Error('لم يتم العثور على الطابعة');
-
-      showStatus(`✅ Appareil trouvé : ${device.name || 'Inconnu'}`, 'success');
-      showStatus(`⏳ Connexion à ${device.name}...`, 'info');
+      await update(ref(db, `users/${currentUser}/printers/${selectedPrinterId}`), { deviceId: device.id });
       const server = await device.gatt.connect();
-      showStatus('✅ Connecté à l\'imprimante', 'success');
-
       let characteristic = null;
       const services = await server.getPrimaryServices();
-      for (const service of services) {
-        const characteristics = await service.getCharacteristics();
-        for (const char of characteristics) {
-          if (char.properties.write || char.properties.writeWithoutResponse) {
-            characteristic = char;
-            break;
-          }
+      for (const svc of services) {
+        const chars = await svc.getCharacteristics();
+        for (const c of chars) {
+          if (c.properties.write || c.properties.writeWithoutResponse) { characteristic = c; break; }
         }
         if (characteristic) break;
       }
-      if (!characteristic) throw new Error('Caractéristique d\'écriture introuvable');
+      if (!characteristic) throw new Error('Pas de caractéristique d\'écriture');
 
-      let protocol = selectedPrinter.protocol;
-      if (!protocol || protocol === 'unknown') {
-        showStatus('⏳ Détection du protocole...', 'info');
-        protocol = await detectProtocol(characteristic);
-        await update(ref(db, `users/${currentUser}/printers/${selectedPrinterId}`), {
-          protocol: protocol,
-          detectedAt: Date.now()
-        });
-        selectedPrinter.protocol = protocol;
-        renderPrinterList();
-        showStatus(`✅ Protocole détecté : ${protocol.toUpperCase()}`, 'success');
+      if (!printer.protocol || printer.protocol === 'unknown') {
+        const proto = await detectProtocol(characteristic);
+        await update(ref(db, `users/${currentUser}/printers/${selectedPrinterId}`), { protocol: proto, detectedAt: Date.now() });
+        printer.protocol = proto;
       }
 
-      // ====== بناء بيانات الطباعة ======
-      const printData = buildInvoice(order, selectedPrinter);
-
-      showStatus(`⏳ Envoi des données (${printData.length} octets)...`, 'info');
-      await sendChunked(characteristic, printData, 150);
+      const data = buildInvoice(order, printer);
+      await sendChunked(characteristic, data, 150);
       await update(ref(db, `users/${currentUser}/printers/${selectedPrinterId}`), { lastUsed: Date.now() });
       showStatus('✅ Impression réussie !', 'success');
       return true;
     } catch (e) {
-      console.error(e);
-      let errorMsg = e.message || 'Erreur inconnue';
-      if (errorMsg.includes('user cancelled')) errorMsg = 'Impression annulée';
-      showStatus(`❌ Échec : ${errorMsg}`, 'error');
+      let msg = e.message || 'Erreur';
+      if (msg.includes('user cancelled')) msg = 'Annulé';
+      showStatus(`❌ ${msg}`, 'error');
       return false;
     }
   }
 
-  // ============================================================
-  // إضافة طابعة
-  // ============================================================
-  document.getElementById('addPrinterBtn').addEventListener('click', () => {
-    document.getElementById('addPrinterModal').style.display = 'flex';
-  });
-  document.getElementById('cancelAddPrinter').addEventListener('click', () => {
-    document.getElementById('addPrinterModal').style.display = 'none';
-  });
-  document.getElementById('confirmAddPrinter').addEventListener('click', async () => {
-    const paperWidth = parseInt(document.getElementById('paperSizeSelect').value) || 80;
-    document.getElementById('addPrinterModal').style.display = 'none';
-    
-    try {
-      showStatus('⏳ Vérification du Bluetooth...', 'info');
-      if (!navigator.bluetooth) throw new Error('Web Bluetooth non supporté. Utilisez Chrome sur Android ou Edge.');
-
-      showStatus('⏳ Recherche d\'une imprimante...', 'info');
-      let device;
-      const serviceUUID1 = '000018f0-0000-1000-8000-00805f9b34fb';
-      const serviceUUID2 = '00001101-0000-1000-8000-00805f9b34fb';
-      
-      try {
-        device = await navigator.bluetooth.requestDevice({
-          acceptAllDevices: true,
-          optionalServices: [serviceUUID1, serviceUUID2]
-        });
-      } catch (e1) {
-        console.warn('acceptAllDevices فشل:', e1);
-        try {
-          device = await navigator.bluetooth.requestDevice({
-            filters: [{ services: [serviceUUID1] }, { services: [serviceUUID2] }],
-            optionalServices: [serviceUUID1, serviceUUID2]
-          });
-        } catch (e2) {
-          console.warn('البحث بالخدمات فشل:', e2);
-          try {
-            device = await navigator.bluetooth.requestDevice({
-              filters: [
-                { namePrefix: 'XP-' }, { namePrefix: 'printer' }, { namePrefix: 'thermal' },
-                { namePrefix: 'Xprinter' }, { namePrefix: 'BT' }, { namePrefix: 'Mi' },
-                { namePrefix: 'Xiaomi' }, { namePrefix: 'P801' }, { namePrefix: 'MTP' },
-                { namePrefix: 'GoojPRT' }, { namePrefix: 'RPP' }
-              ],
-              optionalServices: [serviceUUID1, serviceUUID2]
-            });
-          } catch (e3) {
-            console.warn('البحث بالأسماء فشل:', e3);
-            throw new Error('❌ لم يتم العثور على طابعة. تأكد من تفعيل البلوتوث ووضع الاقتران.');
-          }
-        }
-      }
-
-      if (!device) throw new Error('لم يتم العثور على طابعة.');
-      
-      showStatus(`✅ Appareil sélectionné : ${device.name || 'Inconnu'}`, 'success');
-      showStatus(`⏳ Connexion à ${device.name}...`, 'info');
-
-      let server;
-      try {
-        server = await device.gatt.connect();
-      } catch (e) {
-        throw new Error(`Impossible de se connecter à ${device.name}. Vérifiez qu'elle est allumée.`);
-      }
-
-      let characteristic = null;
-      const services = await server.getPrimaryServices();
-      for (const service of services) {
-        const chars = await service.getCharacteristics();
-        for (const c of chars) {
-          if (c.properties.write || c.properties.writeWithoutResponse) {
-            characteristic = c;
-            break;
-          }
-        }
-        if (characteristic) break;
-      }
-
-      if (!characteristic) {
-        throw new Error('Cet appareil ne semble pas être une imprimante (pas de caractéristique d\'écriture).');
-      }
-
-      showStatus('⏳ Détection du protocole...', 'info');
-      const protocol = await detectProtocol(characteristic);
-
-      const newPrinterRef = push(printersRef);
-      
-      // تحديد القيم الافتراضية: RPP300 تحصل على 2.0 × 2.0، والباقي 1.5 × 1.5 مثلاً
-      const deviceName = (device.name || '').toLowerCase();
-      let defaultWidth = 1.5;
-      let defaultHeight = 1.5;
-      if (deviceName.includes('rpp300')) {
-        defaultWidth = 2.0;
-        defaultHeight = 2.0;
-      }
-      
-      const printerData = {
-        name: device.name || 'Imprimante inconnue',
-        protocol: protocol,
-        paperWidth: paperWidth,
-        deviceId: device.id,
-        widthScale: defaultWidth,
-        heightScale: defaultHeight,
-        lastUsed: Date.now(),
-        createdAt: Date.now(),
-        detectedAt: Date.now()
-      };
-      await set(newPrinterRef, printerData);
-      selectedPrinterId = newPrinterRef.key;
-      renderPrinterList();
-      showStatus(`✅ Imprimante "${printerData.name}" ajoutée (${protocol.toUpperCase()}, ${paperWidth}mm, عرض ${defaultWidth} × ارتفاع ${defaultHeight})`, 'success');
-
-    } catch (e) {
-      console.error(e);
-      let errorMsg = e.message || 'Erreur inconnue';
-      if (errorMsg.includes('user cancelled')) {
-        errorMsg = '❌ Recherche annulée par l\'utilisateur.';
-      } else if (errorMsg.includes('No devices')) {
-        errorMsg = '❌ Aucune imprimante trouvée. Vérifiez le Bluetooth et le mode appairage.';
-      }
-      showStatus(errorMsg, 'error');
-      if (confirm('❌ Échec de la recherche. Voulez-vous réessayer avec des instructions supplémentaires ?')) {
-        document.getElementById('addPrinterModal').style.display = 'flex';
-        showStatus('💡 Assurez-vous que l\'imprimante est allumée et en mode appairage (voyant clignotant).', 'warning');
-      }
-    }
-  });
-
-  // ============================================================
-  // تعديل حجم الطابعة
-  // ============================================================
-  document.getElementById('cancelEditPrinter').addEventListener('click', () => {
-    document.getElementById('editPrinterModal').style.display = 'none';
-    editingPrinterId = null;
-  });
-  
-  document.getElementById('confirmEditPrinter').addEventListener('click', async () => {
-    if (!editingPrinterId) {
-      showStatus('❌ خطأ: لم يتم تحديد طابعة', 'error');
-      return;
-    }
-    const width = parseFloat(document.getElementById('widthSlider').value);
-    const height = parseFloat(document.getElementById('heightSlider').value);
-    try {
-      await update(ref(db, `users/${currentUser}/printers/${editingPrinterId}`), {
-        widthScale: width,
-        heightScale: height,
-        updatedAt: Date.now()
-      });
-      document.getElementById('editPrinterModal').style.display = 'none';
-      showStatus(`✅ تم تحديث الحجم إلى عرض ${width.toFixed(1)} × ارتفاع ${height.toFixed(1)}`, 'success');
-      editingPrinterId = null;
-    } catch (e) {
-      console.error(e);
-      showStatus('❌ فشل التحديث', 'error');
-    }
-  });
-
-  // ============================================================
-  // حذف الكل
-  // ============================================================
-  document.getElementById('clearAllPrintersBtn').addEventListener('click', async () => {
-    if (!confirm('⚠️ Supprimer toutes les imprimantes enregistrées définitivement ?')) return;
-    try {
-      await remove(printersRef);
-      selectedPrinterId = null;
-      showStatus('✅ Toutes les imprimantes ont été supprimées', 'success');
-    } catch (e) {
-      showStatus('❌ Échec de la suppression', 'error');
-    }
-  });
-
-  // ============================================================
-  // عرض قائمة الفواتير
-  // ============================================================
-  function renderInvoicesList(confirmedData) {
+  // ===== INVOICE LIST =====
+  function renderInvoices(snap) {
     const container = document.getElementById('app');
-    const confirmed = confirmedData || {};
-    const entries = Object.entries(confirmed);
-    if (entries.length === 0) {
-      container.innerHTML = `<div class="no-data"><i class="fas fa-file-invoice"></i> Aucune facture confirmée</div>`;
+    const data = snap.val() || {};
+    const entries = Object.entries(data);
+    if (!entries.length) {
+      container.innerHTML = `<div class="no-data"><i class="fas fa-file-invoice"></i>Aucune facture</div>`;
       return;
     }
     const sorted = entries.reverse().slice(0, 50);
     let html = `<div class="invoice-list">`;
-    sorted.forEach(([key, order]) => {
+    for (const [key, order] of sorted) {
       const date = order.confirmedAt ? new Date(order.confirmedAt).toLocaleString('fr-FR') : '---';
       const total = order.totalPrice || 0;
       html += `
         <div class="invoice-card">
           <div class="info">
-            <div><strong>#${order.invoiceNumber || '---'}</strong></div>
-            <div><i class="fas fa-user"></i> ${escapeHtml(order.customerName || 'Client')}</div>
-            <div><i class="fas fa-phone"></i> ${escapeHtml(order.phone || '')}</div>
-            <div><i class="fas fa-calendar"></i> ${date}</div>
+            <strong>#${order.invoiceNumber || '---'}</strong>
+            <span><i class="fas fa-user"></i> ${escapeHtml(order.customerName || 'Client')}</span>
+            <span><i class="fas fa-phone"></i> ${escapeHtml(order.phone || '')}</span>
+            <span><i class="fas fa-calendar-alt"></i> ${date}</span>
           </div>
           <div class="total">${total.toLocaleString()} DA</div>
-          <div style="display:flex; gap:8px; flex-wrap:wrap;">
-            <button class="btn btn-print" onclick="printInvoice('${key}')"><i class="fas fa-print"></i> Imprimer</button>
-            <button class="btn btn-print" style="background:#6b7280;" onclick="previewInvoice('${key}')"><i class="fas fa-eye"></i> Aperçu</button>
+          <div class="actions">
+            <button class="btn btn-print btn-sm" onclick="printInvoice('${key}')"><i class="fas fa-print"></i> Imprimer</button>
+            <button class="btn btn-sm" style="background:#6b7280;color:white;" onclick="previewInvoice('${key}')"><i class="fas fa-eye"></i> Aperçu</button>
           </div>
         </div>
       `;
-    });
+    }
     html += `</div>`;
     container.innerHTML = html;
   }
 
-  // ============================================================
-  // دوال الطباعة والمعاينة
-  // ============================================================
   window.printInvoice = async (key) => {
     try {
-      const snapshot = await get(ref(db, `confirmedOrders/${key}`));
-      if (!snapshot.exists()) { showStatus('❌ Facture introuvable', 'error'); return; }
-      await smartPrint(snapshot.val());
-    } catch (e) {
-      showStatus('❌ Erreur : ' + e.message, 'error');
-    }
+      const snap = await get(ref(db, `confirmedOrders/${key}`));
+      if (!snap.exists()) { showStatus('❌ Introuvable', 'error'); return; }
+      await smartPrint(snap.val());
+    } catch { showStatus('❌ Erreur', 'error'); }
   };
 
-  // ====== معاينة الفاتورة ======
   window.previewInvoice = async (key) => {
     try {
-      const snapshot = await get(ref(db, `confirmedOrders/${key}`));
-      if (!snapshot.exists()) { alert('Facture introuvable'); return; }
-      const order = snapshot.val();
-
+      const snap = await get(ref(db, `confirmedOrders/${key}`));
+      if (!snap.exists()) { alert('Introuvable'); return; }
+      const order = snap.val();
       let itemsHTML = '';
       let total = 0;
-      if (order.items && order.items.length > 0) {
-        order.items.forEach((item, index) => {
-          const qty = Number(item.quantity) || 0;
-          const price = Number(item.price) || 0;
+      if (order.items?.length) {
+        order.items.forEach((it, idx) => {
+          const qty = Number(it.quantity) || 0;
+          const price = Number(it.price) || 0;
           const lineTotal = qty * price;
           total += lineTotal;
           itemsHTML += `
             <div class="item">
-              <div class="name">${index+1}. ${escapeHtml(item.name)}</div>
+              <div class="name">${idx+1}. ${escapeHtml(it.name)}</div>
               <div class="price">${price.toFixed(2).replace('.', ',')}</div>
-              <div class="values">
-                <div></div>
-                <div class="qty">${qty}</div>
-                <div class="total">${lineTotal.toFixed(2).replace('.', ',')}</div>
-              </div>
+              <div class="values"><div></div><div class="qty">${qty}</div><div class="total">${lineTotal.toFixed(2).replace('.', ',')}</div></div>
             </div>
           `;
         });
-      } else {
-        itemsHTML = '<p style="text-align:center;">لا توجد منتجات</p>';
-      }
-
-      const totalFormatted = total.toFixed(2).replace('.', ',');
-      const store = storeName || 'aksel & anais';
-      const phoneStore = storePhoneNumber || '0781-554-885';
+      } else itemsHTML = '<p style="text-align:center;">لا توجد منتجات</p>';
+      const totalF = total.toFixed(2).replace('.', ',');
+      const store = storeName;
+      const phone = storePhoneNumber;
       const date = new Date(order.confirmedAt || Date.now()).toLocaleString('fr-FR');
       const customer = escapeHtml(order.customerName || 'Client');
-      const invoiceNum = cleanInvoiceNumber(order.invoiceNumber || '----');
+      const invNum = cleanInvoiceNumber(order.invoiceNumber || '----');
 
       const win = window.open('', '_blank', 'width=400,height=700,scrollbars=yes');
       win.document.write(`
         <!DOCTYPE html>
         <html lang="fr">
-        <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>Facture #${invoiceNum}</title>
-          <style>
-            * { margin: 0; padding: 0; box-sizing: border-box; }
-            body { background: #ddd; font-family: Arial, Helvetica, sans-serif; }
-            .receipt {
-              width: 80mm;
-              background: #fff;
-              margin: 20px auto;
-              padding: 8px;
-              color: #000;
-            }
-            .center { text-align: center; }
-            .left { text-align: left; }
-            .right { text-align: right; }
-            .bold { font-weight: bold; }
-            .big { font-size: 30px; }
-            .small { font-size: 12px; }
-            .line {
-              border-top: 2px dotted #000;
-              margin: 8px 0;
-            }
-            .info {
-              line-height: 1.6;
-              font-size: 15px;
-            }
-            .headerRow {
-              display: grid;
-              grid-template-columns: 1fr 50px 80px;
-              font-weight: bold;
-              margin-top: 5px;
-              margin-bottom: 5px;
-            }
-            .item {
-              margin-top: 8px;
-            }
-            .name {
-              font-size: 16px;
-              font-weight: bold;
-            }
-            .price {
-              font-size: 15px;
-              margin-left: 18px;
-              margin-top: 2px;
-            }
-            .values {
-              display: grid;
-              grid-template-columns: 1fr 50px 80px;
-              align-items: center;
-              margin-top: -18px;
-            }
-            .qty { text-align: center; }
-            .total { text-align: right; }
-            .summary {
-              margin-top: 12px;
-            }
-            .summaryRow {
-              display: flex;
-              justify-content: space-between;
-              margin: 8px 0;
-              font-size: 18px;
-            }
-            .totalRow {
-              display: flex;
-              justify-content: space-between;
-              font-size: 20px;
-              font-weight: bold;
-              margin: 10px 0;
-            }
-            .footer {
-              text-align: center;
-              margin-top: 15px;
-              font-size: 18px;
-            }
-            .btn-group {
-              text-align: center;
-              margin-top: 15px;
-            }
-            .btn-group button {
-              margin: 5px;
-              padding: 8px 18px;
-              border: none;
-              border-radius: 30px;
-              font-weight: 600;
-              cursor: pointer;
-              font-size: 14px;
-            }
-            .btn-print { background: #1e293b; color: white; }
-            .btn-close { background: #e2e8f0; color: #1e293b; }
-            @media print {
-              body { background: white; }
-              .receipt { margin: 0; width: 80mm; box-shadow: none; }
-              .btn-group { display: none; }
-            }
-          </style>
+        <head><meta charset="UTF-8"><title>Facture #${invNum}</title>
+        <style>
+          *{margin:0;padding:0;box-sizing:border-box}
+          body{background:#ddd;font-family:Arial,sans-serif}
+          .receipt{width:80mm;background:#fff;margin:20px auto;padding:8px;color:#000}
+          .center{text-align:center}
+          .line{border-top:2px dotted #000;margin:8px 0}
+          .info{line-height:1.6;font-size:15px}
+          .headerRow{display:grid;grid-template-columns:1fr 50px 80px;font-weight:bold;margin:5px 0}
+          .item{margin-top:8px}
+          .name{font-size:16px;font-weight:bold}
+          .price{font-size:15px;margin-left:18px;margin-top:2px}
+          .values{display:grid;grid-template-columns:1fr 50px 80px;align-items:center;margin-top:-18px}
+          .qty{text-align:center}
+          .total{text-align:right}
+          .summary{margin-top:12px}
+          .summaryRow{display:flex;justify-content:space-between;margin:8px 0;font-size:18px}
+          .totalRow{display:flex;justify-content:space-between;font-size:20px;font-weight:bold;margin:10px 0}
+          .footer{text-align:center;margin-top:15px;font-size:18px}
+          .btn-group{text-align:center;margin-top:15px}
+          .btn-group button{margin:5px;padding:8px 18px;border:none;border-radius:30px;font-weight:600;cursor:pointer;font-size:14px}
+          .btn-print{background:#1e293b;color:white}
+          .btn-close{background:#e2e8f0;color:#1e293b}
+          @media print{body{background:white}.receipt{margin:0;width:80mm;box-shadow:none}.btn-group{display:none}}
+        </style>
         </head>
         <body>
           <div class="receipt">
-            <div class="center">
-              <h2>${store}</h2>
-              <div class="small">${escapeHtml(order.address || '')}<br>Télé : ${phoneStore}</div>
-            </div>
+            <div class="center"><h2>${store}</h2><div class="small">${escapeHtml(order.address||'')}<br>Tél : ${phone}</div></div>
             <div class="line"></div>
-            <div class="info">
-              <div>Reçu : ${invoiceNum}</div>
-              <div>La caissière : ${customer}</div>
-              <div>Date : ${date}</div>
-            </div>
+            <div class="info"><div>Reçu : ${invNum}</div><div>Client : ${customer}</div><div>Date : ${date}</div></div>
             <div class="line"></div>
-            <div class="headerRow">
-              <div>Prix de l'article</div>
-              <div style="text-align:center;">Qty</div>
-              <div style="text-align:right;">Total (DZD)</div>
-            </div>
+            <div class="headerRow"><div>Article</div><div style="text-align:center;">Qté</div><div style="text-align:right;">Total</div></div>
             <div class="line"></div>
-            <div id="items">${itemsHTML}</div>
+            ${itemsHTML}
             <div class="line"></div>
             <div class="summary">
-              <div class="summaryRow"><span>Sous total</span><span>${totalFormatted}</span></div>
+              <div class="summaryRow"><span>Sous-total</span><span>${totalF}</span></div>
               <div class="line"></div>
-              <div class="totalRow"><span>Total</span><span>${totalFormatted}</span></div>
+              <div class="totalRow"><span>Total</span><span>${totalF}</span></div>
               <div class="line"></div>
-              <div class="summaryRow"><span>Cash</span><span>${totalFormatted}</span></div>
+              <div class="summaryRow"><span>Espèces</span><span>${totalF}</span></div>
             </div>
             <div class="line"></div>
-            <div class="footer">Télé : ${phoneStore}</div>
+            <div class="footer">Tél : ${phone}</div>
           </div>
           <div class="btn-group">
-            <button class="btn-print" onclick="window.print()">🖨️ طباعة</button>
-            <button class="btn-close" onclick="window.close()">✖️ إغلاق</button>
+            <button class="btn-print" onclick="window.print()">🖨️ Imprimer</button>
+            <button class="btn-close" onclick="window.close()">✖️ Fermer</button>
           </div>
         </body>
         </html>
       `);
       win.document.close();
       setTimeout(() => win.focus(), 300);
-    } catch (e) {
-      alert('خطأ في المعاينة: ' + e.message);
-    }
+    } catch { alert('Erreur preview'); }
   };
 
-  // ============================================================
-  // تحميل إعدادات المتجر
-  // ============================================================
-  function loadStoreSettings() {
-    const storeRef = ref(db, 'store');
-    onValue(storeRef, (snapshot) => {
-      const data = snapshot.val();
-      if (data) {
-        if (data.phone) storePhoneNumber = data.phone;
-        if (data.storeName) storeName = data.storeName;
+  // ===== MODALS =====
+  document.getElementById('addPrinterBtn').onclick = () => document.getElementById('addPrinterModal').style.display = 'flex';
+  document.getElementById('cancelAddPrinter').onclick = () => document.getElementById('addPrinterModal').style.display = 'none';
+  document.getElementById('cancelEditPrinter').onclick = () => { document.getElementById('editPrinterModal').style.display = 'none'; editingPrinterId = null; };
+
+  document.getElementById('confirmAddPrinter').addEventListener('click', async () => {
+    const paper = parseInt(document.getElementById('paperSizeSelect').value) || 80;
+    document.getElementById('addPrinterModal').style.display = 'none';
+    try {
+      if (!navigator.bluetooth) throw new Error('Bluetooth non supporté');
+      const device = await navigator.bluetooth.requestDevice({
+        acceptAllDevices: true,
+        optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb', '00001101-0000-1000-8000-00805f9b34fb']
+      });
+      const server = await device.gatt.connect();
+      let char = null;
+      for (const svc of await server.getPrimaryServices()) {
+        for (const c of await svc.getCharacteristics()) {
+          if (c.properties.write || c.properties.writeWithoutResponse) { char = c; break; }
+        }
+        if (char) break;
       }
+      if (!char) throw new Error('Pas de caractéristique');
+      const protocol = await detectProtocol(char);
+      const refNew = push(printersRef);
+      const name = device.name || 'Imprimante';
+      const isRPP = name.toLowerCase().includes('rpp300');
+      await set(refNew, {
+        name, protocol, paperWidth: paper, deviceId: device.id,
+        widthScale: isRPP ? 2.0 : 1.5,
+        heightScale: isRPP ? 2.0 : 1.5,
+        lastUsed: Date.now(), createdAt: Date.now(), detectedAt: Date.now()
+      });
+      selectedPrinterId = refNew.key;
+      showStatus(`✅ ${name} ajoutée`, 'success');
+    } catch (e) {
+      let msg = e.message || 'Erreur';
+      if (msg.includes('cancelled')) msg = 'Annulé';
+      showStatus(`❌ ${msg}`, 'error');
+    }
+  });
+
+  document.getElementById('confirmEditPrinter').addEventListener('click', async () => {
+    if (!editingPrinterId) return;
+    const w = parseFloat(document.getElementById('widthSlider').value);
+    const h = parseFloat(document.getElementById('heightSlider').value);
+    try {
+      await update(ref(db, `users/${currentUser}/printers/${editingPrinterId}`), { widthScale: w, heightScale: h, updatedAt: Date.now() });
+      document.getElementById('editPrinterModal').style.display = 'none';
+      showStatus(`✅ Largeur ${w.toFixed(1)} × Hauteur ${h.toFixed(1)}`, 'success');
+      editingPrinterId = null;
+    } catch { showStatus('❌ Erreur', 'error'); }
+  });
+
+  document.getElementById('clearAllPrintersBtn').addEventListener('click', async () => {
+    if (!confirm('⚠️ Supprimer toutes les imprimantes ?')) return;
+    try { await remove(printersRef); selectedPrinterId = null; showStatus('✅ Tout supprimé', 'success'); } catch { showStatus('❌ Erreur', 'error'); }
+  });
+
+  // ===== STORE SETTINGS =====
+  function loadStore() {
+    onValue(ref(db, 'store'), (snap) => {
+      const d = snap.val();
+      if (d) { if (d.phone) storePhoneNumber = d.phone; if (d.storeName) storeName = d.storeName; }
     });
   }
 
-  // ============================================================
-  // بدء التشغيل
-  // ============================================================
-  loadStoreSettings();
-  loadPrintersFromFirebase();
-  onValue(ref(db, 'confirmedOrders'), (snap) => renderInvoicesList(snap.val()));
-  console.log('✅ Impression des factures - Version avec contrôle précis du width/height');
+  // ===== INIT =====
+  loadStore();
+  loadPrinters();
+  onValue(ref(db, 'confirmedOrders'), (snap) => renderInvoices(snap));
+  console.log('✅ App prête');
 </script>
 </body>
 </html>
