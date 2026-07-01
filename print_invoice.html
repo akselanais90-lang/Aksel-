@@ -35,16 +35,20 @@
     .btn-warning:hover { background: #d97706; }
     .btn-outline { background: transparent; border: 2px solid #e2e8f0; color: #1e293b; }
     .btn-outline:hover { background: #f1f5f9; }
+    .btn-sm { padding: 4px 10px; font-size: 11px; }
     .printer-panel { background: white; border-radius: 20px; padding: 16px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
     .printer-panel .section-title { font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; font-size: 15px; color: #0f172a; }
     .printer-list { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
-    .printer-chip { background: #f1f5f9; padding: 6px 16px; border-radius: 30px; font-size: 13px; display: flex; align-items: center; gap: 8px; cursor: pointer; border: 2px solid transparent; transition: 0.2s; }
+    .printer-chip { background: #f1f5f9; padding: 6px 16px; border-radius: 30px; font-size: 13px; display: flex; align-items: center; gap: 8px; cursor: pointer; border: 2px solid transparent; transition: 0.2s; flex-wrap: wrap; }
     .printer-chip:hover { background: #e2e8f0; }
     .printer-chip.active { border-color: #10b981; background: #d1fae5; font-weight: 700; }
     .printer-chip .delete-printer { background: none; border: none; color: #ef4444; cursor: pointer; font-size: 14px; padding: 0 4px; }
     .printer-chip .delete-printer:hover { color: #b91c1c; }
+    .printer-chip .edit-printer { background: none; border: none; color: #2563eb; cursor: pointer; font-size: 14px; padding: 0 4px; }
+    .printer-chip .edit-printer:hover { color: #1d4ed8; }
     .printer-chip .protocol-badge { font-size: 9px; background: #64748b; color: white; padding: 0 6px; border-radius: 20px; text-transform: uppercase; }
     .printer-chip .paper-badge { font-size: 9px; background: #10b981; color: white; padding: 0 6px; border-radius: 20px; }
+    .printer-chip .size-badge { font-size: 9px; background: #8b5cf6; color: white; padding: 0 6px; border-radius: 20px; }
     .empty-printers { color: #94a3b8; font-size: 13px; padding: 4px 0; }
     .printer-actions { display: flex; gap: 10px; flex-wrap: wrap; border-top: 1px solid #e2e8f0; padding-top: 12px; margin-top: 4px; }
     #statusMessage { padding: 10px 16px; border-radius: 12px; margin-bottom: 16px; display: none; font-weight: 600; }
@@ -67,6 +71,10 @@
     .modal-content .btn-group { display: flex; gap: 10px; }
     .modal-content .btn-group button { flex: 1; }
     .modal-content .hint { font-size: 12px; color: #6b7280; margin-top: -8px; margin-bottom: 12px; }
+    .slider-group { margin: 16px 0; }
+    .slider-group label { display: flex; justify-content: space-between; align-items: center; }
+    .slider-group input[type="range"] { width: 100%; margin: 8px 0; }
+    .slider-value { font-size: 20px; font-weight: bold; color: #2563eb; min-width: 50px; text-align: center; }
     @media (max-width: 640px) { .invoice-card { flex-direction: column; align-items: stretch; } .invoice-card .info { gap: 8px; font-size: 13px; } .printer-chip { font-size: 12px; padding: 4px 12px; } }
   </style>
 </head>
@@ -90,6 +98,8 @@
 </div>
 <div id="statusMessage"></div>
 <div id="app"></div>
+
+<!-- Modal d'ajout -->
 <div id="addPrinterModal" class="modal">
   <div class="modal-content">
     <h3><i class="fas fa-bluetooth"></i> Ajouter une imprimante</h3>
@@ -105,6 +115,44 @@
     </div>
   </div>
 </div>
+
+<!-- Modal d'édition -->
+<div id="editPrinterModal" class="modal">
+  <div class="modal-content">
+    <h3><i class="fas fa-edit"></i> ضبط حجم الخط</h3>
+    
+    <div class="slider-group">
+      <label>
+        <span><i class="fas fa-arrows-alt-h"></i> العرض</span>
+        <span class="slider-value" id="widthValue">2.0</span>
+      </label>
+      <input type="range" id="widthSlider" min="1.0" max="3.0" step="0.1" value="2.0">
+      <div style="display:flex; justify-content:space-between; font-size:12px; color:#94a3b8;">
+        <span>1.0</span>
+        <span>3.0</span>
+      </div>
+    </div>
+
+    <div class="slider-group">
+      <label>
+        <span><i class="fas fa-arrows-alt-v"></i> الارتفاع</span>
+        <span class="slider-value" id="heightValue">2.0</span>
+      </label>
+      <input type="range" id="heightSlider" min="1.0" max="3.0" step="0.1" value="2.0">
+      <div style="display:flex; justify-content:space-between; font-size:12px; color:#94a3b8;">
+        <span>1.0</span>
+        <span>3.0</span>
+      </div>
+    </div>
+
+    <p class="hint">💡 اضبط العرض والارتفاع كما تريد. القيم من 1.0 إلى 3.0 بخطوة 0.1.</p>
+    <div class="btn-group">
+      <button class="btn btn-success" id="confirmEditPrinter"><i class="fas fa-save"></i> حفظ</button>
+      <button class="btn btn-outline" id="cancelEditPrinter"><i class="fas fa-times"></i> إلغاء</button>
+    </div>
+  </div>
+</div>
+
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
   import { getDatabase, ref, onValue, set, remove, push, get, update } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
@@ -133,6 +181,7 @@
   const printersRef = ref(db, `users/${currentUser}/printers`);
   let printersList = [];
   let selectedPrinterId = null;
+  let editingPrinterId = null;
   
   let storePhoneNumber = "0781-554-885";
   let storeName = "aksel & anais";
@@ -187,6 +236,7 @@
       renderPrinterList();
     });
   }
+  
   function renderPrinterList() {
     const container = document.getElementById('printerListContainer');
     if (printersList.length === 0) {
@@ -198,12 +248,20 @@
       const isActive = (printer.id === selectedPrinterId);
       const protocolLabel = printer.protocol || 'escpos';
       const paperLabel = printer.paperWidth ? `${printer.paperWidth}mm` : '80mm';
+      const w = printer.widthScale !== undefined ? printer.widthScale : 2.0;
+      const h = printer.heightScale !== undefined ? printer.heightScale : 2.0;
+      const sizeLabel = `عرض ${w.toFixed(1)} × ارتفاع ${h.toFixed(1)}`;
+      
       html += `
         <div class="printer-chip ${isActive ? 'active' : ''}" data-id="${printer.id}" onclick="selectPrinter('${printer.id}')">
           <i class="fas fa-print"></i>
           <span>${escapeHtml(printer.name || 'Imprimante')}</span>
           <span class="protocol-badge">${escapeHtml(protocolLabel)}</span>
           <span class="paper-badge">${paperLabel}</span>
+          <span class="size-badge">${sizeLabel}</span>
+          <button class="edit-printer" onclick="event.stopPropagation(); openEditPrinter('${printer.id}')" title="Modifier la taille">
+            <i class="fas fa-cog"></i>
+          </button>
           <button class="delete-printer" onclick="event.stopPropagation(); deletePrinter('${printer.id}')" title="Supprimer">
             <i class="fas fa-times"></i>
           </button>
@@ -212,6 +270,7 @@
     });
     container.innerHTML = html;
   }
+  
   window.selectPrinter = function(printerId) {
     selectedPrinterId = printerId;
     const printer = printersList.find(p => p.id === printerId);
@@ -221,6 +280,7 @@
     renderPrinterList();
     showStatus(`✅ Imprimante sélectionnée : "${printer?.name || 'Imprimante'}"`, 'success');
   };
+  
   window.deletePrinter = async function(printerId) {
     if (!confirm('⚠️ Supprimer cette imprimante définitivement ?')) return;
     try {
@@ -234,6 +294,30 @@
       showStatus('❌ Échec de la suppression', 'error');
     }
   };
+  
+  window.openEditPrinter = function(printerId) {
+    editingPrinterId = printerId;
+    const printer = printersList.find(p => p.id === printerId);
+    if (!printer) {
+      showStatus('❌ Imprimante introuvable', 'error');
+      return;
+    }
+    const w = printer.widthScale !== undefined ? printer.widthScale : 2.0;
+    const h = printer.heightScale !== undefined ? printer.heightScale : 2.0;
+    document.getElementById('widthSlider').value = w;
+    document.getElementById('heightSlider').value = h;
+    document.getElementById('widthValue').textContent = w.toFixed(1);
+    document.getElementById('heightValue').textContent = h.toFixed(1);
+    document.getElementById('editPrinterModal').style.display = 'flex';
+  };
+
+  // ربط الشرائح بتحديث القيم
+  document.getElementById('widthSlider').addEventListener('input', function() {
+    document.getElementById('widthValue').textContent = parseFloat(this.value).toFixed(1);
+  });
+  document.getElementById('heightSlider').addEventListener('input', function() {
+    document.getElementById('heightValue').textContent = parseFloat(this.value).toFixed(1);
+  });
 
   // ============================================================
   // أوامر ESC/POS الأساسية (خام)
@@ -248,111 +332,117 @@
   function escposCut() { return new Uint8Array([GS, 0x56, 0x00]); }
   function escposBoldOn() { return new Uint8Array([ESC, 0x45, 0x01]); }
   function escposBoldOff() { return new Uint8Array([ESC, 0x45, 0x00]); }
-  function escposAlign(align) { return new Uint8Array([ESC, 0x61, align]); } // 0=left, 1=center, 2=right
+  function escposAlign(align) { return new Uint8Array([ESC, 0x61, align]); }
 
   // ============================================================
-  // بناء الفاتورة النهائي (بدون مكتبة)
+  // تحويل العرض والارتفاع إلى أمر GS ! n
   // ============================================================
- function buildInvoice(order) {
-  const items = order.items || [];
-  const total = items.reduce((sum, it) => sum + (Number(it.price) * Number(it.quantity)), 0);
-  let invoiceNumber = order.invoiceNumber ? order.invoiceNumber.toString().padStart(4, '0') : '----';
-  invoiceNumber = cleanInvoiceNumber(invoiceNumber);
-  const customer = order.customerName || 'Client';
-  let phone = order.phone || '';
-  phone = cleanPhone(phone);
-  let address = order.address || '';
-  if (address.includes('http')) address = address.split('http')[0].trim();
-  const date = new Date(order.confirmedAt || Date.now()).toLocaleString('fr-FR');
-  
-  const chunks = [];
-  chunks.push(escposInit());
-  
-  const SIZE_2X = new Uint8Array([0x1D, 0x21, 0x11]);
-  
-  // 1. اسم المتجر
-  chunks.push(escposAlign(0));
-  chunks.push(SIZE_2X);
-  chunks.push(escposBoldOff());
-  chunks.push(escposLine(storeName));
-  chunks.push(escposLine(''));
-  
-  // 2. معلومات العميل
-  chunks.push(escposAlign(0));
-  chunks.push(SIZE_2X);
-  chunks.push(escposBoldOff());
-  chunks.push(escposLine(`Facture : ${invoiceNumber}`));
-  chunks.push(escposLine(`Date : ${date}`));
-  chunks.push(escposLine(`Client : ${customer}`));
-  if (phone) chunks.push(escposLine(`Tel : ${phone}`));
-  if (address) chunks.push(escposLine(`Adresse : ${address}`));
-  chunks.push(escposLine(''));
-  
-  // 3. رأس الجدول
-  chunks.push(escposAlign(0));
-  chunks.push(SIZE_2X);
-  chunks.push(escposBoldOff());
-  chunks.push(escposLine('Produit          Qte Prix Total'));
-  chunks.push(escposLine(''));
-  
-  // 4. صفوف المنتجات (بسيطة بدون تقسيم)
-  if (items.length === 0) {
-    chunks.push(escposAlign(0));
-    chunks.push(escposLine('(لا توجد منتجات)'));
-  } else {
-    chunks.push(escposAlign(0));
-    chunks.push(SIZE_2X);
-    chunks.push(escposBoldOff());
+  function buildFontSizeCommand(widthScale, heightScale) {
+    // تقريب القيم إلى أقرب عدد صحيح (1، 2، 3) لأن الأمر يدعم فقط أعداد صحيحة
+    let w = Math.round(widthScale);
+    let h = Math.round(heightScale);
+    // التأكد من أنها ضمن النطاق 1-3 (يمكن تمديدها إلى 8 لكننا نحافظ على البساطة)
+    w = Math.min(3, Math.max(1, w));
+    h = Math.min(3, Math.max(1, h));
+    // تحويل إلى بايت الأمر: (عرض-1)<<3 | (ارتفاع-1)
+    const n = ((w - 1) << 3) | (h - 1);
+    return new Uint8Array([GS, 0x21, n]);
+  }
+
+  // ============================================================
+  // بناء الفاتورة (مع حجم مخصص لكل طابعة)
+  // ============================================================
+  function buildInvoice(order, printer = null) {
+    const items = order.items || [];
+    const total = items.reduce((sum, it) => sum + (Number(it.price) * Number(it.quantity)), 0);
+    let invoiceNumber = order.invoiceNumber ? order.invoiceNumber.toString().padStart(4, '0') : '----';
+    invoiceNumber = cleanInvoiceNumber(invoiceNumber);
+    const customer = order.customerName || 'Client';
+    let phone = order.phone || '';
+    phone = cleanPhone(phone);
+    let address = order.address || '';
+    if (address.includes('http')) address = address.split('http')[0].trim();
+    const date = new Date(order.confirmedAt || Date.now()).toLocaleString('fr-FR');
     
-    items.forEach((item) => {
-      let name = item.name || 'Produit';
-      const qty = Number(item.quantity) || 0;
-      const price = Number(item.price) || 0;
-      const totalItem = qty * price;
-      
-      // إزالة .00 من الأسعار الفردية
-      const priceStr = Number(price).toFixed(2).replace(/\.00$/, '');
-      const totalStr = Number(totalItem).toFixed(2).replace(/\.00$/, '');
-      
-      // قص الاسم إلى 14 حرفاً
-      const nameShort = name.substring(0, 14);
-      // بناء السطر يدوياً بدون padStart و padEnd لتفادي الرموز الغريبة
-      const line = nameShort.padEnd(14) + ' ' + String(qty).padStart(3) + ' ' + priceStr.padStart(6) + ' ' + totalStr.padStart(6);
-      chunks.push(escposLine(line));
-    });
+    const chunks = [];
+    chunks.push(escposInit());
+    
+    // تحديد حجم الخط من الطابعة
+    const widthScale = (printer && printer.widthScale !== undefined) ? printer.widthScale : 2.0;
+    const heightScale = (printer && printer.heightScale !== undefined) ? printer.heightScale : 2.0;
+    const fontSizeCmd = buildFontSizeCommand(widthScale, heightScale);
+    
+    // 1. اسم المتجر
+    chunks.push(escposAlign(0));
+    chunks.push(fontSizeCmd);
+    chunks.push(escposBoldOff());
+    chunks.push(escposLine(storeName));
+    chunks.push(escposLine(''));
+    
+    // 2. معلومات العميل
+    chunks.push(escposAlign(0));
+    chunks.push(fontSizeCmd);
+    chunks.push(escposBoldOff());
+    chunks.push(escposLine(`Facture : ${invoiceNumber}`));
+    chunks.push(escposLine(`Date : ${date}`));
+    chunks.push(escposLine(`Client : ${customer}`));
+    if (phone) chunks.push(escposLine(`Tel : ${phone}`));
+    if (address) chunks.push(escposLine(`Adresse : ${address}`));
+    chunks.push(escposLine(''));
+    
+    // 3. رأس الجدول
+    chunks.push(escposAlign(0));
+    chunks.push(fontSizeCmd);
+    chunks.push(escposBoldOff());
+    chunks.push(escposLine('Produit          Qte Prix Total'));
+    chunks.push(escposLine(''));
+    
+    // 4. صفوف المنتجات
+    if (items.length === 0) {
+      chunks.push(escposLine('(لا توجد منتجات)'));
+    } else {
+      items.forEach((item) => {
+        let name = item.name || 'Produit';
+        const qty = Number(item.quantity) || 0;
+        const price = Number(item.price) || 0;
+        const totalItem = qty * price;
+        const priceStr = Number(price).toFixed(2).replace(/\.00$/, '');
+        const totalStr = Number(totalItem).toFixed(2).replace(/\.00$/, '');
+        const nameShort = name.substring(0, 14);
+        const line = nameShort.padEnd(14) + ' ' + String(qty).padStart(3) + ' ' + priceStr.padStart(6) + ' ' + totalStr.padStart(6);
+        chunks.push(escposLine(line));
+      });
+    }
+    chunks.push(escposLine(''));
+    
+    // 5. الإجمالي
+    chunks.push(escposAlign(0));
+    chunks.push(fontSizeCmd);
+    chunks.push(escposBoldOff());
+    const totalFormatted = total.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+    chunks.push(escposLine(`Total : ${totalFormatted} DA`));
+    chunks.push(escposLine(''));
+    
+    // 6. رسالة الشكر
+    chunks.push(escposAlign(0));
+    chunks.push(fontSizeCmd);
+    chunks.push(escposBoldOff());
+    chunks.push(escposLine(`Tel : ${storePhoneNumber}`));
+    chunks.push(escposLine('Merci pour votre confiance'));
+    chunks.push(escposLine(''));
+    chunks.push(escposLine(''));
+    
+    chunks.push(escposCut());
+    
+    const totalLength = chunks.reduce((s, arr) => s + arr.length, 0);
+    const allData = new Uint8Array(totalLength);
+    let offset = 0;
+    for (const chunk of chunks) {
+      allData.set(chunk, offset);
+      offset += chunk.length;
+    }
+    return allData;
   }
-  
-  chunks.push(escposLine(''));
-  
-  // 5. السعر الإجمالي
-  chunks.push(escposAlign(0));
-  chunks.push(SIZE_2X);
-  chunks.push(escposBoldOff());
-  const totalFormatted = total.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
-  chunks.push(escposLine(`Total : ${totalFormatted} DA`));
-  chunks.push(escposLine(''));
-  
-  // 6. رسالة الشكر والهاتف
-  chunks.push(escposAlign(0));
-  chunks.push(SIZE_2X);
-  chunks.push(escposBoldOff());
-  chunks.push(escposLine(`Tel : ${storePhoneNumber}`));
-  chunks.push(escposLine('Merci pour votre confiance'));
-  chunks.push(escposLine(''));
-  chunks.push(escposLine(''));
-  
-  // 7. قص الورق
-  chunks.push(escposCut());
-  
-  const totalLength = chunks.reduce((s, arr) => s + arr.length, 0);
-  const allData = new Uint8Array(totalLength);
-  let offset = 0;
-  for (const chunk of chunks) {
-    allData.set(chunk, offset);
-    offset += chunk.length;
-  }
-  return allData;
-}
 
   // ============================================================
   // إرسال البيانات على دفعات
@@ -478,8 +568,8 @@
         showStatus(`✅ Protocole détecté : ${protocol.toUpperCase()}`, 'success');
       }
 
-      // استخدام دالة buildInvoice مباشرة (بدون مكتبة)
-      const printData = buildInvoice(order);
+      // ====== بناء بيانات الطباعة ======
+      const printData = buildInvoice(order, selectedPrinter);
 
       showStatus(`⏳ Envoi des données (${printData.length} octets)...`, 'info');
       await sendChunked(characteristic, printData, 150);
@@ -537,7 +627,7 @@
                 { namePrefix: 'XP-' }, { namePrefix: 'printer' }, { namePrefix: 'thermal' },
                 { namePrefix: 'Xprinter' }, { namePrefix: 'BT' }, { namePrefix: 'Mi' },
                 { namePrefix: 'Xiaomi' }, { namePrefix: 'P801' }, { namePrefix: 'MTP' },
-                { namePrefix: 'GoojPRT' }
+                { namePrefix: 'GoojPRT' }, { namePrefix: 'RPP' }
               ],
               optionalServices: [serviceUUID1, serviceUUID2]
             });
@@ -581,11 +671,23 @@
       const protocol = await detectProtocol(characteristic);
 
       const newPrinterRef = push(printersRef);
+      
+      // تحديد القيم الافتراضية: RPP300 تحصل على 2.0 × 2.0، والباقي 1.5 × 1.5 مثلاً
+      const deviceName = (device.name || '').toLowerCase();
+      let defaultWidth = 1.5;
+      let defaultHeight = 1.5;
+      if (deviceName.includes('rpp300')) {
+        defaultWidth = 2.0;
+        defaultHeight = 2.0;
+      }
+      
       const printerData = {
         name: device.name || 'Imprimante inconnue',
         protocol: protocol,
         paperWidth: paperWidth,
         deviceId: device.id,
+        widthScale: defaultWidth,
+        heightScale: defaultHeight,
         lastUsed: Date.now(),
         createdAt: Date.now(),
         detectedAt: Date.now()
@@ -593,7 +695,7 @@
       await set(newPrinterRef, printerData);
       selectedPrinterId = newPrinterRef.key;
       renderPrinterList();
-      showStatus(`✅ Imprimante "${printerData.name}" ajoutée (${protocol.toUpperCase()}, ${paperWidth}mm)`, 'success');
+      showStatus(`✅ Imprimante "${printerData.name}" ajoutée (${protocol.toUpperCase()}, ${paperWidth}mm, عرض ${defaultWidth} × ارتفاع ${defaultHeight})`, 'success');
 
     } catch (e) {
       console.error(e);
@@ -608,6 +710,36 @@
         document.getElementById('addPrinterModal').style.display = 'flex';
         showStatus('💡 Assurez-vous que l\'imprimante est allumée et en mode appairage (voyant clignotant).', 'warning');
       }
+    }
+  });
+
+  // ============================================================
+  // تعديل حجم الطابعة
+  // ============================================================
+  document.getElementById('cancelEditPrinter').addEventListener('click', () => {
+    document.getElementById('editPrinterModal').style.display = 'none';
+    editingPrinterId = null;
+  });
+  
+  document.getElementById('confirmEditPrinter').addEventListener('click', async () => {
+    if (!editingPrinterId) {
+      showStatus('❌ خطأ: لم يتم تحديد طابعة', 'error');
+      return;
+    }
+    const width = parseFloat(document.getElementById('widthSlider').value);
+    const height = parseFloat(document.getElementById('heightSlider').value);
+    try {
+      await update(ref(db, `users/${currentUser}/printers/${editingPrinterId}`), {
+        widthScale: width,
+        heightScale: height,
+        updatedAt: Date.now()
+      });
+      document.getElementById('editPrinterModal').style.display = 'none';
+      showStatus(`✅ تم تحديث الحجم إلى عرض ${width.toFixed(1)} × ارتفاع ${height.toFixed(1)}`, 'success');
+      editingPrinterId = null;
+    } catch (e) {
+      console.error(e);
+      showStatus('❌ فشل التحديث', 'error');
     }
   });
 
@@ -674,7 +806,7 @@
     }
   };
 
-  // ====== معاينة الفاتورة (شكل احترافي) ======
+  // ====== معاينة الفاتورة ======
   window.previewInvoice = async (key) => {
     try {
       const snapshot = await get(ref(db, `confirmedOrders/${key}`));
@@ -879,7 +1011,7 @@
   loadStoreSettings();
   loadPrintersFromFirebase();
   onValue(ref(db, 'confirmedOrders'), (snap) => renderInvoicesList(snap.val()));
-  console.log('✅ Impression des factures - Version finale');
+  console.log('✅ Impression des factures - Version avec contrôle précis du width/height');
 </script>
 </body>
 </html>
