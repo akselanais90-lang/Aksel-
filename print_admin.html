@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>طباعة الفاتورة - aksel & anais</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Cairo', Arial, sans-serif;
+      font-size: 12px;
+      background: white;
+      padding: 10px;
+      direction: ltr;
+    }
+    .invoice {
+      max-width: 1000px;
+      margin: 0 auto;
+      border: 2px solid #000;
+      padding: 12px;
+    }
+    .top-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #000;
+      padding-bottom: 10px;
+      margin-bottom: 15px;
+    }
+    .store-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 55%;
+    }
+    .store-logo img {
+      width: 50px;
+      height: 50px;
+      object-fit: contain;
+    }
+    .store-details h2 {
+      font-size: 14px;
+      font-weight: 900;
+      margin-bottom: 3px;
+    }
+    .store-details p {
+      font-size: 10px;
+      margin: 2px 0;
+    }
+    .client-info {
+      width: 40%;
+      border: 1px solid #000;
+      padding: 6px 10px;
+      line-height: 1.4;
+      font-size: 11px;
+      direction: ltr;
+    }
+    .client-info p {
+      margin: 2px 0;
+      text-align: left;
+    }
+    .info-bar {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 15px;
+      padding: 5px 0;
+      font-size: 11px;
+      font-weight: 600;
+      direction: ltr;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 10px 0;
+      direction: ltr;
+    }
+    th, td {
+      border: 1px solid #000;
+      padding: 2px 4px;
+      font-size: 11px;
+    }
+    th {
+      background: #f4f4f4;
+      font-weight: 700;
+      text-align: center;
+    }
+    .summary-line {
+      margin: 8px 0;
+      text-align: right;
+      font-weight: 600;
+      font-size: 11px;
+      direction: ltr;
+    }
+    .bottom-section {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-top: 15px;
+      border-top: 2px solid #000;
+      padding-top: 10px;
+      direction: ltr;
+    }
+    .invoice-number {
+      text-align: right;
+      font-size: 11px;
+      font-weight: bold;
+    }
+    .total-box {
+      text-align: right;
+    }
+    .total-box strong {
+      font-size: 12px;
+    }
+    .total-amount {
+      font-size: 16px;
+      font-weight: 900;
+    }
+    .footer-text {
+      text-align: center;
+      margin-top: 12px;
+      font-size: 10px;
+      font-weight: 500;
+      direction: ltr;
+    }
+    @media print {
+      body { padding: 0; }
+      .invoice { border: 2px solid #000; }
+      .no-print { display: none !important; }
+    }
+    td:nth-child(2) { direction: ltr; text-align: left; font-weight: 600; }
+    td:nth-child(4), td:nth-child(5) { direction: ltr; text-align: right; }
+  </style>
+</head>
+<body>
+  <div id="invoiceContainer" class="invoice">
+    <!-- سيتم ملء المحتوى بواسطة JavaScript -->
+  </div>
+  <div class="no-print" style="text-align:center; margin:20px 0;">
+    <button onclick="window.print()" style="padding:10px 25px; font-size:14px; margin:5px; background:#000; color:white; border:none; border-radius:5px; cursor:pointer;">
+      🖨️ طباعة
+    </button>
+    <button onclick="window.close()" style="padding:10px 25px; font-size:14px; margin:5px; background:#e5e7eb; border:none; border-radius:5px; cursor:pointer;">
+      ✖️ إغلاق
+    </button>
+  </div>
+  <script>
+    // قراءة بيانات الطلب من sessionStorage
+    const stored = sessionStorage.getItem('printOrder');
+    if (!stored) {
+      document.getElementById('invoiceContainer').innerHTML = '<p style="text-align:center; padding:40px; color:red;">⚠️ لا توجد بيانات للطباعة</p>';
+    } else {
+      const { order, type } = JSON.parse(stored);
+      // حذف البيانات بعد القراءة لتنظيف التخزين
+      sessionStorage.removeItem('printOrder');
+      renderInvoice(order, type);
+    }
+
+    function renderInvoice(order, type) {
+      const container = document.getElementById('invoiceContainer');
+      const isConfirmed = (type === 'confirmed');
+      const invoiceNumber = order.invoiceNumber ? order.invoiceNumber.toString().padStart(4, '0') : '----';
+      
+      let rows = '';
+      let totalQte = 0;
+      let itemIndex = 1;
+      
+      if (order.items && Array.isArray(order.items)) {
+        order.items.forEach((it) => {
+          const qty = Number(it.quantity || 0);
+          const price = Number(it.price || 0);
+          const total = qty * price;
+          totalQte += qty;
+          rows += `
+            <tr>
+              <td style="text-align:center; border:1px solid #000; padding:2px 4px;">${itemIndex}</td>
+              <td style="border:1px solid #000; padding:2px 4px; text-align:left; direction:ltr; font-weight:600;">${escapeHtml(it.name)}</td>
+              <td style="text-align:center; border:1px solid #000; padding:2px 4px;">${qty}</td>
+              <td style="text-align:right; border:1px solid #000; padding:2px 4px; direction:ltr;">
+                ${price.toLocaleString('fr-FR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} DA
+              </td>
+              <td style="text-align:right; border:1px solid #000; padding:2px 4px; direction:ltr;">
+                ${total.toLocaleString('fr-FR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} DA
+              </td>
+            </tr>
+          `;
+          itemIndex++;
+        });
+      }
+      
+      const totalPrice = order.totalPrice || 0;
+      const nbreProduit = order.items ? order.items.length : 0;
+      const sellerName = order.confirmedBy || 'KARIM';
+      
+      container.innerHTML = `
+        <div class="top-header">
+          <div class="store-info">
+            <div class="store-logo"><img src="https://i.postimg.cc/3J7HQ20j/1000022206-removebg-preview.png" alt="Logo"></div>
+            <div class="store-details">
+              <h2>aksel & anais</h2>
+              <p>Télé : 0781 55 48 85</p>
+              <p>zéralda.</p>
+            </div>
+          </div>
+          <div class="client-info">
+            <p><strong>Client :</strong> ${escapeHtml(order.customerName || '')}</p>
+            <p><strong>Adresse :</strong> ${escapeHtml(order.address || '')}</p>
+            <p><strong>Télé :</strong> ${escapeHtml(order.phone || '')}</p>
+          </div>
+        </div>
+        <div class="info-bar">
+          <span>le ${new Date().toLocaleDateString('fr-FR')} - ${new Date().toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'})}</span>
+          <span>Préparé par : ${escapeHtml(sellerName)}</span>
+        </div>
+        <div style="text-align:center; margin:10px 0; font-weight:bold; font-size:14px; direction:ltr;">
+          ${isConfirmed ? 'Bon de livraison (Confirmé)' : 'Bon de livraison'}
+        </div>
+        <table>
+          <thead>
+            <tr><th style="width:5%">N°</th><th style="width:55%">DESIGNATION</th><th style="width:8%">QTE</th><th style="width:16%">Prix u</th><th style="width:16%">Total</th></tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+        <div class="summary-line">Nbre Produit : ${nbreProduit} &nbsp;&nbsp;&nbsp; Tot Qté : ${totalQte}</div>
+        <div class="bottom-section">
+          <div class="invoice-number">bon de livraison N°: ${invoiceNumber}</div>
+          <div class="total-box">
+            <div><strong>net à payer</strong></div>
+            <div class="total-amount">${Math.floor(totalPrice).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} DA</div>
+          </div>
+        </div>
+        <div class="footer-text">Merci pour votre confiance</div>
+      `;
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m] || m));
+    }
+  </script>
+</body>
+</html>
