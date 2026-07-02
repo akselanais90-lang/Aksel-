@@ -2,267 +2,828 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, shrink-to-fit=yes" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover" />
   <title>لوحة الإدارة - aksel & anais</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <style>
-    /* ====== جميع الأنماط كما هي (بدون تغيير) ====== */
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Cairo', sans-serif; background: #fafafa; color: #262626; padding-bottom: 80px; }
-    .top-bar { background: white; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #dbdbdb; position: sticky; top: 0; z-index: 100; }
-    .logo { font-size: 22px; font-weight: 800; background: linear-gradient(135deg, #10b981, #059669); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    /* ====== نفس ستايل المتجر ====== */
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    :root {
+      --primary: #0b6e4f;
+      --primary-light: #1a8a6a;
+      --primary-dark: #064e3b;
+      --gold: #d4a745;
+      --gold-light: #f3e5c0;
+      --vip: #8e44ad;
+      --vip-light: #f4ecf9;
+      --success: #2ecc71;
+      --danger: #e74c3c;
+      --warning: #f39c12;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #e9edf2;
+      --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
+      --shadow-md: 0 8px 24px rgba(0,0,0,0.06);
+      --shadow-lg: 0 16px 40px rgba(0,0,0,0.08);
+      --radius: 18px;
+      --radius-sm: 12px;
+      --transition: 0.25s cubic-bezier(0.4,0,0.2,1);
+      --font: 'Cairo', system-ui, sans-serif;
+    }
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      direction: rtl;
+      text-align: right;
+      min-height: 100vh;
+      padding-bottom: 80px;
+    }
+    /* الهيدر */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 1100;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(16px);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(0,0,0,0.03);
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 1.2rem;
+      font-weight: 900;
+      color: var(--primary-dark);
+      cursor: pointer;
+      user-select: none;
+    }
+    .logo img { height: 2.6rem; width: auto; }
+    .logo span { letter-spacing: -0.5px; }
     .user-info { display: flex; align-items: center; gap: 12px; }
-    .username { font-weight: 600; background: #efefef; padding: 6px 14px; border-radius: 30px; font-size: 14px; }
-    .menu-btn { background: none; border: none; font-size: 24px; cursor: pointer; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-    .menu-btn:hover { background: #efefef; }
-    .dropdown-menu { position: absolute; top: 60px; left: 16px; background: white; border-radius: 20px; box-shadow: 0 6px 20px rgba(0,0,0,0.15); width: 240px; z-index: 200; display: none; overflow: hidden; border: 1px solid #efefef; }
-    .dropdown-menu button { width: 100%; padding: 14px 16px; text-align: right; background: none; border: none; font-family: 'Cairo', sans-serif; font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 12px; cursor: pointer; border-bottom: 1px solid #f0f0f0; }
-    .dropdown-menu button i { width: 24px; color: #262626; }
-    .dropdown-menu button:hover { background: #f8f8f8; }
-    .tabs { display: flex; gap: 8px; padding: 12px 16px; background: white; border-bottom: 1px solid #dbdbdb; overflow-x: auto; }
+    .username {
+      font-weight: 600;
+      background: var(--bg);
+      padding: 6px 14px;
+      border-radius: 40px;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+    .menu-btn {
+      background: none; border: none;
+      font-size: 1.3rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      transition: var(--transition);
+    }
+    .menu-btn:hover { background: var(--bg); color: var(--primary); }
+    .dropdown-menu {
+      position: absolute;
+      top: 70px;
+      left: 16px;
+      background: white;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-lg);
+      width: 240px;
+      z-index: 200;
+      display: none;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    .dropdown-menu button {
+      width: 100%;
+      padding: 14px 16px;
+      text-align: right;
+      background: none;
+      border: none;
+      border-bottom: 1px solid var(--border);
+      font-family: var(--font);
+      font-size: 0.85rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      transition: var(--transition);
+      color: var(--text);
+    }
+    .dropdown-menu button i { width: 24px; color: var(--text-muted); }
+    .dropdown-menu button:hover { background: var(--bg); color: var(--primary); }
+    .dropdown-menu button:hover i { color: var(--primary); }
+
+    /* التبويبات */
+    .tabs {
+      display: flex;
+      gap: 8px;
+      padding: 12px 16px;
+      background: white;
+      border-bottom: 1px solid var(--border);
+      overflow-x: auto;
+      flex-wrap: nowrap;
+    }
     .tabs::-webkit-scrollbar { display: none; }
-    .tab { background: none; border: none; padding: 8px 20px; font-family: 'Cairo', sans-serif; font-weight: 600; font-size: 15px; border-radius: 30px; cursor: pointer; color: #8e8e8e; white-space: nowrap; }
-    .tab.active { background: #262626; color: white; }
-    .filter-section { padding: 8px 16px; background: white; border-bottom: 1px solid #efefef; display: flex; align-items: center; gap: 8px; overflow-x: auto; flex-wrap: nowrap; }
+    .tab {
+      flex-shrink: 0;
+      padding: 8px 20px;
+      border-radius: 40px;
+      border: none;
+      background: var(--bg);
+      font-family: var(--font);
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: var(--transition);
+      white-space: nowrap;
+    }
+    .tab.active {
+      background: var(--primary);
+      color: white;
+      box-shadow: 0 4px 12px rgba(11,110,79,0.25);
+    }
+    .tab:hover:not(.active) { background: #e9edf2; }
+
+    /* فلتر العائلات */
+    .filter-section {
+      padding: 8px 16px;
+      background: white;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow-x: auto;
+      flex-wrap: nowrap;
+    }
     .filter-section::-webkit-scrollbar { display: none; }
-    .filter-btn { padding: 6px 16px; border-radius: 30px; border: 2px solid #e5e7eb; background: white; font-family: 'Cairo', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; transition: all 0.2s; color: #4b5563; min-width: fit-content; }
-    .filter-btn:hover { border-color: #10b981; color: #10b981; }
-    .filter-btn.active { background: #10b981; color: white; border-color: #10b981; }
-    .filter-btn i { margin-left: 4px; }
-    .filter-clear { background: none; border: none; color: #ef4444; font-weight: 600; cursor: pointer; padding: 4px 8px; font-size: 12px; display: none; }
+    .filter-btn {
+      flex-shrink: 0;
+      padding: 6px 16px;
+      border-radius: 40px;
+      border: 1px solid var(--border);
+      background: white;
+      font-family: var(--font);
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: var(--transition);
+      white-space: nowrap;
+    }
+    .filter-btn:hover { border-color: var(--primary); color: var(--primary); }
+    .filter-btn.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+    .filter-count {
+      font-size: 0.65rem;
+      background: var(--bg);
+      padding: 0 8px;
+      border-radius: 30px;
+      margin-right: 4px;
+    }
+    .filter-btn.active .filter-count { background: rgba(255,255,255,0.2); color: white; }
+    .filter-clear {
+      flex-shrink: 0;
+      background: none;
+      border: none;
+      color: var(--danger);
+      font-weight: 600;
+      font-size: 0.75rem;
+      cursor: pointer;
+      padding: 4px 8px;
+      display: none;
+    }
     .filter-clear.show { display: inline-block; }
-    .filter-count { font-size: 11px; color: #9ca3af; margin-right: 4px; background: #f3f4f6; padding: 0 8px; border-radius: 20px; }
-    .family-item-wrapper { display: inline-flex; align-items: center; gap: 2px; position: relative; }
-    .family-actions { display: none; align-items: center; gap: 2px; background: white; border-radius: 30px; padding: 2px 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); position: absolute; left: -5px; top: 50%; transform: translateY(-50%); z-index: 10; }
+
+    /* عائلات مع أزرار إدارة */
+    .family-item-wrapper {
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+      position: relative;
+    }
+    .family-actions {
+      display: none;
+      align-items: center;
+      gap: 2px;
+      background: white;
+      border-radius: 30px;
+      padding: 2px 4px;
+      box-shadow: var(--shadow-sm);
+      position: absolute;
+      left: -5px;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 10;
+    }
     .family-item-wrapper:hover .family-actions { display: inline-flex; }
     .family-item-wrapper .filter-btn.active + .family-actions { display: inline-flex; }
-    .family-action-btn { background: none; border: none; width: 26px; height: 26px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 11px; transition: 0.2s; color: #64748b; }
+    .family-action-btn {
+      background: none; border: none;
+      width: 26px; height: 26px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px;
+      transition: 0.2s;
+      color: var(--text-muted);
+    }
     .family-action-btn:hover { transform: scale(1.1); }
-    .family-action-btn.edit-btn:hover { background: #eef2ff; color: #10b981; }
-    .family-action-btn.delete-btn:hover { background: #fee2e2; color: #dc2626; }
-    .family-action-btn i { font-size: 11px; }
-    .search-box { padding: 8px 16px 12px 16px; background: white; }
-    .search-box input { width: 100%; padding: 10px 16px; border-radius: 30px; border: 1px solid #dbdbdb; background: #fafafa; font-family: 'Cairo', sans-serif; font-size: 14px; outline: none; }
-    .search-box input:focus { border-color: #10b981; }
-    .products-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 12px; }
-    @media (min-width: 640px) { .products-grid { grid-template-columns: repeat(3, 1fr); } }
-    @media (min-width: 1024px) { .products-grid { grid-template-columns: repeat(4, 1fr); } }
-    .product-card { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #efefef; transition: all 0.2s; position: relative; }
-    .product-card:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
-    .product-card img { width: 100%; height: 180px; object-fit: cover; background: #f0f0f0; }
+    .family-action-btn.edit-btn:hover { background: #eef2ff; color: var(--primary); }
+    .family-action-btn.delete-btn:hover { background: #fee2e2; color: var(--danger); }
+
+    /* البحث */
+    .search-box {
+      padding: 8px 16px 12px;
+      background: white;
+    }
+    .search-box input {
+      width: 100%;
+      padding: 10px 16px;
+      border-radius: 40px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      font-family: var(--font);
+      font-size: 0.9rem;
+      outline: none;
+      transition: var(--transition);
+    }
+    .search-box input:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(11,110,79,0.08); }
+
+    /* شبكة المنتجات */
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+      padding: 16px;
+    }
+    @media (min-width: 640px) { .products-grid { grid-template-columns: repeat(3,1fr); } }
+    @media (min-width: 1024px) { .products-grid { grid-template-columns: repeat(4,1fr); } }
+
+    .product-card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border);
+      transition: var(--transition);
+      position: relative;
+    }
+    .product-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+      border-color: var(--primary-light);
+    }
+    .product-card img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      background: var(--bg);
+    }
     .product-info { padding: 12px; }
-    .product-name { font-weight: 700; font-size: 14px; margin-bottom: 6px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-    .product-price { color: #10b981; font-weight: 800; font-size: 16px; margin-bottom: 4px; }
-    .product-wholesale-price { color: #8e44ad; font-weight: 600; font-size: 13px; margin-bottom: 4px; }
-    .product-family { font-size: 11px; color: #6b7280; margin-bottom: 8px; background: #f3f4f6; padding: 2px 10px; border-radius: 20px; display: inline-block; }
-    .product-actions { display: flex; gap: 8px; flex-wrap: wrap; }
-    .btn-icon { flex: 1; padding: 8px; border-radius: 30px; border: none; font-weight: 600; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
-    .btn-edit { background: #eef2ff; color: #10b981; }
-    .btn-delete { background: #ffeaea; color: #e74c3c; }
+    .product-name {
+      font-weight: 700;
+      font-size: 0.85rem;
+      margin-bottom: 4px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      height: 2.4rem;
+    }
+    .product-price {
+      color: var(--primary);
+      font-weight: 800;
+      font-size: 1rem;
+      margin-bottom: 4px;
+    }
+    .product-wholesale-price { color: var(--vip); font-weight: 600; font-size: 0.85rem; }
+    .product-box-qty { color: #2563eb; font-weight: 600; font-size: 0.85rem; }
+    .product-family {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      background: var(--bg);
+      padding: 2px 10px;
+      border-radius: 30px;
+      display: inline-block;
+      margin-bottom: 8px;
+    }
+    .product-actions {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 6px;
+    }
+    .btn-icon {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 30px;
+      border: none;
+      font-weight: 600;
+      font-size: 0.75rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      transition: var(--transition);
+      font-family: var(--font);
+    }
+    .btn-edit { background: #eef2ff; color: var(--primary); }
+    .btn-edit:hover { background: var(--primary); color: white; }
+    .btn-delete { background: #fee2e2; color: var(--danger); }
+    .btn-delete:hover { background: var(--danger); color: white; }
     .btn-discount { background: #fef3c7; color: #d97706; }
-    .btn-discount.active-discount { background: #dc2626; color: white; }
-    .product-card.on-sale { border: 3px solid #dc2626; background: #fff5f5; box-shadow: 0 0 20px rgba(220, 38, 38, 0.15); }
-    .product-card.on-sale .product-price { color: #dc2626; font-size: 1.2rem; }
-    .product-card.on-sale .old-price { text-decoration: line-through; color: #999; font-size: 0.8rem; margin-left: 6px; }
-    .sale-badge { position: absolute; top: 8px; left: 8px; background: #dc2626; color: #ffdd00; padding: 4px 12px; border-radius: 30px; font-weight: 700; font-size: 11px; box-shadow: 0 2px 8px rgba(220,38,38,0.3); z-index: 5; display: flex; align-items: center; gap: 4px; }
-    .sale-badge i { font-size: 10px; }
-    .discount-timer { font-size: 11px; color: #dc2626; font-weight: 600; margin-top: 4px; background: #fee2e2; padding: 2px 10px; border-radius: 20px; display: inline-block; }
-    .discount-timer.unlimited { background: #dbeafe; color: #2563eb; }
-    .order-card { background: white; margin: 12px 16px; padding: 16px; border-radius: 24px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); border-right: 4px solid #10b981; }
-    .confirmed-card { border-right-color: #f39c12 !important; background: #fffef7; }
-    .order-header { display: flex; justify-content: space-between; margin-bottom: 12px; font-weight: 700; }
-    .order-items { background: #fafafa; padding: 10px; border-radius: 16px; margin: 10px 0; font-size: 14px; }
-    .order-footer { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
-    .fab { position: fixed; bottom: 20px; left: 20px; background: #10b981; color: white; width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 26px; border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.2); cursor: pointer; z-index: 150; }
-    .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(6px); display: flex; align-items: center; justify-content: center; z-index: 1000; display: none; }
-    .modal-content { background: white; width: 90%; max-width: 450px; border-radius: 28px; padding: 24px; max-height: 85vh; overflow-y: auto; position: relative; }
-    input, textarea, select { width: 100%; padding: 12px; margin-bottom: 12px; border: 1px solid #dbdbdb; border-radius: 16px; font-family: 'Cairo', sans-serif; background: #fafafa; }
-    .btn-primary { background: #10b981; color: white; border: none; padding: 12px; border-radius: 40px; font-weight: 600; width: 100%; cursor: pointer; }
-    .btn-secondary { background: #e5e7eb; color: #1f2937; border: none; padding: 12px; border-radius: 40px; font-weight: 600; width: 100%; cursor: pointer; }
-    .toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: #262626; color: white; padding: 10px 24px; border-radius: 40px; font-size: 14px; z-index: 1100; display: none; }
+    .btn-discount:hover { background: #d97706; color: white; }
+    .btn-discount.active-discount { background: var(--danger); color: white; }
+    .product-card.on-sale {
+      border: 2px solid var(--danger);
+      background: #fffaf5;
+    }
+    .product-card.on-sale .product-price { color: var(--danger); }
+    .product-card.on-sale .old-price {
+      text-decoration: line-through;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      margin-left: 6px;
+    }
+    .sale-badge {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      background: var(--danger);
+      color: #ffdd00;
+      padding: 4px 12px;
+      border-radius: 30px;
+      font-weight: 700;
+      font-size: 11px;
+      box-shadow: 0 2px 8px rgba(220,38,38,0.3);
+      z-index: 5;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .discount-timer {
+      font-size: 0.7rem;
+      color: var(--danger);
+      font-weight: 600;
+      background: #fee2e2;
+      padding: 2px 10px;
+      border-radius: 30px;
+      display: inline-block;
+      margin-top: 4px;
+    }
     .hidden-product { opacity: 0.6; filter: grayscale(0.2); }
-    .no-data { text-align: center; padding: 40px; color: #8e8e8e; }
-    .no-data i { font-size: 40px; display: block; margin-bottom: 12px; color: #d1d5db; }
-    html, body { width: 100%; overflow-x: hidden; }
-    body { font-size: 14px; }
-    @media (max-width: 640px) { body { font-size: 13px; } .products-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; padding: 8px; } .product-card img { height: 120px; } .product-info { padding: 6px; } .product-name { font-size: 11px; } .product-price { font-size: 13px; } .btn-icon { padding: 5px; font-size: 11px; } .tab { padding: 5px 12px; font-size: 12px; } .top-bar { padding: 8px 12px; } .logo { font-size: 18px; } .order-card { margin: 8px 12px; padding: 12px; } .modal-content { padding: 16px; width: 95%; } .fab { width: 48px; height: 48px; font-size: 22px; bottom: 15px; left: 15px; } .filter-btn { font-size: 11px; padding: 4px 12px; } .filter-section { padding: 6px 12px; gap: 4px; } .family-actions { left: 0px; } }
-    @media (min-width: 641px) and (max-width: 1024px) { .products-grid { grid-template-columns: repeat(3, 1fr); gap: 12px; } .product-card img { height: 160px; } }
-    @media (min-width: 1025px) { .products-grid { grid-template-columns: repeat(4, 1fr); gap: 16px; padding: 16px; } body { max-width: 1400px; margin: 0 auto; } }
-    #pagination { text-align: center; margin: 20px 0; padding: 10px; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 4px; }
-    #pagination button { min-width: 38px; height: 38px; border: none; border-radius: 10px; margin: 0 2px; background: white; color: #333; font-weight: 600; font-size: 14px; box-shadow: 0 2px 6px rgba(0,0,0,0.08); cursor: pointer; }
-    #pagination button:hover { transform: translateY(-2px); background: #10b981; color: white; }
-    #pagination span { margin: 0 4px; color: #64748b; font-weight: 500; }
-    .whatsapp-orders { background: #f0fdf4; border-right-color: #25D366 !important; }
-    .whatsapp-badge { background: #25D366; color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; display: inline-block; }
-    .confirmed-badge { background: #f39c12; color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; display: inline-block; }
-    .notification-badge { background: #25D366; color: white; border-radius: 50%; padding: 2px 6px; font-size: 11px; margin-right: 5px; display: inline-block; animation: pulse 1s infinite; }
-    @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.2); opacity: 0.8; } 100% { transform: scale(1); opacity: 1; } }
-    .delete-all-btn { background: #e74c3c; color: white; border: none; padding: 10px 20px; border-radius: 30px; margin: 12px; cursor: pointer; font-weight: bold; }
-    .family-field-wrapper { position: relative; width: 100%; margin-bottom: 12px; }
-    .family-field-wrapper select { width: 100%; padding: 12px 16px; padding-left: 48px; border: 1px solid #dbdbdb; border-radius: 16px; font-family: 'Cairo', sans-serif; background: #fafafa; appearance: none; -webkit-appearance: none; outline: none; cursor: pointer; font-size: 14px; }
-    .family-field-wrapper select:focus { border-color: #10b981; }
-    .family-add-btn { position: absolute; left: 6px; top: 50%; transform: translateY(-50%); background: #10b981; color: white; border: none; border-radius: 30px; padding: 6px 12px; font-size: 11px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 4px; white-space: nowrap; transition: 0.2s; z-index: 2; }
-    .family-add-btn:hover { background: #059669; transform: translateY(-50%) scale(1.05); }
-    .family-add-btn i { font-size: 12px; }
-    .discount-modal .modal-content { max-width: 500px; }
-    .discount-modal .form-group { margin-bottom: 12px; }
-    .discount-modal .form-group label { display: block; font-weight: 600; font-size: 13px; margin-bottom: 4px; color: #374151; }
-    .discount-modal .form-group .hint { font-size: 11px; color: #6b7280; margin-top: 2px; }
-    .discount-modal .checkbox-group { display: flex; align-items: center; gap: 8px; margin: 8px 0; }
-    .discount-modal .checkbox-group input[type="checkbox"] { width: 18px; height: 18px; margin: 0; cursor: pointer; }
-    .discount-modal .checkbox-group label { font-weight: 500; font-size: 14px; cursor: pointer; }
-    .discount-modal .date-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .discount-modal .date-fields input[type="datetime-local"] { padding: 10px; }
-    .discount-modal .btn-danger { background: #dc2626; color: white; border: none; padding: 12px; border-radius: 40px; font-weight: 600; width: 100%; cursor: pointer; }
-    .discount-modal .btn-warning { background: #f59e0b; color: white; border: none; padding: 12px; border-radius: 40px; font-weight: 600; width: 100%; cursor: pointer; }
-    .discount-modal .btn-success { background: #10b981; color: white; border: none; padding: 12px; border-radius: 40px; font-weight: 600; width: 100%; cursor: pointer; }
+
+    /* الطلبات */
+    .order-card {
+      background: white;
+      margin: 12px 16px;
+      padding: 16px;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      border-right: 4px solid var(--primary);
+      transition: var(--transition);
+      cursor: pointer;
+    }
+    .order-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+    .whatsapp-orders { border-right-color: #25D366; background: #f0fdf4; }
+    .confirmed-card { border-right-color: var(--warning); background: #fffef7; }
+    .whatsapp-badge {
+      background: #25D366;
+      color: white;
+      padding: 2px 12px;
+      border-radius: 30px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      display: inline-block;
+      margin-right: 6px;
+    }
+    .confirmed-badge {
+      background: var(--warning);
+      color: white;
+      padding: 2px 12px;
+      border-radius: 30px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      display: inline-block;
+      margin-right: 6px;
+    }
+
+    /* الأزرار الثابتة */
+    .fab {
+      position: fixed;
+      bottom: 24px;
+      left: 24px;
+      background: var(--primary);
+      color: white;
+      width: 56px;
+      height: 56px;
+      border-radius: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      border: none;
+      box-shadow: 0 8px 24px rgba(11,110,79,0.35);
+      cursor: pointer;
+      z-index: 150;
+      transition: var(--transition);
+    }
+    .fab:hover { transform: scale(1.04); }
+
+    /* المودالات */
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(15,23,42,0.55);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      padding: 20px;
+    }
+    .modal-content {
+      background: white;
+      width: 100%;
+      max-width: 500px;
+      border-radius: 28px;
+      padding: 24px;
+      max-height: 85vh;
+      overflow-y: auto;
+      box-shadow: var(--shadow-lg);
+    }
+    .modal-content h3 { text-align: center; font-weight: 800; margin-bottom: 16px; }
+    input, select, textarea {
+      width: 100%;
+      padding: 12px 16px;
+      margin-bottom: 12px;
+      border: 1px solid var(--border);
+      border-radius: 40px;
+      font-family: var(--font);
+      background: var(--bg);
+      font-size: 0.9rem;
+      outline: none;
+      transition: var(--transition);
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(11,110,79,0.08);
+    }
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 40px;
+      font-weight: 700;
+      width: 100%;
+      cursor: pointer;
+      transition: var(--transition);
+      font-family: var(--font);
+    }
+    .btn-primary:hover { opacity: 0.9; transform: scale(0.98); }
+    .btn-secondary {
+      background: var(--bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 12px;
+      border-radius: 40px;
+      font-weight: 600;
+      width: 100%;
+      cursor: pointer;
+      transition: var(--transition);
+      font-family: var(--font);
+    }
+    .btn-secondary:hover { background: var(--border); }
+    .btn-danger {
+      background: var(--danger);
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 40px;
+      font-weight: 600;
+      width: 100%;
+      cursor: pointer;
+      transition: var(--transition);
+      font-family: var(--font);
+    }
+    .btn-danger:hover { opacity: 0.9; }
+    .btn-success {
+      background: var(--success);
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 40px;
+      font-weight: 600;
+      width: 100%;
+      cursor: pointer;
+      transition: var(--transition);
+      font-family: var(--font);
+    }
+    .btn-success:hover { opacity: 0.9; }
+    .toast {
+      position: fixed;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--text);
+      color: white;
+      padding: 10px 24px;
+      border-radius: 40px;
+      font-size: 0.9rem;
+      z-index: 1100;
+      display: none;
+    }
+
+    /* العائلات في الإضافة */
+    .family-field-wrapper {
+      position: relative;
+      width: 100%;
+      margin-bottom: 12px;
+    }
+    .family-field-wrapper select {
+      padding-left: 60px;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+    .family-add-btn {
+      position: absolute;
+      left: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 30px;
+      padding: 4px 14px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: var(--transition);
+      font-family: var(--font);
+    }
+    .family-add-btn:hover { background: var(--primary-dark); }
+
+    .discount-modal .date-fields {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .discount-modal .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 8px 0;
+    }
+    .discount-modal .checkbox-group input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      margin: 0;
+      cursor: pointer;
+    }
+
     #discountsSection { display: none; }
-    .discounts-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px; padding: 12px; }
-    .discount-card { background: white; border-radius: 20px; padding: 16px; border-right: 6px solid #dc2626; box-shadow: 0 2px 8px rgba(0,0,0,0.05); position: relative; transition: 0.2s; }
-    .discount-card:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
-    .discount-card .product-name-discount { font-weight: 700; font-size: 15px; margin-bottom: 4px; }
-    .discount-card .discount-prices { display: flex; align-items: center; gap: 12px; margin: 6px 0; }
-    .discount-card .discount-prices .new-price { color: #dc2626; font-weight: 800; font-size: 1.2rem; }
-    .discount-card .discount-prices .old-price-discount { text-decoration: line-through; color: #9ca3af; font-size: 0.9rem; }
-    .discount-card .discount-timer-card { background: #fee2e2; padding: 4px 12px; border-radius: 30px; font-size: 12px; font-weight: 600; color: #dc2626; display: inline-block; margin-top: 6px; }
-    .discount-card .discount-timer-card.unlimited { background: #dbeafe; color: #2563eb; }
-    .discount-card .discount-actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
-    .discount-card .discount-actions button { flex: 1; padding: 6px; border: none; border-radius: 30px; font-weight: 600; font-size: 12px; cursor: pointer; transition: 0.2s; }
-    .discount-card .discount-actions .btn-remove-discount { background: #fee2e2; color: #dc2626; }
-    .discount-card .discount-actions .btn-remove-discount:hover { background: #dc2626; color: white; }
-    .discount-card .discount-actions .btn-reactivate { background: #dbeafe; color: #2563eb; }
-    .discount-card .discount-actions .btn-reactivate:hover { background: #2563eb; color: white; }
-    .badge-unlimited { background: #2563eb; color: white; padding: 2px 10px; border-radius: 20px; font-size: 10px; }
-    .badge-expired { background: #6b7280; color: white; padding: 2px 10px; border-radius: 20px; font-size: 10px; }
-    @media (max-width: 640px) { .discounts-grid { grid-template-columns: 1fr; } }
+    .discounts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 16px;
+      padding: 16px;
+    }
+
+    .no-data {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 50px 20px;
+      color: var(--text-muted);
+    }
+    .no-data i { font-size: 3rem; display: block; margin-bottom: 12px; color: #d1d5db; }
+
+    #pagination {
+      text-align: center;
+      margin: 16px 0;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 4px;
+    }
+    #pagination button {
+      min-width: 36px;
+      height: 36px;
+      border: none;
+      border-radius: var(--radius-sm);
+      background: white;
+      color: var(--text);
+      font-weight: 600;
+      font-size: 0.85rem;
+      box-shadow: var(--shadow-sm);
+      cursor: pointer;
+      transition: var(--transition);
+      font-family: var(--font);
+    }
+    #pagination button:hover:not(:disabled) {
+      background: var(--primary);
+      color: white;
+      transform: translateY(-2px);
+    }
+    #pagination .active-page {
+      background: var(--primary);
+      color: white;
+      box-shadow: 0 4px 12px rgba(11,110,79,0.2);
+    }
+    #pagination button:disabled { opacity: 0.4; cursor: default; }
+    #pagination span { padding: 0 6px; color: var(--text-muted); }
+
+    /* تحسينات للجوال */
+    @media (max-width: 640px) {
+      .products-grid { grid-template-columns: repeat(2,1fr); gap: 10px; padding: 10px; }
+      .product-card img { height: 140px; }
+      .product-info { padding: 8px; }
+      .product-name { font-size: 0.75rem; height: 2rem; }
+      .btn-icon { font-size: 0.65rem; padding: 4px 6px; }
+      .tab { font-size: 0.75rem; padding: 6px 14px; }
+      .modal-content { padding: 16px; }
+    }
+
+    footer {
+      text-align: center;
+      padding: 16px;
+      background: white;
+      margin-top: 30px;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border);
+    }
+    footer a { color: var(--primary); text-decoration: none; font-weight: 600; }
+
+    .delete-all-btn {
+      background: var(--danger);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 40px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: var(--font);
+      transition: var(--transition);
+    }
+    .delete-all-btn:hover { opacity: 0.9; }
+
+    .notification-badge {
+      background: #25D366;
+      color: white;
+      border-radius: 50%;
+      padding: 2px 8px;
+      font-size: 0.7rem;
+      margin-right: 4px;
+      animation: pulse 1s infinite;
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.1); opacity: 0.8; }
+      100% { transform: scale(1); opacity: 1; }
+    }
   </style>
 </head>
 <body>
 
-<div class="top-bar">
+<!-- ====== الهيدر ====== -->
+<header>
   <div class="logo" onclick="toggleVIPBox()">
-    <img src="https://i.postimg.cc/3J7HQ20j/1000022206-removebg-preview.png" alt="Logo" style="height: 3.3rem; width: auto; margin-left: 8px; display: inline-block; vertical-align: middle;">
-    <span style="display: inline-block; vertical-align: middle;">aksel & anais</span>
+    <img src="https://i.postimg.cc/3J7HQ20j/1000022206-removebg-preview.png" alt="aksel & anais" />
+    <span>aksel & anais</span>
   </div>
   <div class="user-info">
     <span class="username" id="userNameDisplay"></span>
     <button class="menu-btn" id="menuToggleBtn"><i class="fas fa-ellipsis-h"></i></button>
   </div>
-</div>
+</header>
 
+<!-- ====== القائمة المنسدلة ====== -->
 <div class="dropdown-menu" id="dropdownMenu">
   <button id="btnCover"><i class="fas fa-image"></i> تغيير الغلاف</button>
   <button id="btnUsers"><i class="fas fa-users"></i> إدارة المستخدمين</button>
   <button id="btnOwnerSettings"><i class="fas fa-crown"></i> إعدادات المالك</button>
-  <!-- هذا الزر سيظهر فقط للمالك (تم تعديله في الكود) -->
-  <button id="btnWholesaleCode"><i class="fas fa-key"></i>  تغيير الرقم السري للجملة</button>
+  <button id="btnWholesaleCode"><i class="fas fa-key"></i> تغيير الرقم السري للجملة</button>
   <button id="btnDeleteAllProducts"><i class="fas fa-trash-alt"></i> حذف كل المنتجات</button>
   <button id="btnLogout"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</button>
 </div>
 
+<!-- ====== التبويبات ====== -->
 <div class="tabs" id="tabsContainer" style="display: none;">
   <button class="tab active" data-tab="products">📦 المنتجات</button>
   <button class="tab" data-tab="discounts">🏷️ التخفيضات</button>
   <button class="tab" data-tab="hidden">🔒 المخفية</button>
   <button class="tab" data-tab="whatsapp">💚 طلبات واتساب <span id="whatsappBadge" class="notification-badge" style="display:none;">0</span></button>
-  <button class="tab" data-tab="confirmed">✅ الطلبات المؤكدة <span id="confirmedBadge" style="background:#f39c12; border-radius:20px; padding:2px 8px; font-size:12px; margin-right:5px; display:none;">0</span></button>
+  <button class="tab" data-tab="confirmed">✅ الطلبات المؤكدة <span id="confirmedBadge" style="background:var(--warning); border-radius:20px; padding:2px 8px; font-size:0.7rem; margin-right:4px; display:none;">0</span></button>
 </div>
 
+<!-- ====== قسم المنتجات ====== -->
 <div id="productsSection">
   <div class="filter-section" id="familyFilterSection">
     <button class="filter-btn active" data-family="الكل" id="filterAll">
       <i class="fas fa-th-list"></i> الكل
       <span class="filter-count" id="countAll">0</span>
     </button>
-    <button class="filter-clear" id="clearFilterBtn">
-      <i class="fas fa-times"></i> إلغاء التصفية
-    </button>
+    <button class="filter-clear" id="clearFilterBtn"><i class="fas fa-times"></i> إلغاء التصفية</button>
   </div>
   <div class="search-box">
-    <input type="text" id="searchInput" placeholder="🔍 بحث عن منتج...">
+    <input type="text" id="searchInput" placeholder="🔍 بحث عن منتج..." />
   </div>
   <div id="coverBanner" style="display:none; padding:12px;">
-    <img id="coverImage" style="width:100%; border-radius:24px; max-height:180px; object-fit:cover;">
+    <img id="coverImage" style="width:100%; border-radius:var(--radius); max-height:180px; object-fit:cover;" />
   </div>
   <div class="products-grid" id="productsContainer"></div>
   <div id="pagination"></div>
 </div>
 
+<!-- ====== قسم التخفيضات ====== -->
 <div id="discountsSection">
-  <div style="padding: 12px; background: #fef3c7; margin: 12px; border-radius: 16px; text-align: center; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
-    <div>
-      <i class="fas fa-tags" style="color:#d97706; font-size:20px;"></i>
-      <span style="font-weight:700; margin-right:8px;">إدارة التخفيضات</span>
-    </div>
-    <span style="font-size:13px; color:#92400e;">يمكنك إدارة التخفيضات من خلال أزرار "تخفيض" على المنتجات</span>
+  <div style="padding:12px; background:var(--gold-light); margin:12px; border-radius:var(--radius); text-align:center;">
+    <i class="fas fa-tags" style="color:var(--gold);"></i>
+    <span style="font-weight:700; margin-right:8px;">إدارة التخفيضات</span>
   </div>
   <div class="discounts-grid" id="discountsContainer">
     <div class="no-data">لا توجد تخفيضات حالياً</div>
   </div>
 </div>
 
+<!-- ====== قسم المخفية ====== -->
 <div id="hiddenSection" style="display: none;">
   <div class="products-grid" id="hiddenProductsContainer"></div>
 </div>
 
+<!-- ====== قسم طلبات واتساب ====== -->
 <div id="whatsappSection" style="display: none;">
-  <div style="padding: 12px; background: #f0fdf4; margin: 12px; border-radius: 16px; text-align: center;">
+  <div style="padding:12px; background:#f0fdf4; margin:12px; border-radius:var(--radius); text-align:center;">
     <i class="fab fa-whatsapp" style="color:#25D366; font-size:24px;"></i>
     <p style="margin-top:8px;">الطلبات تصل مباشرة إلى <strong>واتساب</strong> على الرقم <strong dir="ltr">0781554885</strong></p>
-    <p style="font-size:12px; color:#666;">يمكنك طباعة الفاتورة من هنا</p>
   </div>
   <div id="whatsappOrdersContainer"></div>
 </div>
 
+<!-- ====== قسم الطلبات المؤكدة ====== -->
 <div id="confirmedSection" style="display: none;">
-  <!-- زر حذف الطلبات سيظهر فقط للمالك (تم تعديله في الكود) -->
   <div style="text-align:center; margin:12px;">
     <button id="deleteAllConfirmedBtn" class="delete-all-btn">🗑️ حذف جميع الطلبات المؤكدة</button>
   </div>
   <div id="confirmedOrdersContainer"></div>
 </div>
 
+<!-- ====== زر الإضافة ====== -->
 <button class="fab" id="addProductBtn" style="display: none;">+</button>
 
-<div id="loginModal" class="modal" onclick="closeModalOnOutsideClick(event, 'loginModal')" style="display: flex;">
+<!-- ====== مودال تسجيل الدخول ====== -->
+<div id="loginModal" class="modal" onclick="closeModalOnOutsideClick(event, 'loginModal')" style="display:flex;">
   <div class="modal-content" onclick="event.stopPropagation()" style="text-align:center;">
-    <img src="https://i.postimg.cc/3J7HQ20j/1000022206-removebg-preview.png" style="width:80px; margin-bottom:16px;">
+    <img src="https://i.postimg.cc/3J7HQ20j/1000022206-removebg-preview.png" style="width:80px; margin-bottom:16px;" />
     <h3>تسجيل الدخول</h3>
-    <input type="text" id="adminUser" placeholder="اسم المستخدم">
-    <input type="password" id="adminPassword" placeholder="كلمة المرور">
+    <input type="text" id="adminUser" placeholder="اسم المستخدم" />
+    <input type="password" id="adminPassword" placeholder="كلمة المرور" />
     <button class="btn-primary" onclick="checkPassword()">دخول</button>
   </div>
 </div>
 
+<!-- ====== مودال إضافة/تعديل منتج ====== -->
 <div id="productModal" class="modal" onclick="closeModalOnOutsideClick(event, 'productModal')">
   <div class="modal-content" onclick="event.stopPropagation()">
-    <span onclick="closeModal('productModal')" style="position: absolute; top: 15px; left: 20px; font-size: 24px; cursor: pointer; color: #aaa;">&times;</span>
-    <h3 id="formTitle" style="margin-bottom: 18px; color: #10b981; text-align: center;">إضافة منتج</h3>
+    <span onclick="closeModal('productModal')" style="position:absolute; top:15px; left:20px; font-size:24px; cursor:pointer; color:var(--text-muted);">&times;</span>
+    <h3 id="formTitle" style="color:var(--primary);">إضافة منتج</h3>
     <form id="productForm">
-      <input type="hidden" id="editId">
-      <input type="text" id="serial" placeholder="الرقم التسلسلي" required>
-      <input type="text" id="name" placeholder="اسم المنتج" required>
-      <input type="number" id="price" placeholder="سعر البيع (دج)" required>
-      <!-- ====== حقل سعر الجملة الجديد ====== -->
-      <input type="number" id="wholesalePrice" placeholder="سعر الجملة (دج) - اختياري">
+      <input type="hidden" id="editId" />
+      <input type="text" id="name" placeholder="اسم المنتج" required />
+      <input type="number" id="price" placeholder="سعر البيع (دج)" required />
+      <input type="number" id="wholesalePrice" placeholder="سعر الجملة (دج) - اختياري" />
+      <input type="number" id="quantityPerBox" placeholder="الكمية في العلبة (اختياري)" step="1" min="0" />
       <div class="family-field-wrapper">
-        <select id="familySelect">
-          <option value="">-- اختر عائلة --</option>
-        </select>
-        <button type="button" class="family-add-btn" id="addFamilyBtn">
-          <i class="fas fa-plus"></i> إضافة
-        </button>
+        <select id="familySelect"><option value="">-- اختر عائلة --</option></select>
+        <button type="button" class="family-add-btn" id="addFamilyBtn"><i class="fas fa-plus"></i> إضافة</button>
       </div>
-      <input type="text" id="newFamilyInput" placeholder="اسم العائلة الجديدة" style="display:none; margin-bottom:8px;">
+      <input type="text" id="newFamilyInput" placeholder="اسم العائلة الجديدة" style="display:none;" />
       <div style="display:flex; gap:8px;">
-        <input type="file" id="imageFile" accept="image/*" style="flex:1;">
-        <label for="cameraInput" style="background:#efefef; padding:12px; border-radius:16px; cursor:pointer;">📷 كاميرا</label>
-        <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none;">
+        <input type="file" id="imageFile" accept="image/*" style="flex:1;" />
+        <label for="cameraInput" style="background:var(--bg); padding:12px; border-radius:40px; cursor:pointer; border:1px solid var(--border);"><i class="fas fa-camera"></i></label>
+        <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none;" />
       </div>
       <div style="display:flex; gap:10px; margin-top:10px;">
         <button type="submit" class="btn-primary">💾 حفظ</button>
-        <button type="button" id="toggleVisibilityBtn" style="display:none; background:orange; border:none; border-radius:40px; padding:0 16px;">👁️ إظهار/إخفاء</button>
+        <button type="button" id="toggleVisibilityBtn" style="display:none; background:var(--warning); color:white; border:none; border-radius:40px; padding:0 16px; font-weight:700; cursor:pointer;">👁️ إظهار/إخفاء</button>
       </div>
     </form>
   </div>
@@ -271,105 +832,111 @@
 <!-- ====== مودال التخفيض ====== -->
 <div id="discountModal" class="modal discount-modal" onclick="closeModalOnOutsideClick(event, 'discountModal')">
   <div class="modal-content" onclick="event.stopPropagation()">
-    <span onclick="closeModal('discountModal')" style="position: absolute; top: 15px; left: 20px; font-size: 24px; cursor: pointer; color: #aaa;">&times;</span>
-    <h3 style="margin-bottom: 18px; color: #dc2626; text-align: center;">🏷️ إدارة التخفيض</h3>
-    <div id="discountFormContainer">
-      <input type="hidden" id="discountProductId">
-      <div class="form-group">
-        <label>المنتج: <span id="discountProductName" style="font-weight:700; color:#10b981;"></span></label>
-      </div>
-      <div class="form-group">
-        <label>السعر بعد التخفيض (دج)</label>
-        <input type="number" id="discountNewPrice" placeholder="أدخل السعر الجديد" required>
-      </div>
-      <div class="form-group">
-        <div class="checkbox-group">
-          <input type="checkbox" id="discountUnlimited">
-          <label for="discountUnlimited">تخفيض بدون وقت محدد (دائم)</label>
+    <span onclick="closeModal('discountModal')" style="position:absolute; top:15px; left:20px; font-size:24px; cursor:pointer; color:var(--text-muted);">&times;</span>
+    <h3 style="color:var(--danger);">🏷️ إدارة التخفيض</h3>
+    <input type="hidden" id="discountProductId" />
+    <div class="form-group">
+      <label style="font-weight:600;">المنتج: <span id="discountProductName" style="color:var(--primary);"></span></label>
+    </div>
+    <div class="form-group">
+      <label style="font-weight:600;">السعر بعد التخفيض (دج)</label>
+      <input type="number" id="discountNewPrice" placeholder="أدخل السعر الجديد" required />
+    </div>
+    <div class="checkbox-group">
+      <input type="checkbox" id="discountUnlimited" />
+      <label for="discountUnlimited">تخفيض بدون وقت محدد (دائم)</label>
+    </div>
+    <div id="discountDateGroup">
+      <label style="font-weight:600;">المدة (من - إلى)</label>
+      <div class="date-fields">
+        <div>
+          <label style="font-weight:400; font-size:0.8rem;">من</label>
+          <input type="datetime-local" id="discountStartDate" />
+        </div>
+        <div>
+          <label style="font-weight:400; font-size:0.8rem;">إلى</label>
+          <input type="datetime-local" id="discountEndDate" />
         </div>
       </div>
-      <div class="form-group" id="discountDateGroup">
-        <label>المدة (من - إلى)</label>
-        <div class="date-fields">
-          <div>
-            <label style="font-weight:400; font-size:12px;">من</label>
-            <input type="datetime-local" id="discountStartDate">
-          </div>
-          <div>
-            <label style="font-weight:400; font-size:12px;">إلى</label>
-            <input type="datetime-local" id="discountEndDate">
-          </div>
-        </div>
-        <div class="hint">⚠️ إذا تركت الحقول فارغة سيتم تفعيل التخفيض فوراً ولن ينتهي تلقائياً.</div>
-      </div>
-      <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:12px;">
-        <button type="button" id="saveDiscountBtn" class="btn-success" style="flex:2;">💾 حفظ التخفيض</button>
-        <button type="button" id="removeDiscountBtn" class="btn-danger" style="flex:1; display:none;">🗑️ إزالة</button>
-      </div>
+      <div style="font-size:0.7rem; color:var(--text-muted); margin-top:4px;">⚠️ إذا تركت الحقول فارغة سيتم تفعيل التخفيض فوراً ولن ينتهي تلقائياً.</div>
+    </div>
+    <div style="display:flex; gap:10px; margin-top:12px;">
+      <button type="button" id="saveDiscountBtn" class="btn-success" style="flex:2;">💾 حفظ</button>
+      <button type="button" id="removeDiscountBtn" class="btn-danger" style="flex:1; display:none;">🗑️ إزالة</button>
     </div>
   </div>
 </div>
 
+<!-- ====== مودال المستخدمين ====== -->
 <div id="usersModal" class="modal" onclick="closeModalOnOutsideClick(event, 'usersModal')">
   <div class="modal-content" onclick="event.stopPropagation()">
-    <span onclick="closeModal('usersModal')" style="position: absolute; top: 15px; left: 20px; font-size: 24px; cursor: pointer; color: #aaa;">&times;</span>
-    <h3 style="margin-bottom: 12px; color: #1f2937; font-size: 18px;">👥 إدارة المستخدمين</h3>
-    <input id="newUserName" placeholder="اسم المستخدم" style="width:100%; padding:12px; margin-bottom:10px; border-radius:14px; border:1px solid #e5e7eb; background:#f8fafc;">
-    <input id="newUserPass" placeholder="كلمة المرور" style="width:100%; padding:12px; margin-bottom:10px; border-radius:14px; border:1px solid #e5e7eb; background:#f8fafc;">
-    <label style="display: flex; align-items: center; gap: 8px; margin: 10px 0; cursor: pointer;">
-      <input type="checkbox" id="isAdminCheck" style="width: 18px; height: 18px; margin: 0; cursor: pointer;">
-      <span style="font-size: 14px; color: #374151;">مدير (Admin)</span>
+    <span onclick="closeModal('usersModal')" style="position:absolute; top:15px; left:20px; font-size:24px; cursor:pointer; color:var(--text-muted);">&times;</span>
+    <h3>👥 إدارة المستخدمين</h3>
+    <input id="newUserName" placeholder="اسم المستخدم" />
+    <input id="newUserPass" placeholder="كلمة المرور" />
+    <label style="display:flex; align-items:center; gap:8px; margin:8px 0; cursor:pointer;">
+      <input type="checkbox" id="isAdminCheck" style="width:18px; height:18px; margin:0;" />
+      <span style="font-size:0.9rem;">مدير (Admin)</span>
     </label>
-    <button id="addUserBtn" class="btn-primary" style="margin-bottom: 12px;">➕ إضافة</button>
-    <div id="usersList" style="max-height: 200px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;"></div>
-    <button onclick="closeModal('usersModal')" style="width:100%; margin-top:12px; padding:12px; border:none; border-radius:14px; background:#e74c3c; color:white; font-weight:700; cursor:pointer;">إغلاق</button>
+    <button id="addUserBtn" class="btn-primary" style="margin-bottom:12px;">➕ إضافة</button>
+    <div id="usersList" style="max-height:200px; overflow-y:auto; display:flex; flex-direction:column; gap:8px;"></div>
+    <button onclick="closeModal('usersModal')" class="btn-danger">إغلاق</button>
   </div>
 </div>
 
+<!-- ====== مودال إعدادات المالك ====== -->
 <div id="ownerModal" class="modal" onclick="closeModalOnOutsideClick(event, 'ownerModal')">
   <div class="modal-content" onclick="event.stopPropagation()">
-    <span onclick="closeModal('ownerModal')" style="position: absolute; top: 15px; left: 20px; font-size: 24px; cursor: pointer; color: #aaa;">&times;</span>
-    <h3 style="margin-bottom: 14px; font-size: 18px; color: #1f2937;">🔐 إعدادات المالك</h3>
-    <input id="newOwnerName" placeholder="الاسم الجديد" style="width:100%; padding:12px; margin-bottom:10px; border-radius:14px; border:1px solid #e5e7eb; background:#f8fafc; outline:none;">
-    <input id="newOwnerPass" placeholder="كلمة المرور الجديدة" style="width:100%; padding:12px; margin-bottom:10px; border-radius:14px; border:1px solid #e5e7eb; background:#f8fafc; outline:none;">
-    <button onclick="closeModal('ownerModal')" style="width:100%; padding:12px; border:none; border-radius:14px; background:#e74c3c; color:white; font-weight:700; cursor:pointer;">❌ إلغاء</button>
+    <span onclick="closeModal('ownerModal')" style="position:absolute; top:15px; left:20px; font-size:24px; cursor:pointer; color:var(--text-muted);">&times;</span>
+    <h3>🔐 إعدادات المالك</h3>
+    <input id="newOwnerName" placeholder="الاسم الجديد" />
+    <input id="newOwnerPass" placeholder="كلمة المرور الجديدة" />
+    <button onclick="closeModal('ownerModal')" class="btn-secondary">❌ إلغاء</button>
   </div>
 </div>
 
+<!-- ====== مودال تفاصيل الطلب ====== -->
 <div id="orderDetailModal" class="modal" onclick="closeModalOnOutsideClick(event, 'orderDetailModal')">
-  <div class="modal-content" onclick="event.stopPropagation()" style="max-width: 700px;">
-    <span onclick="closeModal('orderDetailModal')" style="position: absolute; top: 15px; left: 20px; font-size: 28px; cursor: pointer; color: #aaa;">&times;</span>
+  <div class="modal-content" onclick="event.stopPropagation()" style="max-width:700px;">
+    <span onclick="closeModal('orderDetailModal')" style="position:absolute; top:15px; left:20px; font-size:28px; cursor:pointer; color:var(--text-muted);">&times;</span>
     <div id="orderDetailContent"></div>
   </div>
 </div>
-<!-- ====== مودال تغيير الرقم السري للجملة (مستقل) ====== -->
+
+<!-- ====== مودال الرقم السري للجملة ====== -->
 <div id="wholesaleCodeModal" class="modal" onclick="closeModalOnOutsideClick(event, 'wholesaleCodeModal')">
   <div class="modal-content" onclick="event.stopPropagation()">
-    <span onclick="closeModal('wholesaleCodeModal')" style="position: absolute; top: 15px; left: 20px; font-size: 24px; cursor: pointer; color: #aaa;">&times;</span>
-    <h3 style="margin-bottom: 18px; font-size: 18px; color: #8e44ad; text-align: center;">🔑 تغيير الرقم السري للجملة</h3>
-    <p style="font-size: 13px; color: #6b7280; margin-bottom: 14px; text-align: center;">
-      هذا الرقم السري يستخدمه زبائن الجملة لتفعيل أسعار الجملة في المتجر.
-    </p>
-    <input id="wholesaleCodeInput" placeholder="الرقم السري الجديد" style="width:100%; padding:12px; margin-bottom:14px; border-radius:14px; border:1px solid #e5e7eb; background:#f8fafc; outline:none; direction:ltr; font-size:16px;">
-    <button id="saveWholesaleCodeBtn" class="btn-primary" style="margin-bottom:10px; background: linear-gradient(135deg, #8e44ad, #9b59b6);">💾 حفظ الرقم السري</button>
-    <button onclick="closeModal('wholesaleCodeModal')" style="width:100%; padding:12px; border:none; border-radius:14px; background:#e74c3c; color:white; font-weight:700; cursor:pointer;">❌ إلغاء</button>
-  </div>
-</div>
-<!-- ====== مودال اختيار طريقة الطباعة ====== -->
-<div id="printOptionModal" class="modal" onclick="closeModalOnOutsideClick(event, 'printOptionModal')">
-  <div class="modal-content" onclick="event.stopPropagation()" style="max-width:400px; text-align:center;">
-    <h3 style="margin-bottom:16px;">🖨️ اختر طريقة الطباعة</h3>
-    <button id="thermalPrintBtn" class="btn" style="background:#1e293b; color:white; padding:12px; border-radius:30px; width:100%; margin-bottom:10px; border:none; font-weight:bold; cursor:pointer;">
-      <i class="fas fa-bluetooth"></i> طباعة حرارية (بلوتوث)
-    </button>
-    <button id="normalPrintBtn" class="btn" style="background:#10b981; color:white; padding:12px; border-radius:30px; width:100%; border:none; font-weight:bold; cursor:pointer;">
-      <i class="fas fa-print"></i> طباعة عادية (حاسوب)
-    </button>
-    <button onclick="closeModal('printOptionModal')" style="background:none; border:none; color:#94a3b8; margin-top:16px; cursor:pointer; font-size:14px;">إلغاء</button>
+    <span onclick="closeModal('wholesaleCodeModal')" style="position:absolute; top:15px; left:20px; font-size:24px; cursor:pointer; color:var(--text-muted);">&times;</span>
+    <h3 style="color:var(--vip);">🔑 تغيير الرقم السري للجملة</h3>
+    <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:12px;">هذا الرقم يستخدمه زبائن الجملة لتفعيل الأسعار.</p>
+    <input id="wholesaleCodeInput" placeholder="الرقم السري الجديد" dir="ltr" />
+    <button id="saveWholesaleCodeBtn" class="btn-primary" style="background:linear-gradient(135deg, var(--vip), #9b59b6);">💾 حفظ</button>
+    <button onclick="closeModal('wholesaleCodeModal')" class="btn-danger">❌ إلغاء</button>
   </div>
 </div>
 
+<!-- ====== مودال اختيار الطباعة ====== -->
+<div id="printOptionModal" class="modal" onclick="closeModalOnOutsideClick(event, 'printOptionModal')">
+  <div class="modal-content" onclick="event.stopPropagation()" style="max-width:400px; text-align:center;">
+    <h3>🖨️ اختر طريقة الطباعة</h3>
+    <button id="thermalPrintBtn" style="background:#1e293b; color:white; padding:12px; border-radius:40px; width:100%; margin-bottom:10px; border:none; font-weight:700; cursor:pointer; font-family:var(--font);">
+      <i class="fas fa-bluetooth"></i> طباعة حرارية (بلوتوث)
+    </button>
+    <button id="normalPrintBtn" style="background:var(--primary); color:white; padding:12px; border-radius:40px; width:100%; border:none; font-weight:700; cursor:pointer; font-family:var(--font);">
+      <i class="fas fa-print"></i> طباعة عادية (حاسوب)
+    </button>
+    <button onclick="closeModal('printOptionModal')" style="background:none; border:none; color:var(--text-muted); margin-top:16px; cursor:pointer; font-size:0.9rem; font-family:var(--font);">إلغاء</button>
+  </div>
+</div>
+
+<!-- ====== توست ====== -->
 <div class="toast" id="toastMessage">✅ تم بنجاح</div>
+
+<!-- ====== الفوتر ====== -->
+<footer>
+  <p>aksel & anais &copy; 2026 – جميع الحقوق محفوظة</p>
+  <p><i class="fa-solid fa-phone"></i> <a href="tel:0781554885">0781554885</a></p>
+</footer>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
@@ -440,36 +1007,31 @@
     }
   }
 
-  // ====== تحديث صلاحيات الأزرار (التعديل المطلوب) ======
+  // ====== تحديث صلاحيات الأزرار ======
   function updateMenuPermissions() {
     const role = getRole();
     const isOwnerRole = role === "owner";
     const isAdminRole = role === "admin";
 
-    // أزرار خاصة بالمالك فقط
     const ownerOnlyBtns = {
       btnUsers: true,
       btnOwnerSettings: true,
       btnDeleteAllProducts: true,
-      btnWholesaleCode: true,   // ✅ زر تغيير الرقم السري للمالك فقط
+      btnWholesaleCode: true,
     };
     for (let [id, show] of Object.entries(ownerOnlyBtns)) {
       const btn = document.getElementById(id);
       if (btn) btn.style.display = isOwnerRole ? "flex" : "none";
     }
 
-    // زر تغيير الغلاف للمالك والمدير
     const coverBtn = document.getElementById("btnCover");
     if (coverBtn) coverBtn.style.display = (isOwnerRole || isAdminRole) ? "flex" : "none";
 
-    // زر تسجيل الخروج للجميع
     const logoutBtn = document.getElementById("btnLogout");
     if (logoutBtn) logoutBtn.style.display = "flex";
 
-    // زر إضافة منتج للمالك والمدير
     document.getElementById("addProductBtn").style.display = (isOwnerRole || isAdminRole) ? "flex" : "none";
 
-    // زر حذف جميع الطلبات المؤكدة للمالك فقط ✅
     const deleteAllConfirmedBtn = document.getElementById("deleteAllConfirmedBtn");
     if (deleteAllConfirmedBtn) {
       deleteAllConfirmedBtn.style.display = isOwnerRole ? "inline-block" : "none";
@@ -510,7 +1072,7 @@
     }); 
   }
 
-  // ====== دوال العائلات (بدون تغيير) ======
+  // ====== دوال العائلات ======
   function loadFamilies() {
     onValue(familiesRef, (snap) => {
       const data = snap.val();
@@ -718,8 +1280,7 @@
     if (searchTerm) {
       result = Object.fromEntries(
         Object.entries(result).filter(([_, p]) => 
-          (p.name || "").toLowerCase().includes(searchTerm) || 
-          (p.serial || "").toLowerCase().includes(searchTerm)
+          (p.name || "").toLowerCase().includes(searchTerm)
         )
       );
     }
@@ -733,7 +1294,7 @@
     applyFiltersAndRender();
   }
 
-  // ====== دوال المنتجات والطلبات (مع دعم الجملة) ======
+  // ====== دوال المنتجات والطلبات ======
   async function getNextInvoiceNumber() {
     const snapshot = await get(invoiceCounterRef);
     let currentNumber = snapshot.exists() ? snapshot.val() : 0;
@@ -746,7 +1307,6 @@
     const items = cart.map(item => ({
         id: item.id,
         name: item.name,
-        serial: item.serial || '---',
         quantity: item.quantity,
         price: item.price
     }));
@@ -762,7 +1322,7 @@
     return push(ordersRef, order);
   }
 
-  // ====== دوال الطباعة (بدون تغيير) ======
+  // ====== دوال الطباعة (المعدلة) ======
   let printContext = { key: null, order: null, type: null };
 
   async function confirmOrderOnly(key, order) {
@@ -786,17 +1346,15 @@
 
   function printNormal() {
     const { key, order, type } = printContext;
-    if (type === 'whatsapp') {
-      const sellerName = localStorage.getItem("user") || "Admin";
-      printInvoice(order, sellerName);
-    } else {
-      const sellerName = localStorage.getItem("user") || "Admin";
-      printConfirmedOrder(order, sellerName);
-    }
+    // حفظ بيانات الطلب في sessionStorage
+    sessionStorage.setItem('printOrder', JSON.stringify({ key, order, type }));
+    // فتح صفحة الطباعة الجديدة (للحاسوب)
+    window.open('print_admin.html', '_blank');
     closeModal('printOptionModal');
   }
 
   function printThermal() {
+    // الطباعة الحرارية تفتح الصفحة الموجودة print_invoice.html
     window.open('print_invoice.html', '_blank');
     closeModal('printOptionModal');
   }
@@ -804,248 +1362,7 @@
   document.getElementById('thermalPrintBtn').addEventListener('click', printThermal);
   document.getElementById('normalPrintBtn').addEventListener('click', printNormal);
 
-  function printInvoice(order, sellerName) {
-  let rows = "";
-  let totalQte = 0;
-  let itemIndex = 1;
-  let invoiceNumber = order.invoiceNumber ? order.invoiceNumber.toString().padStart(4, '0') : '----';
-  
-  if (order.items && Array.isArray(order.items)) {
-    order.items.forEach((it) => {
-      const qty = Number(it.quantity || 0);
-      const price = Number(it.price || 0);
-      const total = qty * price;
-      totalQte += qty;
-      rows += `
-        <tr>
-          <td style="text-align:center; border:1px solid #000; padding:2px 4px;">${itemIndex}</td>
-          <td style="border:1px solid #000; padding:2px 4px; text-align:center; direction:ltr;">${escapeHtml(it.serial || '---')}</td>
-          <td style="border:1px solid #000; padding:2px 4px; text-align:left; direction:ltr; font-weight:600;">${escapeHtml(it.name || '')}</td>
-          <td style="text-align:center; border:1px solid #000; padding:2px 4px;">${qty}</td>
-          <!-- عرض السعر الفردي بدون فواصل عشرية -->
-          <td style="text-align:right; border:1px solid #000; padding:2px 4px; direction:ltr;">
-            ${price.toLocaleString('fr-FR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} DA
-          </td>
-          <!-- عرض المجموع بدون فواصل عشرية -->
-          <td style="text-align:right; border:1px solid #000; padding:2px 4px; direction:ltr;">
-            ${total.toLocaleString('fr-FR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} DA
-          </td>
-        </tr>
-      `;
-      itemIndex++;
-    });
-  }
-  
-  const totalPrice = order.totalPrice || 0;
-  const nbreProduit = order.items ? order.items.length : 0;
-  
-  const win = window.open('', '_blank');
-  win.document.write(`
-    <!DOCTYPE html>
-    <html lang="fr" dir="ltr">
-    <head>
-      <meta charset="UTF-8">
-      <title>Bon de livraison</title>
-      <style>
-        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap');
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Cairo', Arial, sans-serif; font-size: 12px; background: white; padding: 10px; direction: ltr; }
-        .invoice { max-width: 1000px; margin: 0 auto; border: 2px solid #000; padding: 12px; }
-        .top-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 15px; }
-        .store-info { display: flex; align-items: center; gap: 10px; width: 55%; }
-        .store-logo img { width: 50px; height: 50px; object-fit: contain; }
-        .store-details h2 { font-size: 14px; font-weight: 900; margin-bottom: 3px; }
-        .store-details p { font-size: 10px; margin: 2px 0; }
-        .client-info { width: 40%; border: 1px solid #000; padding: 6px 10px; line-height: 1.4; font-size: 11px; direction: ltr; }
-        .client-info p { margin: 2px 0; text-align: left; }
-        .info-bar { display: flex; justify-content: space-between; margin-bottom: 15px; padding: 5px 0; font-size: 11px; font-weight: 600; direction: ltr; }
-        table { width: 100%; border-collapse: collapse; margin: 10px 0; direction: ltr; }
-        /* تقليل padding في الرأس والخلايا */
-        th, td { border: 1px solid #000; padding: 2px 4px; font-size: 11px; }
-        th { background: #f4f4f4; font-weight: 700; text-align: center; }
-        .summary-line { margin: 8px 0; text-align: right; font-weight: 600; font-size: 11px; direction: ltr; }
-        .bottom-section { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 15px; border-top: 2px solid #000; padding-top: 10px; direction: ltr; }
-        .invoice-number { text-align: right; font-size: 11px; font-weight: bold; }
-        .total-box { text-align: right; }
-        .total-box strong { font-size: 12px; }
-        .total-amount { font-size: 16px; font-weight: 900; }
-        .footer-text { text-align: center; margin-top: 12px; font-size: 10px; font-weight: 500; direction: ltr; }
-        @page { @bottom-center { content: "Page : " counter(page) "/" counter(pages); } }
-        @media print { body { padding: 0; } .invoice { border: 2px solid #000; } .no-print { display: none !important; } }
-        td:nth-child(3) { direction: ltr; text-align: left; font-weight: 600; }
-        td:nth-child(2) { direction: ltr; text-align: center; }
-        td:nth-child(5), td:nth-child(6) { direction: ltr; text-align: right; }
-      </style>
-    </head>
-    <body>
-      <div class="invoice">
-        <div class="top-header">
-          <div class="store-info">
-            <div class="store-logo"><img src="https://i.postimg.cc/3J7HQ20j/1000022206-removebg-preview.png" alt="Logo"></div>
-            <div class="store-details">
-              <h2>aksel & anais</h2>
-              <p>Télé : 0775-980-735</p>
-              <p>zéralda.</p>
-            </div>
-          </div>
-          <div class="client-info">
-            <p><strong>Client :</strong> ${escapeHtml(order.customerName || '')}</p>
-            <p><strong>Adresse :</strong> ${escapeHtml(order.address || '')}</p>
-            <p><strong>Télé :</strong> ${escapeHtml(order.phone || '')}</p>
-          </div>
-        </div>
-        <div class="info-bar">
-          <span>le ${new Date().toLocaleDateString('fr-FR')} - ${new Date().toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'})}</span>
-          <span>Préparé par : ${escapeHtml(sellerName || 'KARIM')}</span>
-        </div>
-        <div style="text-align:center; margin:10px 0; font-weight:bold; font-size:14px; direction:ltr;">Bon de livraison</div>
-        <table>
-          <thead><tr><th style="width:5%">N°</th><th style="width:10%">Réf</th><th style="width:50%">DESIGNATION</th><th style="width:8%">QTE</th><th style="width:13%">Prix u</th><th style="width:14%">Total</th></tr></thead>
-          <tbody>${rows}</tbody>
-        </table>
-        <div class="summary-line">Nbre Produit : ${nbreProduit} &nbsp;&nbsp;&nbsp; Tot Qté : ${totalQte}</div>
-        <div class="bottom-section">
-          <div class="invoice-number">bon de livraison N°: ${invoiceNumber}</div>
-          <div class="total-box">
-            <div><strong>net à payer</strong></div>
-            <!-- هنا نترك الصيغة العشرية بمنزلتين للمبلغ الإجمالي -->
-            <div class="total-amount">${Math.floor(totalPrice).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} DA</div>
-          </div>
-        </div>
-        <div class="footer-text">Merci pour votre confiance</div>
-      </div>
-      <div class="no-print" style="text-align:center; margin:20px 0;">
-        <button onclick="window.print()" style="padding:10px 25px; font-size:14px; margin:5px; background:#000; color:white; border:none; border-radius:5px; cursor:pointer;">🖨️ Imprimer</button>
-        <button onclick="window.close()" style="padding:10px 25px; font-size:14px; margin:5px;">✖️ Fermer</button>
-      </div>
-    </body>
-    </html>
-  `);
-  win.document.close();
-  setTimeout(() => { win.focus(); }, 500);
-}
-
-  function printConfirmedOrder(order, sellerName) {
-  let rows = "";
-  let totalQte = 0;
-  let itemIndex = 1;
-  let invoiceNumber = order.invoiceNumber ? order.invoiceNumber.toString().padStart(4, '0') : '----';
-  
-  if (order.items && Array.isArray(order.items)) {
-    order.items.forEach((it) => {
-      const qty = Number(it.quantity || 0);
-      const price = Number(it.price || 0);
-      const total = qty * price;
-      totalQte += qty;
-      rows += `
-        <tr>
-          <td style="text-align:center; border:1px solid #000; padding:2px 4px;">${itemIndex}</td>
-          <td style="border:1px solid #000; padding:2px 4px; text-align:center; direction:ltr;">${escapeHtml(it.serial || '---')}</td>
-          <td style="border:1px solid #000; padding:2px 4px; text-align:left; direction:ltr; font-weight:600;">${escapeHtml(it.name || '')}</td>
-          <td style="text-align:center; border:1px solid #000; padding:2px 4px;">${qty}</td>
-          <!-- عرض السعر الفردي بدون فواصل عشرية -->
-          <td style="text-align:right; border:1px solid #000; padding:2px 4px; direction:ltr;">
-            ${price.toLocaleString('fr-FR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} DA
-          </td>
-          <!-- عرض المجموع بدون فواصل عشرية -->
-          <td style="text-align:right; border:1px solid #000; padding:2px 4px; direction:ltr;">
-            ${total.toLocaleString('fr-FR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} DA
-          </td>
-        </tr>
-      `;
-      itemIndex++;
-    });
-  }
-  
-  const totalPrice = order.totalPrice || 0;
-  const nbreProduit = order.items ? order.items.length : 0;
-  
-  const win = window.open('', '_blank');
-  win.document.write(`
-    <!DOCTYPE html>
-    <html lang="fr" dir="ltr">
-    <head>
-      <meta charset="UTF-8">
-      <title>Bon de livraison confirmé</title>
-      <style>
-        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap');
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Cairo', Arial, sans-serif; font-size: 12px; background: white; padding: 10px; direction: ltr; }
-        .invoice { max-width: 1000px; margin: 0 auto; border: 2px solid #000; padding: 12px; }
-        .top-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 15px; }
-        .store-info { display: flex; align-items: center; gap: 10px; width: 55%; }
-        .store-logo img { width: 50px; height: 50px; object-fit: contain; }
-        .store-details h2 { font-size: 14px; font-weight: 900; margin-bottom: 3px; }
-        .store-details p { font-size: 10px; margin: 2px 0; }
-        .client-info { width: 40%; border: 1px solid #000; padding: 6px 10px; line-height: 1.4; font-size: 11px; direction: ltr; }
-        .client-info p { margin: 2px 0; text-align: left; }
-        .info-bar { display: flex; justify-content: space-between; margin-bottom: 15px; padding: 5px 0; font-size: 11px; font-weight: 600; direction: ltr; }
-        table { width: 100%; border-collapse: collapse; margin: 10px 0; direction: ltr; }
-        th, td { border: 1px solid #000; padding: 2px 4px; font-size: 11px; }
-        th { background: #f4f4f4; font-weight: 700; text-align: center; }
-        .summary-line { margin: 8px 0; text-align: right; font-weight: 600; font-size: 11px; direction: ltr; }
-        .bottom-section { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 15px; border-top: 2px solid #000; padding-top: 10px; direction: ltr; }
-        .invoice-number { text-align: right; font-size: 11px; font-weight: bold; }
-        .total-box { text-align: right; }
-        .total-box strong { font-size: 12px; }
-        .total-amount { font-size: 16px; font-weight: 900; }
-        .footer-text { text-align: center; margin-top: 12px; font-size: 10px; font-weight: 500; direction: ltr; }
-        @page { @bottom-center { content: "Page : " counter(page) "/" counter(pages); } }
-        @media print { body { padding: 0; } .invoice { border: 2px solid #000; } .no-print { display: none !important; } }
-        td:nth-child(3) { direction: ltr; text-align: left; font-weight: 600; }
-        td:nth-child(2) { direction: ltr; text-align: center; }
-        td:nth-child(5), td:nth-child(6) { direction: ltr; text-align: right; }
-      </style>
-    </head>
-    <body>
-      <div class="invoice">
-        <div class="top-header">
-          <div class="store-info">
-            <div class="store-logo"><img src="https://i.postimg.cc/3J7HQ20j/1000022206-removebg-preview.png" alt="Logo"></div>
-            <div class="store-details">
-              <h2>aksel & anais</h2>
-              <p>Télé : 0781554885</p>
-              <p>zéralda.</p>
-            </div>
-          </div>
-          <div class="client-info">
-            <p><strong>Client :</strong> ${escapeHtml(order.customerName || '')}</p>
-            <p><strong>Adresse :</strong> ${escapeHtml(order.address || '')}</p>
-            <p><strong>Télé :</strong> ${escapeHtml(order.phone || '')}</p>
-          </div>
-        </div>
-        <div class="info-bar">
-          <span>le ${new Date().toLocaleDateString('fr-FR')} - ${new Date().toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'})}</span>
-          <span>Préparé par : ${escapeHtml(sellerName || 'KARIM')}</span>
-        </div>
-        <div style="text-align:center; margin:10px 0; font-weight:bold; font-size:14px; direction:ltr;">Bon de livraison</div>
-        <table>
-          <thead><tr><th style="width:5%">N°</th><th style="width:10%">Réf</th><th style="width:50%">DESIGNATION</th><th style="width:8%">QTE</th><th style="width:13%">Prix u</th><th style="width:14%">Total</th></tr></thead>
-          <tbody>${rows}</tbody>
-        </table>
-        <div class="summary-line">Nbre Produit : ${nbreProduit} &nbsp;&nbsp;&nbsp; Tot Qté : ${totalQte}</div>
-        <div class="bottom-section">
-          <div class="invoice-number">bon de livraison N°: ${invoiceNumber}</div>
-          <div class="total-box">
-            <div><strong>net à payer</strong></div>
-            <!-- المبلغ الإجمالي مع منزلتين عشريتين -->
-            <div class="total-amount">${Math.floor(totalPrice).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} DA</div>
-          </div>
-        </div>
-        <div class="footer-text">Merci pour votre confiance</div>
-      </div>
-      <div class="no-print" style="text-align:center; margin:20px 0;">
-        <button onclick="window.print()" style="padding:10px 25px; font-size:14px; margin:5px; background:#000; color:white; border:none; border-radius:5px; cursor:pointer;">🖨️ Imprimer</button>
-        <button onclick="window.close()" style="padding:10px 25px; font-size:14px; margin:5px;">✖️ Fermer</button>
-      </div>
-    </body>
-    </html>
-  `);
-  win.document.close();
-  setTimeout(() => { win.focus(); }, 500);
-}
-
-  // ====== عرض المنتجات (مع إظهار سعر الجملة في البطاقة) ======
+  // ====== عرض المنتجات ======
   function renderProducts(page) {
     const container = document.getElementById("productsContainer");
     if (!container) return;
@@ -1095,10 +1412,14 @@
         `;
       }
       
-      // عرض سعر الجملة إذا وجد
       let wholesaleHtml = '';
       if (prod.wholesalePrice && !isNaN(prod.wholesalePrice)) {
         wholesaleHtml = `<div class="product-wholesale-price">🏷️ جملة: ${Number(prod.wholesalePrice).toLocaleString()} دج</div>`;
+      }
+      
+      let boxQtyHtml = '';
+      if (prod.quantityPerBox && prod.quantityPerBox > 0) {
+        boxQtyHtml = `<div class="product-box-qty">📦 العلبة: ${prod.quantityPerBox} وحدة</div>`;
       }
       
       card.innerHTML = `
@@ -1107,6 +1428,7 @@
           <div class="product-name">${escapeHtml(prod.name)}</div>
           ${priceHtml}
           ${wholesaleHtml}
+          ${boxQtyHtml}
           <div class="product-family">🏷️ ${prod.family || 'غير مصنف'}</div>
           ${isOnSale && !discount.unlimited && discount.endDate ? `<div class="discount-timer" id="timer_${id}" data-end="${discount.endDate}" data-productid="${id}"><i class="far fa-clock"></i> <span class="time-left">جاري...</span></div>` : ''}
           <div class="product-actions">
@@ -1140,40 +1462,7 @@
     renderPagination(total);
   }
 
-  // ====== زر تغيير الرقم السري للجملة (مستقل) ======
-  // ملاحظة: هذا الزر يظهر فقط للمالك (تم التحكم به في updateMenuPermissions)
-  document.getElementById("btnWholesaleCode")?.addEventListener("click", () => {
-    if (!isOwner()) {
-      showToast("غير مسموح");
-      return;
-    }
-    openModal("wholesaleCodeModal");
-    get(wholesaleCodeRef).then(snap => {
-      if (snap.exists() && snap.val().code) {
-        document.getElementById("wholesaleCodeInput").value = snap.val().code;
-      } else {
-        document.getElementById("wholesaleCodeInput").value = '';
-      }
-    });
-  });
-
-  document.getElementById("saveWholesaleCodeBtn")?.addEventListener("click", async () => {
-    const code = document.getElementById("wholesaleCodeInput").value.trim();
-    if (!code) {
-      showToast("⚠️ الرجاء إدخال الرقم السري");
-      return;
-    }
-    try {
-      await set(wholesaleCodeRef, { code: code });
-      showToast("✅ تم حفظ الرقم السري للجملة بنجاح");
-      closeModal("wholesaleCodeModal");
-    } catch (error) {
-      console.error(error);
-      showToast("❌ حدث خطأ أثناء الحفظ");
-    }
-  });
-
-  // ====== دوال التخفيضات (بدون تغيير) ======
+  // ====== دوال التخفيضات ======
   function loadDiscounts() {
     onValue(discountsRef, (snap) => {
       const data = snap.val() || {};
@@ -1523,16 +1812,16 @@
     createBtn("›", currentPage + 1, false, currentPage === total);
   }
 
-  // ====== تعديل المنتج (مع تعبئة سعر الجملة) ======
+  // ====== تعديل المنتج ======
   window.editProduct = (id) => {
     const p = allProducts[id];
     if(!p) return;
     editingProductId = id;
     document.getElementById("editId").value = id;
-    document.getElementById("serial").value = p.serial || "";
     document.getElementById("name").value = p.name || "";
     document.getElementById("price").value = p.price || "";
     document.getElementById("wholesalePrice").value = p.wholesalePrice || "";
+    document.getElementById("quantityPerBox").value = p.quantityPerBox || "";
     setFamilyInForm(p.family || "");
     document.getElementById("formTitle").innerText = "✏️ تعديل المنتج";
     const toggleBtn = document.getElementById("toggleVisibilityBtn");
@@ -1560,14 +1849,14 @@
     throw new Error("فشل الرفع");
   }
 
-  // ====== حفظ المنتج (مع إضافة سعر الجملة) ======
+  // ====== حفظ المنتج ======
   document.getElementById("productForm").onsubmit = async (e) => {
     e.preventDefault();
     const id = document.getElementById("editId").value;
-    const serial = document.getElementById("serial").value.trim();
     const name = document.getElementById("name").value.trim();
     const price = parseFloat(document.getElementById("price").value)||0;
     const wholesalePrice = parseFloat(document.getElementById("wholesalePrice").value)||0;
+    const quantityPerBox = parseInt(document.getElementById("quantityPerBox").value)||0;
     const familySelect = document.getElementById("familySelect");
     const selectedFamily = familySelect.value;
     const fileInput = document.getElementById("imageFile");
@@ -1585,10 +1874,10 @@
         newImg = upload.url; newDel = upload.deleteUrl;
       }
       const data = { 
-        serial, 
         name, 
         price, 
         wholesalePrice: wholesalePrice > 0 ? wholesalePrice : null,
+        quantityPerBox: quantityPerBox > 0 ? quantityPerBox : null,
         family: selectedFamily || "",
         imageUrl: newImg, 
         deleteUrl: newDel, 
@@ -1602,6 +1891,7 @@
       editingProductId = null;
       document.getElementById("familySelect").value = "";
       document.getElementById("wholesalePrice").value = "";
+      document.getElementById("quantityPerBox").value = "";
     } catch(err) { alert("خطأ: "+err.message); }
   };
 
@@ -1613,7 +1903,7 @@
     closeModal("productModal");
   }
 
-  // ====== عرض الطلبات (بدون تغيير) ======
+  // ====== عرض الطلبات ======
   function renderWhatsappOrders(ordersData) {
     const container = document.getElementById("whatsappOrdersContainer");
     if (!container) return;
@@ -1714,7 +2004,7 @@
     });
   }
 
-  // ====== مودال تفاصيل الطلب (بدون تغيير) ======
+  // ====== مودال تفاصيل الطلب ======
   function openOrderDetailModal(order, type, key) {
     const modal = document.getElementById("orderDetailModal");
     const content = document.getElementById("orderDetailContent");
@@ -1729,8 +2019,7 @@
         itemsHtml += `
           <tr>
             <td style="text-align:center; padding: 6px;">${idx+1}</td>
-            <td style="text-align:center;">${escapeHtml(it.serial || '---')}</td>
-            <td>${escapeHtml(it.name)}</td>
+            <td style="text-align:right; font-weight:600;">${escapeHtml(it.name)}</td>
             <td style="text-align:center;">${qty}</td>
             <td style="text-align:right;">${price.toLocaleString()} دج</td>
             <td style="text-align:right;">${total.toLocaleString()} دج</td>
@@ -1779,7 +2068,6 @@
             <thead>
               <tr style="background:#f1f5f9;">
                 <th style="padding:8px; text-align:center;">#</th>
-                <th style="padding:8px; text-align:center;">الرقم التسلسلي</th>
                 <th style="padding:8px; text-align:right;">المنتج</th>
                 <th style="padding:8px; text-align:center;">الكمية</th>
                 <th style="padding:8px; text-align:right;">السعر</th>
@@ -1787,11 +2075,11 @@
               </tr>
             </thead>
             <tbody>
-              ${itemsHtml || '<tr><td colspan="6" style="text-align:center; padding:12px;">لا توجد منتجات</td></tr>'}
+              ${itemsHtml || '<tr><td colspan="5" style="text-align:center; padding:12px;">لا توجد منتجات</td></tr>'}
             </tbody>
             <tfoot>
   <tr style="font-weight:700; background:#f8fafc;">
-    <td colspan="6" style="text-align:right; padding:8px; color:#10b981;">
+    <td colspan="5" style="text-align:right; padding:8px; color:#10b981;">
       المبلغ الإجمالي : ${order.totalPrice.toLocaleString()} دج
     </td>
   </tr>
@@ -2006,7 +2294,6 @@
     }
   });
 
-  // حفظ إعدادات المالك (بدون الرقم السري)
   document.getElementById("saveOwnerBtn")?.addEventListener("click", async () => {
     const newName = document.getElementById("newOwnerName").value.trim();
     const newPass = document.getElementById("newOwnerPass").value.trim();
@@ -2134,6 +2421,7 @@
       document.getElementById("newFamilyInput").style.display = "none";
       document.getElementById("newFamilyInput").value = "";
       document.getElementById("wholesalePrice").value = "";
+      document.getElementById("quantityPerBox").value = "";
       const btn = document.getElementById("addFamilyBtn");
       btn.innerHTML = '<i class="fas fa-plus"></i> إضافة';
       btn.style.background = "#10b981";
