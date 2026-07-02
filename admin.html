@@ -2312,6 +2312,32 @@
     closeModal("ownerModal");
   });
 
+  // ====== زر تغيير الرقم السري للجملة ======
+  document.getElementById("btnWholesaleCode")?.addEventListener("click", () => {
+    if (isOwner()) {
+      openModal("wholesaleCodeModal");
+    } else {
+      showToast("غير مسموح");
+    }
+  });
+
+  // ====== زر حفظ الرقم السري للجملة ======
+  document.getElementById("saveWholesaleCodeBtn")?.addEventListener("click", async () => {
+    const code = document.getElementById("wholesaleCodeInput").value.trim();
+    if (!code) {
+      showToast("⚠️ الرجاء إدخال الرقم السري");
+      return;
+    }
+    try {
+      await set(ref(db, "store/wholesaleCode"), { code: code });
+      showToast("✅ تم تحديث الرقم السري للجملة");
+      closeModal("wholesaleCodeModal");
+    } catch (error) {
+      console.error(error);
+      showToast("❌ حدث خطأ أثناء الحفظ");
+    }
+  });
+
   document.getElementById("btnDeleteAllProducts")?.addEventListener("click", async () => {
     if(confirm("حذف جميع المنتجات نهائياً؟")) { 
       await remove(productsRef); 
